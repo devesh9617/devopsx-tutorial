@@ -7,15 +7,16 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { BookOpen, Clock, Award, PlayCircle, Lock, ArrowRight, CheckCircle2, Flame, BarChart3 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import { courses } from '../../data/courses';
 import EmptyState from '../../components/ui/EmptyState';
 import PageWrapper, { PageHeader, FilterPill } from '../../components/ui/PageWrapper';
 
 const mockProgress = { 1: 65, 2: 32, 5: 88 };
 
-function ProgressBar({ value }) {
+function ProgressBar({ value, isDark }) {
   return (
-    <div style={{ flex: 1, height: '6px', background: 'rgba(255,255,255,.08)', borderRadius: '999px', overflow: 'hidden' }}>
+    <div style={{ flex: 1, height: '6px', background: isDark ? 'rgba(255,255,255,.08)' : 'rgba(59,130,246,.12)', borderRadius: '999px', overflow: 'hidden' }}>
       <motion.div
         initial={{ width: 0 }}
         animate={{ width: `${value}%` }}
@@ -34,6 +35,7 @@ function ProgressBar({ value }) {
 
 export default function MyLearning() {
   const { user } = useAuth();
+  const { isDark } = useTheme();
   const navigate = useNavigate();
   const [tab, setTab] = useState('in-progress');
 
@@ -42,15 +44,15 @@ export default function MyLearning() {
       <PageWrapper>
         <div style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '20px', textAlign: 'center', padding: '40px 20px' }}>
           <div style={{ width: '64px', height: '64px', borderRadius: '20px', background: 'rgba(59,130,246,.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Lock size={32} color="#60a5fa" />
+            <Lock size={32} color="#3b82f6" />
           </div>
-          <h2 style={{ color: '#fff', fontFamily: 'var(--font-display)', fontSize: '1.6rem', fontWeight: 800 }}>Sign in to view your learning dashboard</h2>
+          <h2 style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-display)', fontSize: '1.6rem', fontWeight: 800 }}>Sign in to view your learning dashboard</h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', maxWidth: '360px' }}>
             Access all your enrolled courses, track progress, and resume video lessons right where you left off.
           </p>
           <div style={{ display: 'flex', gap: '12px' }}>
             <button onClick={() => navigate('/login')} style={{ padding: '12px 28px', borderRadius: '12px', background: 'linear-gradient(135deg,#3b82f6,#06b6d4)', color: '#fff', fontWeight: 700, border: 'none', cursor: 'pointer', fontSize: '0.875rem' }}>Sign In</button>
-            <button onClick={() => navigate('/register')} style={{ padding: '12px 28px', borderRadius: '12px', background: 'rgba(255,255,255,.07)', color: 'var(--text-secondary)', border: '1px solid var(--border-muted)', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 600 }}>Create Account</button>
+            <button onClick={() => navigate('/register')} style={{ padding: '12px 28px', borderRadius: '12px', background: 'var(--bg-glass)', color: 'var(--text-secondary)', border: '1px solid var(--border-muted)', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 600 }}>Create Account</button>
           </div>
         </div>
       </PageWrapper>
@@ -81,12 +83,12 @@ export default function MyLearning() {
           { icon: Award,    label: 'Completed',        value: completed.length,  color: '#10b981' },
           { icon: Flame,    label: 'Streak',           value: '7 Days',          color: '#f59e0b' },
         ].map(({ icon: Icon, label, value, color }) => (
-          <div key={label} style={{ background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '16px', padding: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div key={label} style={{ background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '16px', padding: '16px', display: 'flex', alignItems: 'center', gap: '12px', boxShadow: isDark ? 'none' : '0 2px 8px rgba(15,23,42,.04)' }}>
             <div style={{ width: '38px', height: '38px', borderRadius: '12px', background: `${color}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <Icon size={18} style={{ color }} />
             </div>
             <div>
-              <p style={{ color: '#fff', fontSize: '1.25rem', fontWeight: 800, fontFamily: 'var(--font-display)', margin: 0, lineHeight: 1 }}>{value}</p>
+              <p style={{ color: 'var(--text-primary)', fontSize: '1.25rem', fontWeight: 800, fontFamily: 'var(--font-display)', margin: 0, lineHeight: 1 }}>{value}</p>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.72rem', margin: '3px 0 0' }}>{label}</p>
             </div>
           </div>
@@ -154,7 +156,7 @@ export default function MyLearning() {
                   </div>
 
                   <Link to={`/courses/${course.slug}`} style={{ textDecoration: 'none' }}>
-                    <h3 style={{ color: '#fff', fontSize: '0.95rem', fontWeight: 700, margin: '0 0 4px', lineHeight: 1.35 }}>
+                    <h3 style={{ color: 'var(--text-primary)', fontSize: '0.95rem', fontWeight: 700, margin: '0 0 4px', lineHeight: 1.35 }}>
                       {course.title}
                     </h3>
                   </Link>
@@ -165,8 +167,8 @@ export default function MyLearning() {
 
                   {/* Progress Bar Row */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                    <ProgressBar value={progress} />
-                    <span style={{ color: progress >= 70 ? '#34d399' : '#60a5fa', fontSize: '0.75rem', fontWeight: 800, flexShrink: 0, minWidth: '34px', textAlign: 'right' }}>
+                    <ProgressBar value={progress} isDark={isDark} />
+                    <span style={{ color: progress >= 70 ? (isDark ? '#34d399' : '#059669') : (isDark ? '#60a5fa' : '#1d4ed8'), fontSize: '0.75rem', fontWeight: 800, flexShrink: 0, minWidth: '34px', textAlign: 'right' }}>
                       {progress}%
                     </span>
                   </div>

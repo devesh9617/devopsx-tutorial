@@ -2,11 +2,13 @@
 // Dashboard Page — DevOpsX Student Dashboard (Theme-Aware)
 // ============================================================
 
+import { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
   BookOpen, Clock, Award, TrendingUp, Calendar, Star,
-  BarChart3, Target, Flame, ArrowRight, Trophy, Lightbulb, Rocket, BookMarked
+  BarChart3, Target, Flame, ArrowRight, Trophy, Lightbulb, Rocket, BookMarked,
+  ChevronLeft, ChevronRight
 } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -38,45 +40,30 @@ function StatCard({ icon: Icon, label, value, color, trend, delay = 0, isDark })
           : `0 4px 20px ${color}18, 0 1px 4px rgba(0,0,0,.06)`,
         flex: '1 1 0',
         position: 'relative',
-        overflow: 'hidden',
+        display: 'flex', flexDirection: 'column', gap: '8px',
       }}
     >
-      {/* Subtle top accent bar */}
-      {!isDark && (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{
-          position: 'absolute', top: 0, left: 0, right: 0, height: '3px',
-          background: `linear-gradient(90deg, ${color}, ${color}88)`,
-          borderRadius: '18px 18px 0 0',
-        }} />
-      )}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '14px' }}>
-        <div style={{
-          width: '42px', height: '42px', borderRadius: '13px',
-          background: isDark ? `${color}20` : `${color}15`,
-          border: `1.5px solid ${color}30`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+          width: '38px', height: '38px', borderRadius: '12px',
+          background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
-          <Icon size={18} style={{ color }} />
+          <Icon size={18} color={color} />
         </div>
         {trend && (
-          <span style={{
-            fontSize: '0.7rem', color: '#10b981', fontWeight: 700,
-            background: isDark ? 'rgba(16,185,129,.12)' : 'rgba(16,185,129,.1)',
-            padding: '3px 9px', borderRadius: '999px',
-            border: '1px solid rgba(16,185,129,.2)',
-          }}>
+          <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#10b981', background: 'rgba(16,185,129,.12)', padding: '2px 8px', borderRadius: '999px' }}>
             +{trend}%
           </span>
         )}
       </div>
-      <p style={{
-        color: isDark ? '#fff' : '#0f172a',
-        fontSize: '1.65rem', fontWeight: 800,
-        fontFamily: 'var(--font-display)', margin: '0 0 4px', lineHeight: 1,
-      }}>
-        {value}
-      </p>
-      <p style={{ color: 'var(--text-muted)', fontSize: '0.78rem', margin: 0 }}>{label}</p>
+      <div>
+        <p style={{ color: isDark ? '#ffffff' : '#0f172a', fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 800, margin: '0 0 2px', lineHeight: 1 }}>
+          {value}
+        </p>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', margin: 0, fontWeight: 500 }}>
+          {label}
+        </p>
+      </div>
     </motion.div>
   );
 }
@@ -101,15 +88,17 @@ function Bar({ value, isDark, color = 'linear-gradient(90deg,#3b82f6,#06b6d4)' }
 export default function Dashboard() {
   const { user } = useAuth();
   const { isDark } = useTheme();
+  const scrollRef = useRef(null);
 
-  const enrolledCourses = courses.filter((c) => user?.enrolledCourses?.includes(c.id));
-  const displayCourses = enrolledCourses.length ? enrolledCourses : courses.slice(0, 8);
+  const displayCourses = courses; // Show all 18 courses in horizontal slider
   const pendingAssignments = assignments.filter((a) => a.status === 'pending').slice(0, 3);
   const progressMap = {
-    [courses[0]?.id]: 65, [courses[1]?.id]: 32, [courses[2]?.id]: 88,
-    [courses[3]?.id]: 45, [courses[4]?.id]: 72, [courses[5]?.id]: 20,
-    [courses[6]?.id]: 55, [courses[7]?.id]: 90,
+    1: 65, 2: 32, 3: 88, 4: 45, 5: 72, 6: 20, 7: 55, 8: 90,
+    9: 40, 10: 82, 11: 60, 12: 75, 13: 50, 14: 85, 15: 30, 16: 95, 17: 68, 18: 42
   };
+
+  const scrollLeft = () => scrollRef.current?.scrollBy({ left: -320, behavior: 'smooth' });
+  const scrollRight = () => scrollRef.current?.scrollBy({ left: 320, behavior: 'smooth' });
 
   const diffColor = (d) => d === 'Hard' ? '#ef4444' : d === 'Medium' ? '#f59e0b' : '#10b981';
 
@@ -127,7 +116,6 @@ export default function Dashboard() {
   const tooltipBorder = isDark ? '1px solid rgba(255,255,255,.1)' : '1px solid rgba(59,130,246,.2)';
   const tooltipColor  = isDark ? '#fff' : '#0f172a';
   const radialBg  = isDark ? 'rgba(255,255,255,.06)' : 'rgba(59,130,246,.08)';
-  const viewAllHover = isDark ? 'rgba(255,255,255,.04)' : 'rgba(59,130,246,.06)';
 
   return (
     <div style={{
@@ -214,31 +202,78 @@ export default function Dashboard() {
               <h2 style={{ color: headingColor, fontWeight: 700, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
                 <TrendingUp size={16} color="#3b82f6" /> Continue Learning
               </h2>
-              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{displayCourses.length} courses</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600 }}>{displayCourses.length} Courses</span>
+                {/* Scroll Arrow Buttons */}
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  <button
+                    onClick={scrollLeft}
+                    title="Slide Left"
+                    style={{
+                      width: '28px', height: '28px', borderRadius: '8px',
+                      background: isDark ? 'rgba(255,255,255,.07)' : 'rgba(59,130,246,.1)',
+                      border: '1px solid var(--border-subtle)',
+                      color: 'var(--text-primary)', cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      transition: 'all 0.15s',
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--brand-blue-hover)'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = isDark ? 'rgba(255,255,255,.07)' : 'rgba(59,130,246,.1)'}
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+                  <button
+                    onClick={scrollRight}
+                    title="Slide Right"
+                    style={{
+                      width: '28px', height: '28px', borderRadius: '8px',
+                      background: isDark ? 'rgba(255,255,255,.07)' : 'rgba(59,130,246,.1)',
+                      border: '1px solid var(--border-subtle)',
+                      color: 'var(--text-primary)', cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      transition: 'all 0.15s',
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--brand-blue-hover)'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = isDark ? 'rgba(255,255,255,.07)' : 'rgba(59,130,246,.1)'}
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Horizontal scroll */}
-            <div style={{ display: 'flex', gap: '12px', overflowX: 'auto', paddingBottom: '8px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <div
+              ref={scrollRef}
+              style={{
+                display: 'flex', gap: '14px', overflowX: 'auto', paddingBottom: '10px',
+                scrollSnapType: 'x mandatory', scrollbarWidth: 'none', msOverflowStyle: 'none',
+                scrollBehavior: 'smooth',
+              }}
+            >
               {displayCourses.map((course, i) => {
-                const prog = progressMap[course.id] ?? [65, 32, 88, 45, 72, 20, 55, 90][i] ?? 50;
+                const prog = progressMap[course.id] ?? 50;
                 const progColor = prog >= 70
                   ? 'linear-gradient(90deg,#10b981,#059669)'
                   : 'linear-gradient(90deg,#3b82f6,#06b6d4)';
-                const progText  = prog >= 70 ? '#10b981' : '#3b82f6';
+                const progText  = prog >= 70 ? (isDark ? '#34d399' : '#059669') : (isDark ? '#60a5fa' : '#2563eb');
                 return (
                   <Link
                     to={`/courses/${course.slug}`}
                     key={course.id}
                     style={{
                       display: 'flex', flexDirection: 'column', gap: '10px',
-                      minWidth: '190px', maxWidth: '210px', flexShrink: 0,
+                      minWidth: '200px', maxWidth: '220px', flexShrink: 0,
+                      scrollSnapAlign: 'start',
                       padding: '12px', borderRadius: '14px', textDecoration: 'none',
                       background: itemBg, border: itemBorder,
-                      transition: 'all 0.18s ease',
+                      boxShadow: isDark ? 'none' : '0 2px 8px rgba(15,23,42,.04)',
+                      transition: 'all 0.2s ease',
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.background = isDark ? 'rgba(255,255,255,.07)' : 'rgba(59,130,246,.08)';
                       e.currentTarget.style.transform = 'translateY(-4px)';
+                      e.currentTarget.style.borderColor = 'var(--brand-blue)';
                       e.currentTarget.style.boxShadow = isDark
                         ? '0 12px 30px rgba(0,0,0,.35)'
                         : '0 8px 24px rgba(59,130,246,.18)';
@@ -246,24 +281,28 @@ export default function Dashboard() {
                     onMouseLeave={(e) => {
                       e.currentTarget.style.background = itemBg;
                       e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = 'none';
+                      e.currentTarget.style.borderColor = isDark ? 'rgba(255,255,255,.05)' : 'rgba(59,130,246,.1)';
+                      e.currentTarget.style.boxShadow = isDark ? 'none' : '0 2px 8px rgba(15,23,42,.04)';
                     }}
                   >
-                    <div style={{ width: '100%', height: '108px', borderRadius: '10px', overflow: 'hidden', flexShrink: 0 }}>
+                    <div style={{ width: '100%', height: '110px', borderRadius: '10px', overflow: 'hidden', flexShrink: 0 }}>
                       <img src={course.thumbnail} alt={course.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{
                         color: isDark ? '#f1f5f9' : '#0f172a',
-                        fontSize: '0.78rem', fontWeight: 600, margin: '0 0 4px',
+                        fontSize: '0.8rem', fontWeight: 700, margin: '0 0 4px',
                         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                       }}>
                         {course.title}
                       </p>
-                      <p style={{ color: 'var(--text-muted)', fontSize: '0.67rem', margin: '0 0 8px' }}>{course.duration}</p>
+                      <p style={{ color: 'var(--text-muted)', fontSize: '0.7rem', margin: '0 0 8px' }}>
+                        {course.category} • {course.lessons} lessons
+                      </p>
+
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Bar isDark={isDark} value={prog} color={progColor} />
-                        <span style={{ color: progText, fontSize: '0.7rem', fontWeight: 700, flexShrink: 0 }}>
+                        <Bar value={prog} isDark={isDark} color={progColor} />
+                        <span style={{ fontSize: '0.68rem', fontWeight: 800, color: progText, flexShrink: 0 }}>
                           {prog}%
                         </span>
                       </div>

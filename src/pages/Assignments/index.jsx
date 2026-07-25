@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ClipboardList, Clock, CheckCircle, AlertCircle, Circle, ChevronRight } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
 import { assignments } from '../../data/assignments';
 import PageWrapper, { PageHeader, FilterPill } from '../../components/ui/PageWrapper';
 
@@ -12,6 +13,7 @@ const statusConfig = {
 const diffColor = { Easy: '#10b981', Medium: '#f59e0b', Hard: '#ef4444' };
 
 export default function Assignments() {
+  const { isDark } = useTheme();
   const [filter, setFilter] = useState('all');
   const filtered = filter === 'all' ? assignments : assignments.filter((a) => a.status === filter);
 
@@ -26,7 +28,7 @@ export default function Assignments() {
     <PageWrapper>
       <PageHeader
         icon={ClipboardList}
-        iconColor="#60a5fa"
+        iconColor="#3b82f6"
         title="Assignments"
         subtitle={`${assignments.length} assignments total — track your progress`}
       />
@@ -46,11 +48,11 @@ export default function Assignments() {
       {/* Summary stats bar */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '20px' }}>
         {[
-          { label: 'Pending',     value: counts.pending,      color: '#9ca3af', emoji: '⏳' },
-          { label: 'In Progress', value: counts['in-progress'],color: '#f59e0b', emoji: '🔄' },
-          { label: 'Completed',   value: counts.completed,    color: '#10b981', emoji: '✅' },
+          { label: 'Pending',     value: counts.pending,      color: '#6b7280', emoji: '⏳' },
+          { label: 'In Progress', value: counts['in-progress'],color: '#d97706', emoji: '🔄' },
+          { label: 'Completed',   value: counts.completed,    color: '#059669', emoji: '✅' },
         ].map(({ label, value, color, emoji }) => (
-          <div key={label} style={{ background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '14px', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div key={label} style={{ background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '14px', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '12px', boxShadow: isDark ? 'none' : '0 2px 8px rgba(15,23,42,.04)' }}>
             <span style={{ fontSize: '22px' }}>{emoji}</span>
             <div>
               <p style={{ color, fontWeight: 800, fontSize: '1.25rem', margin: 0, lineHeight: 1 }}>{value}</p>
@@ -70,8 +72,8 @@ export default function Assignments() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.04 }}
-              style={{ background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '16px', padding: '18px', display: 'flex', alignItems: 'flex-start', gap: '14px', transition: 'all 0.2s', cursor: 'default' }}
-              onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(59,130,246,.25)'; e.currentTarget.style.background = 'rgba(15,25,41,.9)'; }}
+              style={{ background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '16px', padding: '18px', display: 'flex', alignItems: 'flex-start', gap: '14px', transition: 'all 0.2s', cursor: 'default', boxShadow: isDark ? 'none' : '0 2px 8px rgba(15,23,42,.04)' }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--brand-blue)'; e.currentTarget.style.background = isDark ? 'rgba(15,25,41,.9)' : 'rgba(59,130,246,.04)'; }}
               onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-subtle)'; e.currentTarget.style.background = 'var(--bg-card)'; }}
             >
               {/* Status icon */}
@@ -82,12 +84,12 @@ export default function Assignments() {
               {/* Content */}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
-                  <h3 style={{ color: '#fff', fontWeight: 700, fontSize: '0.9rem', margin: '0 0 4px' }}>{a.title}</h3>
+                  <h3 style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: '0.9rem', margin: '0 0 4px' }}>{a.title}</h3>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
                     <span style={{ fontSize: '0.72rem', fontWeight: 700, padding: '3px 10px', borderRadius: '999px', background: `${diffColor[a.difficulty]}20`, color: diffColor[a.difficulty] }}>
                       {a.difficulty}
                     </span>
-                    <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#60a5fa' }}>{a.points} pts</span>
+                    <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--text-accent)' }}>{a.points} pts</span>
                   </div>
                 </div>
 
@@ -109,7 +111,7 @@ export default function Assignments() {
                 {/* Tags */}
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px', marginTop: '10px' }}>
                   {a.tags.map((tag) => (
-                    <span key={tag} style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: '999px', background: 'rgba(59,130,246,.1)', color: '#60a5fa', border: '1px solid rgba(59,130,246,.2)' }}>
+                    <span key={tag} style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: '999px', background: isDark ? 'rgba(59,130,246,.1)' : 'rgba(59,130,246,.08)', color: 'var(--text-accent)', border: '1px solid rgba(59,130,246,.2)' }}>
                       {tag}
                     </span>
                   ))}

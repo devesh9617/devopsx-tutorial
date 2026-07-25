@@ -119,14 +119,14 @@ export default function Footer() {
             { title: 'Company',   links: footerLinks.company },
           ].map(({ title, links }) => (
             <div key={title} style={{ minWidth: 0 }}>
-              <h4 style={{ color: '#fff', fontSize: '0.85rem', fontWeight: 700, margin: '0 0 14px', letterSpacing: '0.02em' }}>{title}</h4>
+              <h4 style={{ color: 'var(--text-primary)', fontSize: '0.85rem', fontWeight: 800, margin: '0 0 14px', letterSpacing: '0.02em' }}>{title}</h4>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '9px' }}>
                 {links.map(({ label, to }) => (
                   <li key={label}>
                     <Link
                       to={to}
                       style={{ color: 'var(--text-muted)', fontSize: '0.8rem', textDecoration: 'none', transition: 'color 0.15s' }}
-                      onMouseEnter={(e) => e.currentTarget.style.color = '#60a5fa'}
+                      onMouseEnter={(e) => e.currentTarget.style.color = '#3b82f6'}
                       onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-muted)'}
                     >
                       {label}
@@ -141,7 +141,7 @@ export default function Footer() {
         {/* Newsletter Banner */}
         <div style={{
           background: 'rgba(59,130,246,.06)',
-          border: '1px solid rgba(59,130,246,.15)',
+          border: '1px solid rgba(59,130,246,.2)',
           borderRadius: '16px',
           padding: '20px 24px',
           display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between',
@@ -149,7 +149,7 @@ export default function Footer() {
           marginBottom: '28px',
         }}>
           <div>
-            <h4 style={{ color: '#fff', fontSize: '0.925rem', fontWeight: 700, margin: '0 0 3px' }}>Stay updated with DevOpsX</h4>
+            <h4 style={{ color: 'var(--text-primary)', fontSize: '0.925rem', fontWeight: 800, margin: '0 0 3px' }}>Stay updated with DevOpsX</h4>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.78rem', margin: 0 }}>
               Get new courses, free resources, and career tips weekly.
             </p>
@@ -162,11 +162,11 @@ export default function Footer() {
               style={{
                 flex: 1, minWidth: '180px',
                 padding: '9px 14px', borderRadius: '10px',
-                background: 'rgba(255,255,255,.06)',
+                background: 'var(--bg-input)',
                 border: '1px solid var(--border-muted)',
-                color: '#fff', fontSize: '0.8rem', outline: 'none',
+                color: 'var(--text-primary)', fontSize: '0.8rem', outline: 'none',
               }}
-              onFocus={(e) => e.target.style.borderColor = 'rgba(59,130,246,.5)'}
+              onFocus={(e) => e.target.style.borderColor = 'var(--brand-blue)'}
               onBlur={(e)  => e.target.style.borderColor = 'var(--border-muted)'}
             />
             <button

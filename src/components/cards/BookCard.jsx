@@ -1,11 +1,10 @@
-// ============================================================
-// BookCard Component — DevOpsX Digital Library (Ultra-Professional Redesign)
-// ============================================================
-
 import { motion } from 'framer-motion';
 import { Download, BookOpen, Star, Eye } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function BookCard({ book, index = 0 }) {
+  const { isDark } = useTheme();
+
   return (
     <motion.article
       initial={{ opacity: 0, y: 16 }}
@@ -13,23 +12,25 @@ export default function BookCard({ book, index = 0 }) {
       transition={{ delay: Math.min(index * 0.04, 0.3), duration: 0.3 }}
       style={{
         background: 'var(--bg-card)',
-        border: '1px solid var(--border-subtle)',
+        border: isDark ? '1px solid var(--border-subtle)' : '1px solid rgba(59,130,246,.25)',
         borderRadius: '16px',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
         position: 'relative',
-        boxShadow: '0 4px 20px rgba(0,0,0,.3)',
+        boxShadow: isDark ? '0 4px 20px rgba(0,0,0,.3)' : '0 2px 10px rgba(15,23,42,.06), 0 1px 3px rgba(15,23,42,.04)',
         transition: 'all 0.25s ease',
       }}
       whileHover={{
         transform: 'translateY(-4px)',
-        borderColor: 'rgba(59,130,246,.4)',
-        boxShadow: '0 12px 32px rgba(0,0,0,.5), 0 0 20px rgba(59,130,246,.15)',
+        borderColor: isDark ? 'rgba(59,130,246,.4)' : 'rgba(59,130,246,.55)',
+        boxShadow: isDark
+          ? '0 12px 32px rgba(0,0,0,.5), 0 0 20px rgba(59,130,246,.15)'
+          : '0 8px 24px rgba(59,130,246,.16), 0 2px 6px rgba(0,0,0,.04)',
       }}
     >
       {/* Cover Image (3:4 Book Aspect Ratio) */}
-      <div style={{ position: 'relative', width: '100%', aspectRatio: '3/4', overflow: 'hidden', background: '#0a1020' }}>
+      <div style={{ position: 'relative', width: '100%', aspectRatio: '3/4', overflow: 'hidden', background: isDark ? '#0a1020' : '#e0e7ff' }}>
         <img
           src={book.cover}
           alt={book.title}
@@ -60,7 +61,7 @@ export default function BookCard({ book, index = 0 }) {
       {/* Content Body */}
       <div style={{ padding: '14px', display: 'flex', flexDirection: 'column', flex: 1 }}>
         {/* Title */}
-        <h3 style={{ color: '#fff', fontSize: '0.875rem', fontWeight: 700, lineHeight: 1.35, margin: '0 0 4px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+        <h3 style={{ color: 'var(--text-primary)', fontSize: '0.875rem', fontWeight: 700, lineHeight: 1.35, margin: '0 0 4px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
           {book.title}
         </h3>
 
@@ -72,8 +73,8 @@ export default function BookCard({ book, index = 0 }) {
         {/* Meta Row: Rating, Pages, Year */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '12px', marginTop: 'auto' }}>
           <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-            <Star size={11} color="#fbbf24" fill="#fbbf24" />
-            <strong style={{ color: '#fbbf24' }}>{book.rating}</strong>
+            <Star size={11} color={isDark ? '#fbbf24' : '#d97706'} fill={isDark ? '#fbbf24' : '#d97706'} />
+            <strong style={{ color: isDark ? '#fbbf24' : '#d97706' }}>{book.rating}</strong>
           </span>
           <span>{book.pages} pages</span>
           <span>{book.year}</span>
@@ -102,12 +103,12 @@ export default function BookCard({ book, index = 0 }) {
             title="Download PDF"
             style={{
               padding: '7px 10px', borderRadius: '10px',
-              background: 'rgba(255,255,255,.05)', border: '1px solid var(--border-subtle)',
+              background: 'var(--bg-glass)', border: '1px solid var(--border-subtle)',
               color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
               transition: 'all 0.15s',
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(59,130,246,.15)'; e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'rgba(59,130,246,.3)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,.05)'; e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.borderColor = 'var(--border-subtle)'; }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-glass-hover)'; e.currentTarget.style.color = 'var(--text-primary)'; e.currentTarget.style.borderColor = 'var(--border-brand)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--bg-glass)'; e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.borderColor = 'var(--border-subtle)'; }}
           >
             <Download size={13} />
           </button>

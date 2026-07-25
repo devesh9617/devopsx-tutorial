@@ -5,6 +5,7 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Zap, BookOpen, Users, Code2, Award, Sparkles, Terminal } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTheme } from '../../context/ThemeContext';
 
 const stats = [
   { icon: BookOpen, value: '500+', label: 'Courses' },
@@ -25,6 +26,8 @@ const itemVar = {
 };
 
 export default function Hero() {
+  const { isDark } = useTheme();
+
   return (
     <section
       style={{
@@ -36,15 +39,18 @@ export default function Hero() {
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
-        background: 'radial-gradient(ellipse 90% 55% at 50% -10%, rgba(59,130,246,.16) 0%, transparent 70%), var(--bg-primary)',
+        background: isDark
+          ? 'radial-gradient(ellipse 90% 55% at 50% -10%, rgba(59,130,246,.16) 0%, transparent 70%), var(--bg-primary)'
+          : 'radial-gradient(ellipse 90% 55% at 50% -10%, rgba(59,130,246,.12) 0%, transparent 70%), var(--bg-primary)',
         padding: '60px 24px 80px',
+        transition: 'background 0.25s ease',
       }}
     >
       {/* Background Grid & Blobs */}
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', inset: 0, opacity: 0.4, backgroundImage: 'linear-gradient(rgba(59,130,246,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,.04) 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
+        <div style={{ position: 'absolute', inset: 0, opacity: isDark ? 0.4 : 0.6, backgroundImage: isDark ? 'linear-gradient(rgba(59,130,246,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,.04) 1px, transparent 1px)' : 'linear-gradient(rgba(59,130,246,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,.07) 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
 
-        {/* Floating Code Badges (Positioned cleanly on far edges) */}
+        {/* Floating Code Badges */}
         <motion.div
           animate={{ y: [0, -10, 0] }}
           transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
@@ -53,13 +59,15 @@ export default function Hero() {
             position: 'absolute', top: '22%', left: '3%',
             alignItems: 'center', gap: '8px',
             padding: '8px 14px', borderRadius: '12px',
-            background: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(12px)',
-            border: '1px solid rgba(34,197,94,.25)', color: '#4ade80',
-            fontFamily: 'var(--font-mono)', fontSize: '0.75rem',
-            boxShadow: '0 8px 24px rgba(0,0,0,.4)',
+            background: isDark ? 'rgba(15,23,42,0.88)' : 'rgba(255,255,255,0.92)',
+            backdropFilter: 'blur(12px)',
+            border: isDark ? '1px solid rgba(34,197,94,.3)' : '1px solid rgba(34,197,94,.4)',
+            color: isDark ? '#4ade80' : '#15803d',
+            fontFamily: 'var(--font-mono)', fontSize: '0.75rem', fontWeight: 600,
+            boxShadow: isDark ? '0 8px 24px rgba(0,0,0,.4)' : '0 6px 20px rgba(34,197,94,.12)',
           }}
         >
-          <Terminal size={14} color="#4ade80" /> $ docker build -t app:v1 .
+          <Terminal size={14} color={isDark ? '#4ade80' : '#15803d'} /> $ docker build -t app:v1 .
         </motion.div>
 
         <motion.div
@@ -70,13 +78,15 @@ export default function Hero() {
             position: 'absolute', top: '55%', left: '4%',
             alignItems: 'center', gap: '8px',
             padding: '8px 14px', borderRadius: '12px',
-            background: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(12px)',
-            border: '1px solid rgba(59,130,246,.25)', color: '#60a5fa',
-            fontFamily: 'var(--font-mono)', fontSize: '0.75rem',
-            boxShadow: '0 8px 24px rgba(0,0,0,.4)',
+            background: isDark ? 'rgba(15,23,42,0.88)' : 'rgba(255,255,255,0.92)',
+            backdropFilter: 'blur(12px)',
+            border: isDark ? '1px solid rgba(59,130,246,.3)' : '1px solid rgba(59,130,246,.4)',
+            color: isDark ? '#60a5fa' : '#1d4ed8',
+            fontFamily: 'var(--font-mono)', fontSize: '0.75rem', fontWeight: 600,
+            boxShadow: isDark ? '0 8px 24px rgba(0,0,0,.4)' : '0 6px 20px rgba(59,130,246,.12)',
           }}
         >
-          <Terminal size={14} color="#60a5fa" /> $ kubectl apply -f deploy.yaml
+          <Terminal size={14} color={isDark ? '#60a5fa' : '#1d4ed8'} /> $ kubectl apply -f deploy.yaml
         </motion.div>
 
         <motion.div
@@ -87,13 +97,15 @@ export default function Hero() {
             position: 'absolute', top: '25%', right: '3%',
             alignItems: 'center', gap: '8px',
             padding: '8px 14px', borderRadius: '12px',
-            background: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(12px)',
-            border: '1px solid rgba(168,85,247,.25)', color: '#c084fc',
-            fontFamily: 'var(--font-mono)', fontSize: '0.75rem',
-            boxShadow: '0 8px 24px rgba(0,0,0,.4)',
+            background: isDark ? 'rgba(15,23,42,0.88)' : 'rgba(255,255,255,0.92)',
+            backdropFilter: 'blur(12px)',
+            border: isDark ? '1px solid rgba(168,85,247,.3)' : '1px solid rgba(168,85,247,.4)',
+            color: isDark ? '#c084fc' : '#7e22ce',
+            fontFamily: 'var(--font-mono)', fontSize: '0.75rem', fontWeight: 600,
+            boxShadow: isDark ? '0 8px 24px rgba(0,0,0,.4)' : '0 6px 20px rgba(168,85,247,.12)',
           }}
         >
-          <Terminal size={14} color="#c084fc" /> $ terraform plan -out=tfplan
+          <Terminal size={14} color={isDark ? '#c084fc' : '#7e22ce'} /> $ terraform plan -out=tfplan
         </motion.div>
 
         <motion.div
@@ -104,13 +116,15 @@ export default function Hero() {
             position: 'absolute', top: '60%', right: '4%',
             alignItems: 'center', gap: '8px',
             padding: '8px 14px', borderRadius: '12px',
-            background: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(12px)',
-            border: '1px solid rgba(245,158,11,.25)', color: '#fbbf24',
-            fontFamily: 'var(--font-mono)', fontSize: '0.75rem',
-            boxShadow: '0 8px 24px rgba(0,0,0,.4)',
+            background: isDark ? 'rgba(15,23,42,0.88)' : 'rgba(255,255,255,0.92)',
+            backdropFilter: 'blur(12px)',
+            border: isDark ? '1px solid rgba(245,158,11,.3)' : '1px solid rgba(245,158,11,.4)',
+            color: isDark ? '#fbbf24' : '#b45309',
+            fontFamily: 'var(--font-mono)', fontSize: '0.75rem', fontWeight: 600,
+            boxShadow: isDark ? '0 8px 24px rgba(0,0,0,.4)' : '0 6px 20px rgba(245,158,11,.12)',
           }}
         >
-          <Terminal size={14} color="#fbbf24" /> $ git push origin main
+          <Terminal size={14} color={isDark ? '#fbbf24' : '#b45309'} /> $ git push origin main
         </motion.div>
       </div>
 
@@ -125,12 +139,13 @@ export default function Hero() {
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: '8px',
                 padding: '6px 16px', borderRadius: '999px',
-                background: 'rgba(59,130,246,.12)', border: '1px solid rgba(59,130,246,.28)',
-                color: '#93c5fd', fontSize: '0.8rem', fontWeight: 600,
+                background: isDark ? 'rgba(59,130,246,.12)' : 'rgba(59,130,246,.1)',
+                border: isDark ? '1px solid rgba(59,130,246,.28)' : '1px solid rgba(59,130,246,.35)',
+                color: isDark ? '#93c5fd' : '#1d4ed8', fontSize: '0.8rem', fontWeight: 700,
                 textDecoration: 'none', transition: 'all 0.15s',
               }}
             >
-              <Sparkles size={13} color="#fbbf24" />
+              <Sparkles size={13} color={isDark ? '#fbbf24' : '#d97706'} />
               <span>AI & ML Learning Path is live!</span>
               <ArrowRight size={13} />
             </Link>
@@ -145,12 +160,18 @@ export default function Hero() {
               fontWeight: 800,
               lineHeight: 1.15,
               letterSpacing: '-0.03em',
-              color: '#fff',
+              color: 'var(--text-primary)',
               margin: '0 0 20px',
             }}
           >
             Master{' '}
-            <span style={{ background: 'linear-gradient(135deg,#60a5fa 0%,#22d3ee 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            <span style={{
+              background: isDark
+                ? 'linear-gradient(135deg,#60a5fa 0%,#22d3ee 100%)'
+                : 'linear-gradient(135deg,#1d4ed8 0%,#0284c7 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}>
               DevOps, Cloud
             </span>
             <br />
@@ -161,11 +182,12 @@ export default function Hero() {
           <motion.p
             variants={itemVar}
             style={{
-              color: 'var(--text-muted)',
+              color: 'var(--text-secondary)',
               fontSize: 'clamp(0.95rem, 2vw, 1.15rem)',
               lineHeight: 1.65,
               maxWidth: '640px',
               margin: '0 auto 28px',
+              fontWeight: 500,
             }}
           >
             Learn from industry experts with 500+ courses, hands-on projects, and
@@ -180,13 +202,23 @@ export default function Hero() {
                 key={tag}
                 to={`/courses?search=${encodeURIComponent(tag)}`}
                 style={{
-                  fontSize: '0.72rem', padding: '4px 12px', borderRadius: '999px',
-                  background: 'rgba(255,255,255,.05)', border: '1px solid var(--border-subtle)',
-                  color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500,
+                  fontSize: '0.72rem', padding: '5px 14px', borderRadius: '999px',
+                  background: isDark ? 'rgba(255,255,255,.05)' : '#ffffff',
+                  border: isDark ? '1px solid var(--border-subtle)' : '1px solid rgba(59,130,246,.25)',
+                  color: 'var(--text-primary)', textDecoration: 'none', fontWeight: 600,
+                  boxShadow: isDark ? 'none' : '0 2px 6px rgba(15,23,42,.04)',
                   transition: 'all 0.15s',
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(59,130,246,.2)'; e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'rgba(59,130,246,.4)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,.05)'; e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.borderColor = 'var(--border-subtle)'; }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = isDark ? 'rgba(59,130,246,.2)' : 'rgba(59,130,246,.12)';
+                  e.currentTarget.style.color = 'var(--brand-blue)';
+                  e.currentTarget.style.borderColor = 'var(--brand-blue)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = isDark ? 'rgba(255,255,255,.05)' : '#ffffff';
+                  e.currentTarget.style.color = 'var(--text-primary)';
+                  e.currentTarget.style.borderColor = isDark ? 'var(--border-subtle)' : 'rgba(59,130,246,.25)';
+                }}
               >
                 {tag}
               </Link>
@@ -201,7 +233,7 @@ export default function Hero() {
                 display: 'inline-flex', alignItems: 'center', gap: '8px',
                 padding: '12px 28px', borderRadius: '14px',
                 background: 'linear-gradient(135deg,#3b82f6,#06b6d4)',
-                color: '#fff', fontSize: '0.925rem', fontWeight: 700,
+                color: '#fff', fontSize: '0.925rem', fontWeight: 800,
                 textDecoration: 'none', boxShadow: '0 8px 24px rgba(59,130,246,.35)',
                 transition: 'all 0.15s',
               }}
@@ -213,12 +245,22 @@ export default function Hero() {
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: '8px',
                 padding: '12px 28px', borderRadius: '14px',
-                background: 'rgba(255,255,255,.06)', border: '1px solid var(--border-muted)',
-                color: '#fff', fontSize: '0.925rem', fontWeight: 600,
+                background: 'var(--bg-card)',
+                border: isDark ? '1px solid var(--border-muted)' : '1px solid rgba(59,130,246,.3)',
+                color: 'var(--text-primary)', fontSize: '0.925rem', fontWeight: 700,
                 textDecoration: 'none', transition: 'all 0.15s',
+                boxShadow: isDark ? 'none' : '0 4px 14px rgba(15,23,42,.05)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'var(--brand-blue)';
+                e.currentTarget.style.background = isDark ? 'rgba(59,130,246,.1)' : 'rgba(59,130,246,.06)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = isDark ? 'var(--border-muted)' : 'rgba(59,130,246,.3)';
+                e.currentTarget.style.background = 'var(--bg-card)';
               }}
             >
-              <Zap size={16} color="#fbbf24" /> Free Courses
+              <Zap size={16} color={isDark ? '#fbbf24' : '#d97706'} /> Free Courses
             </Link>
           </motion.div>
 
@@ -236,17 +278,19 @@ export default function Hero() {
                 style={{
                   display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
                   padding: '16px 12px', borderRadius: '16px',
-                  background: 'rgba(15,25,41,.7)', border: '1px solid var(--border-subtle)',
+                  background: 'var(--bg-card)',
+                  border: isDark ? '1px solid var(--border-subtle)' : '1px solid rgba(59,130,246,.25)',
+                  boxShadow: isDark ? 'none' : '0 4px 16px rgba(15,23,42,.05)',
                   backdropFilter: 'blur(12px)',
                 }}
               >
-                <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(59,130,246,.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Icon size={16} color="#60a5fa" />
+                <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: isDark ? 'rgba(59,130,246,.15)' : 'rgba(59,130,246,.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Icon size={16} color="#3b82f6" />
                 </div>
-                <span style={{ color: '#fff', fontFamily: 'var(--font-display)', fontSize: '1.25rem', fontWeight: 800, lineHeight: 1 }}>
+                <span style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-display)', fontSize: '1.25rem', fontWeight: 800, lineHeight: 1 }}>
                   {value}
                 </span>
-                <span style={{ color: 'var(--text-muted)', fontSize: '0.72rem' }}>{label}</span>
+                <span style={{ color: 'var(--text-muted)', fontSize: '0.72rem', fontWeight: 600 }}>{label}</span>
               </div>
             ))}
           </motion.div>

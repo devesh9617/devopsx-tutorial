@@ -1,5 +1,5 @@
 // ============================================================
-// Course Details Page — DevOpsX (Fixed Premium Player & Details)
+// Course Details Page — DevOpsX (Fixed Premium Player & Details Theme-Aware)
 // ============================================================
 
 import { useState } from 'react';
@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { getCourseBySlug } from '../../data/courses';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import { LevelBadge } from '../../components/ui/Badge';
 import StarRating from '../../components/ui/StarRating';
 import Button from '../../components/ui/Button';
@@ -22,6 +23,7 @@ export default function CourseDetails() {
   const { slug } = useParams();
   const course = getCourseBySlug(slug);
   const { user, isEnrolled, toggleWishlist, isWishlisted } = useAuth();
+  const { isDark } = useTheme();
   const navigate = useNavigate();
   const [openSection, setOpenSection] = useState(0);
   const [showVideo, setShowVideo] = useState(false);
@@ -30,7 +32,7 @@ export default function CourseDetails() {
     return (
       <PageWrapper>
         <div style={{ textAlign: 'center', padding: '80px 0' }}>
-          <h2 style={{ color: '#fff', fontSize: '1.5rem', fontWeight: 700, marginBottom: '16px' }}>Course Not Found</h2>
+          <h2 style={{ color: 'var(--text-primary)', fontSize: '1.5rem', fontWeight: 700, marginBottom: '16px' }}>Course Not Found</h2>
           <Button onClick={() => navigate('/courses')}>Browse All Courses</Button>
         </div>
       </PageWrapper>
@@ -56,18 +58,23 @@ export default function CourseDetails() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', minWidth: 0 }}>
 
           {/* Header Card */}
-          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '20px', padding: '24px' }}>
+          <div style={{
+            background: 'var(--bg-card)',
+            border: isDark ? '1px solid var(--border-subtle)' : '1px solid rgba(59,130,246,.25)',
+            borderRadius: '20px', padding: '24px',
+            boxShadow: isDark ? 'none' : '0 4px 16px rgba(15,23,42,.05)',
+          }}>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
               <LevelBadge level={course.level} />
-              <span style={{ fontSize: '0.72rem', padding: '2px 10px', borderRadius: '999px', background: 'rgba(59,130,246,.15)', color: '#60a5fa', border: '1px solid rgba(59,130,246,.25)', fontWeight: 600 }}>
+              <span style={{ fontSize: '0.72rem', padding: '2px 10px', borderRadius: '999px', background: isDark ? 'rgba(59,130,246,.15)' : 'rgba(59,130,246,.1)', color: 'var(--text-accent)', border: '1px solid rgba(59,130,246,.25)', fontWeight: 600 }}>
                 {course.category}
               </span>
               {course.isFree && (
-                <span style={{ fontSize: '0.72rem', padding: '2px 10px', borderRadius: '999px', background: '#10b981', color: '#fff', fontWeight: 800 }}>FREE</span>
+                <span style={{ fontSize: '0.72rem', padding: '2px 10px', borderRadius: '999px', background: isDark ? '#10b981' : '#059669', color: '#fff', fontWeight: 800 }}>FREE</span>
               )}
             </div>
 
-            <h1 style={{ color: '#fff', fontFamily: 'var(--font-display)', fontSize: 'clamp(1.4rem, 3vw, 2rem)', fontWeight: 800, margin: '0 0 10px', lineHeight: 1.25 }}>
+            <h1 style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-display)', fontSize: 'clamp(1.4rem, 3vw, 2rem)', fontWeight: 800, margin: '0 0 10px', lineHeight: 1.25 }}>
               {course.title}
             </h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.6, margin: '0 0 16px' }}>
@@ -85,7 +92,7 @@ export default function CourseDetails() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <img src={course.instructor.avatar} alt={course.instructor.name} style={{ width: '38px', height: '38px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(59,130,246,.4)' }} />
               <div>
-                <p style={{ color: '#fff', fontSize: '0.85rem', fontWeight: 600, margin: 0 }}>{course.instructor.name}</p>
+                <p style={{ color: 'var(--text-primary)', fontSize: '0.85rem', fontWeight: 700, margin: 0 }}>{course.instructor.name}</p>
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.72rem', margin: 0 }}>Instructor</p>
               </div>
             </div>
@@ -119,12 +126,17 @@ export default function CourseDetails() {
           </div>
 
           {/* What you'll learn */}
-          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '20px', padding: '24px' }}>
-            <h2 style={{ color: '#fff', fontWeight: 800, fontSize: '1.1rem', margin: '0 0 16px' }}>What You'll Learn</h2>
+          <div style={{
+            background: 'var(--bg-card)',
+            border: isDark ? '1px solid var(--border-subtle)' : '1px solid rgba(59,130,246,.25)',
+            borderRadius: '20px', padding: '24px',
+            boxShadow: isDark ? 'none' : '0 4px 16px rgba(15,23,42,.05)',
+          }}>
+            <h2 style={{ color: 'var(--text-primary)', fontWeight: 800, fontSize: '1.1rem', margin: '0 0 16px' }}>What You'll Learn</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px' }}>
               {course.skills.map((skill) => (
                 <div key={skill} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                  <CheckCircle size={15} color="#34d399" style={{ flexShrink: 0, marginTop: '2px' }} />
+                  <CheckCircle size={15} color={isDark ? '#34d399' : '#059669'} style={{ flexShrink: 0, marginTop: '2px' }} />
                   <span>{skill}</span>
                 </div>
               ))}
@@ -132,18 +144,23 @@ export default function CourseDetails() {
           </div>
 
           {/* Curriculum */}
-          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '20px', padding: '24px' }}>
-            <h2 style={{ color: '#fff', fontWeight: 800, fontSize: '1.1rem', margin: '0 0 16px' }}>Class Curriculum</h2>
+          <div style={{
+            background: 'var(--bg-card)',
+            border: isDark ? '1px solid var(--border-subtle)' : '1px solid rgba(59,130,246,.25)',
+            borderRadius: '20px', padding: '24px',
+            boxShadow: isDark ? 'none' : '0 4px 16px rgba(15,23,42,.05)',
+          }}>
+            <h2 style={{ color: 'var(--text-primary)', fontWeight: 800, fontSize: '1.1rem', margin: '0 0 16px' }}>Class Curriculum</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {course.curriculum.map((section, i) => (
-                <div key={i} style={{ borderRadius: '14px', border: '1px solid var(--border-subtle)', background: 'rgba(255,255,255,.02)', overflow: 'hidden' }}>
+                <div key={i} style={{ borderRadius: '14px', border: '1px solid var(--border-subtle)', background: 'var(--bg-glass)', overflow: 'hidden' }}>
                   <button
                     onClick={() => setOpenSection(openSection === i ? -1 : i)}
                     style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <span style={{ width: '26px', height: '26px', borderRadius: '8px', background: 'linear-gradient(135deg,#3b82f6,#06b6d4)', color: '#fff', fontSize: '0.75rem', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{i + 1}</span>
-                      <span style={{ color: '#fff', fontWeight: 600, fontSize: '0.85rem' }}>{section.section}</span>
+                      <span style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: '0.85rem' }}>{section.section}</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-muted)', fontSize: '0.75rem' }}>
                       <span>{section.lessons} lessons</span>
@@ -151,10 +168,10 @@ export default function CourseDetails() {
                     </div>
                   </button>
                   {openSection === i && (
-                    <div style={{ borderTop: '1px solid var(--border-subtle)', padding: '12px 16px', background: 'rgba(0,0,0,.2)' }}>
+                    <div style={{ borderTop: '1px solid var(--border-subtle)', padding: '12px 16px', background: isDark ? 'rgba(0,0,0,.2)' : 'rgba(59,130,246,.03)' }}>
                       {Array.from({ length: Math.min(section.lessons, 4) }, (_, li) => (
                         <div key={li} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                          <PlayCircle size={14} color="#60a5fa" />
+                          <PlayCircle size={14} color="#3b82f6" />
                           <span style={{ color: 'var(--text-secondary)' }}>Lesson {li + 1}: {section.section} – Part {li + 1}</span>
                           <span style={{ marginLeft: 'auto', fontSize: '0.72rem' }}>{Math.ceil(parseInt(section.duration) / section.lessons)}m</span>
                         </div>
@@ -169,16 +186,21 @@ export default function CourseDetails() {
 
         {/* Right Column: Enrollment Box */}
         <div style={{ width: '300px', flexShrink: 0, position: 'sticky', top: '80px' }}>
-          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '20px', overflow: 'hidden', padding: '20px', boxShadow: '0 8px 32px rgba(0,0,0,.4)' }}>
+          <div style={{
+            background: 'var(--bg-card)',
+            border: isDark ? '1px solid var(--border-subtle)' : '1px solid rgba(59,130,246,.25)',
+            borderRadius: '20px', overflow: 'hidden', padding: '20px',
+            boxShadow: isDark ? '0 8px 32px rgba(0,0,0,.4)' : '0 4px 20px rgba(15,23,42,.06)',
+          }}>
             {/* Price tag */}
             <div style={{ marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid var(--border-subtle)' }}>
               {course.isFree ? (
-                <div style={{ fontSize: '2rem', fontWeight: 800, color: '#34d399' }}>Free Access</div>
+                <div style={{ fontSize: '2rem', fontWeight: 800, color: isDark ? '#34d399' : '#059669' }}>Free Access</div>
               ) : (
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                  <span style={{ fontSize: '1.8rem', fontWeight: 800, color: '#fff' }}>₹{course.price.toLocaleString()}</span>
+                  <span style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-primary)' }}>₹{course.price.toLocaleString()}</span>
                   <span style={{ color: 'var(--text-muted)', textDecoration: 'line-through', fontSize: '0.9rem' }}>₹{course.originalPrice.toLocaleString()}</span>
-                  <span style={{ color: '#34d399', fontSize: '0.75rem', fontWeight: 700 }}>{discount}% off</span>
+                  <span style={{ color: isDark ? '#34d399' : '#059669', fontSize: '0.75rem', fontWeight: 700 }}>{discount}% off</span>
                 </div>
               )}
             </div>
@@ -200,14 +222,14 @@ export default function CourseDetails() {
                   onClick={() => user && toggleWishlist(course.id)}
                   style={{
                     flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-                    padding: '8px', borderRadius: '12px', background: 'rgba(255,255,255,.05)',
+                    padding: '8px', borderRadius: '12px', background: 'var(--bg-glass)',
                     border: `1px solid ${wishlisted ? '#ef4444' : 'var(--border-subtle)'}`,
                     color: wishlisted ? '#ef4444' : 'var(--text-muted)', fontSize: '0.78rem', cursor: 'pointer',
                   }}
                 >
                   <Heart size={14} fill={wishlisted ? '#ef4444' : 'none'} /> Wishlist
                 </button>
-                <button style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '8px', borderRadius: '12px', background: 'rgba(255,255,255,.05)', border: '1px solid var(--border-subtle)', color: 'var(--text-muted)', fontSize: '0.78rem', cursor: 'pointer' }}>
+                <button style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '8px', borderRadius: '12px', background: 'var(--bg-glass)', border: '1px solid var(--border-subtle)', color: 'var(--text-muted)', fontSize: '0.78rem', cursor: 'pointer' }}>
                   <Share2 size={14} /> Share
                 </button>
               </div>
@@ -215,7 +237,7 @@ export default function CourseDetails() {
 
             {/* Course Features */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <p style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 700, margin: '0 0 4px' }}>This class includes:</p>
+              <p style={{ color: 'var(--text-primary)', fontSize: '0.8rem', fontWeight: 700, margin: '0 0 4px' }}>This class includes:</p>
               {[
                 [Clock, `${course.duration} on-demand video`],
                 [BookOpen, `${course.lessons} recorded lessons`],
@@ -224,7 +246,7 @@ export default function CourseDetails() {
                 [Globe, `${course.language} language`],
               ].map(([Icon, text], idx) => (
                 <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                  <Icon size={14} color="#60a5fa" />
+                  <Icon size={14} color="#3b82f6" />
                   <span>{text}</span>
                 </div>
               ))}

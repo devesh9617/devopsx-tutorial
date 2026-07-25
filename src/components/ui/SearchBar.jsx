@@ -49,7 +49,7 @@ export default function SearchBar({ size = 'md', className = '', placeholder, va
           height: s.height,
           fontSize: s.fontSize,
           paddingLeft: s.pl,
-          paddingRight: val ? '80px' : '12px',
+          paddingRight: '80px',
           background: 'var(--bg-input)',
           border: '1px solid var(--border-muted)',
           color: 'var(--text-primary)',

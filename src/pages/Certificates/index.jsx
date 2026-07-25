@@ -1,10 +1,7 @@
-// ============================================================
-// Certificates Page — DevOpsX (Ultra-Professional Redesign)
-// ============================================================
-
 import { motion } from 'framer-motion';
 import { Award, Download, Share2, ExternalLink, CheckCircle2, Lock, Copy, Sparkles, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import EmptyState from '../../components/ui/EmptyState';
@@ -31,6 +28,7 @@ const mockCertificates = [
 
 export default function Certificates() {
   const { user } = useAuth();
+  const { isDark } = useTheme();
   const navigate = useNavigate();
 
   if (!user) {
@@ -38,15 +36,15 @@ export default function Certificates() {
       <PageWrapper>
         <div style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '20px', textAlign: 'center', padding: '40px 20px' }}>
           <div style={{ width: '64px', height: '64px', borderRadius: '20px', background: 'rgba(245,158,11,.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Lock size={32} color="#fbbf24" />
+            <Lock size={32} color="#f59e0b" />
           </div>
-          <h2 style={{ color: '#fff', fontFamily: 'var(--font-display)', fontSize: '1.6rem', fontWeight: 800 }}>Sign in to view your certificates</h2>
+          <h2 style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-display)', fontSize: '1.6rem', fontWeight: 800 }}>Sign in to view your certificates</h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', maxWidth: '360px' }}>
             Earn industry-recognized certificates upon completing DevOpsX courses.
           </p>
           <div style={{ display: 'flex', gap: '12px' }}>
             <button onClick={() => navigate('/login')} style={{ padding: '12px 28px', borderRadius: '12px', background: 'linear-gradient(135deg,#f59e0b,#d97706)', color: '#fff', fontWeight: 700, border: 'none', cursor: 'pointer', fontSize: '0.875rem' }}>Sign In</button>
-            <button onClick={() => navigate('/register')} style={{ padding: '12px 28px', borderRadius: '12px', background: 'rgba(255,255,255,.07)', color: 'var(--text-secondary)', border: '1px solid var(--border-muted)', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 600 }}>Create Account</button>
+            <button onClick={() => navigate('/register')} style={{ padding: '12px 28px', borderRadius: '12px', background: 'var(--bg-glass)', color: 'var(--text-secondary)', border: '1px solid var(--border-muted)', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 600 }}>Create Account</button>
           </div>
         </div>
       </PageWrapper>
@@ -63,7 +61,7 @@ export default function Certificates() {
       {/* Header */}
       <PageHeader
         icon={Award}
-        iconColor="#fbbf24"
+        iconColor="#f59e0b"
         badge="VERIFIED CREDENTIALS"
         title="My Certificates"
         subtitle={`You have earned ${mockCertificates.length} verified certificates — share them on LinkedIn or download PDFs`}
@@ -88,11 +86,11 @@ export default function Certificates() {
               style={{
                 position: 'relative',
                 background: 'var(--bg-card)',
-                border: '1px solid rgba(245,158,11,.25)',
+                border: isDark ? '1px solid rgba(245,158,11,.25)' : '1px solid rgba(245,158,11,.4)',
                 borderRadius: '20px',
                 padding: '24px',
                 overflow: 'hidden',
-                boxShadow: '0 8px 32px rgba(0,0,0,.35)',
+                boxShadow: isDark ? '0 8px 32px rgba(0,0,0,.35)' : '0 4px 20px rgba(15,23,42,.06), 0 1px 3px rgba(0,0,0,.04)',
               }}
             >
               {/* Top Gold Gradient Bar */}
@@ -109,24 +107,24 @@ export default function Certificates() {
                     display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                     boxShadow: '0 4px 16px rgba(245,158,11,.2)',
                   }}>
-                    <Award size={28} color="#fbbf24" fill="rgba(245,158,11,.3)" />
+                    <Award size={28} color={isDark ? '#fbbf24' : '#d97706'} fill="rgba(245,158,11,.3)" />
                   </div>
 
                   {/* Info */}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                      <CheckCircle2 size={13} color="#34d399" />
-                      <span style={{ fontSize: '0.72rem', color: '#34d399', fontWeight: 700 }}>Verified Certificate of Completion</span>
+                      <CheckCircle2 size={13} color={isDark ? '#34d399' : '#059669'} />
+                      <span style={{ fontSize: '0.72rem', color: isDark ? '#34d399' : '#059669', fontWeight: 700 }}>Verified Certificate of Completion</span>
                     </div>
 
-                    <h3 style={{ color: '#fff', fontFamily: 'var(--font-display)', fontSize: '1.15rem', fontWeight: 800, margin: '0 0 8px', lineHeight: 1.3 }}>
+                    <h3 style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-display)', fontSize: '1.15rem', fontWeight: 800, margin: '0 0 8px', lineHeight: 1.3 }}>
                       {cert.courseTitle}
                     </h3>
 
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '14px', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '8px' }}>
-                      <span>Issued: <strong style={{ color: '#fff' }}>{cert.issuedDate}</strong></span>
-                      <span>Instructor: <strong style={{ color: '#fff' }}>{cert.instructor}</strong></span>
-                      <span>Grade: <strong style={{ color: '#fbbf24' }}>{cert.grade}</strong></span>
+                      <span>Issued: <strong style={{ color: 'var(--text-primary)' }}>{cert.issuedDate}</strong></span>
+                      <span>Instructor: <strong style={{ color: 'var(--text-primary)' }}>{cert.instructor}</strong></span>
+                      <span>Grade: <strong style={{ color: isDark ? '#fbbf24' : '#d97706' }}>{cert.grade}</strong></span>
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -134,7 +132,7 @@ export default function Certificates() {
                       <button
                         onClick={() => copyCred(cert.credentialId)}
                         title="Copy Credential ID"
-                        style={{ background: 'none', border: 'none', color: '#60a5fa', cursor: 'pointer', padding: '2px', display: 'flex' }}
+                        style={{ background: 'none', border: 'none', color: 'var(--text-accent)', cursor: 'pointer', padding: '2px', display: 'flex' }}
                       >
                         <Copy size={11} />
                       </button>
@@ -143,7 +141,7 @@ export default function Certificates() {
                 </div>
 
                 {/* Right: Actions */}
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', shrink: 0 }}>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', flexShrink: 0 }}>
                   <button
                     onClick={() => toast.success('Downloading Certificate PDF…')}
                     style={{
@@ -161,11 +159,11 @@ export default function Certificates() {
                     title="Share Certificate"
                     style={{
                       padding: '10px 12px', borderRadius: '12px',
-                      background: 'rgba(255,255,255,.05)', border: '1px solid var(--border-subtle)',
+                      background: 'var(--bg-glass)', border: '1px solid var(--border-subtle)',
                       color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center',
                     }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,.1)'; e.currentTarget.style.color = '#fff'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,.05)'; e.currentTarget.style.color = 'var(--text-muted)'; }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-glass-hover)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--bg-glass)'; e.currentTarget.style.color = 'var(--text-muted)'; }}
                   >
                     <Share2 size={14} />
                   </button>
@@ -178,7 +176,7 @@ export default function Certificates() {
 
       {/* LinkedIn Promo Box */}
       <div style={{
-        background: 'rgba(10,102,194,.08)',
+        background: isDark ? 'rgba(10,102,194,.08)' : 'rgba(10,102,194,.06)',
         border: '1px solid rgba(10,102,194,.25)',
         borderRadius: '20px',
         padding: '20px 24px',
@@ -190,7 +188,7 @@ export default function Certificates() {
             <ShieldCheck size={22} color="#fff" />
           </div>
           <div>
-            <h4 style={{ color: '#fff', fontSize: '0.95rem', fontWeight: 700, margin: '0 0 3px' }}>Add Certificates to LinkedIn Profile</h4>
+            <h4 style={{ color: 'var(--text-primary)', fontSize: '0.95rem', fontWeight: 800, margin: '0 0 3px' }}>Add Certificates to LinkedIn Profile</h4>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', margin: 0 }}>
               Showcase your verified DevOpsX certificates on LinkedIn to catch recruiter attention.
             </p>

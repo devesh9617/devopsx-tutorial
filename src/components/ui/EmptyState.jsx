@@ -33,8 +33,8 @@ export default function EmptyState({
         style={{ background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.2)' }}>
         <Icon size={36} className="text-blue-400" />
       </div>
-      <h3 className="text-xl font-semibold text-white mb-2">{title}</h3>
-      <p className="text-gray-400 mb-8 max-w-sm">{description}</p>
+      <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>{title}</h3>
+      <p style={{ color: 'var(--text-muted)' }} className="mb-8 max-w-sm">{description}</p>
       {action && actionLabel && (
         <Button onClick={action}>{actionLabel}</Button>
       )}

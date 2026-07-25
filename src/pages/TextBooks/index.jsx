@@ -66,8 +66,8 @@ export default function TextBooks() {
               paddingLeft: '40px', paddingRight: search ? '32px' : '14px',
               paddingTop: '11px', paddingBottom: '11px',
               borderRadius: '14px', fontSize: '0.875rem', outline: 'none',
-              background: 'rgba(255,255,255,.05)', border: '1px solid var(--border-muted)',
-              color: '#f1f5f9', transition: 'all 0.15s ease',
+              background: 'var(--bg-input)', border: '1px solid var(--border-muted)',
+              color: 'var(--text-primary)', transition: 'all 0.15s ease',
             }}
             onFocus={(e) => { e.target.style.borderColor = 'rgba(59,130,246,.5)'; e.target.style.boxShadow = '0 0 0 3px rgba(59,130,246,.1)'; }}
             onBlur={(e)  => { e.target.style.borderColor = 'var(--border-muted)'; e.target.style.boxShadow = 'none'; }}
