@@ -2,7 +2,7 @@
 // Sidebar Component — DevOpsX (Ultra User-Friendly & Sleek)
 // ============================================================
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -10,10 +10,120 @@ import {
   Users, Settings, ChevronDown, Server, Cloud, Shield, Terminal,
   Layers, Brain, Globe, Database, GitBranch, Cpu, ChevronRight,
   BookMarked, ClipboardList, FileQuestion, Video, Heart, Award,
-  UserCircle, BarChart3, X, Sparkles, Folder
+  UserCircle, BarChart3, X, Sparkles, Folder, CheckCircle2, ChevronUp
 } from 'lucide-react';
 import { useSidebar } from '../../context/SidebarContext';
+import { useTheme } from '../../context/ThemeContext';
 import BrandLogo from '../ui/BrandLogo';
+
+// Grade features data (same as GradeSelect)
+const gradeData = {
+  'grade-5-8': {
+    label: 'Class 5 – 8',
+    accent: '#34d399',
+    features: [
+      'Ebooks & Study Material', 'Video Courses', 'Assignments & Quizzes',
+      'AI Art Gallery', 'Artscane Projects', 'AI Agent Comparison',
+      'AI Agent Projects', 'AI Chatbots Practice', 'AI Automation Basics',
+      'Prompt Libraries', 'Learning Support',
+    ],
+  },
+  'grade-9-12': {
+    label: 'Class 9 – 12',
+    accent: '#60a5fa',
+    features: [
+      'Ebooks & Courses', 'Assignments & Syllabus', 'Video Courses',
+      'AI Tool Access', 'Learning Kit', 'Prompt Libraries',
+      'AI Chatbots', 'AI Automation', 'Peer Learning Tool', 'Learning Support',
+    ],
+  },
+  'college': {
+    label: 'College / Graduate',
+    accent: '#a78bfa',
+    features: [
+      'Ebooks & Courses', 'Video Lectures', 'Masters Programs',
+      'Learning Kit', 'Advanced AI Projects', 'Machine Learning',
+      'ULMs & LLM Projects', 'Python Language Models',
+      'AI Automation', 'Project Portfolio',
+    ],
+  },
+};
+
+// Grade Features Panel component — reacts to localStorage changes
+function GradeFeaturePanel({ collapsed }) {
+  const [open, setOpen] = useState(true);
+  const { isDark } = useTheme();
+  const [gradeKey, setGradeKey] = useState(
+    () => (typeof window !== 'undefined' ? localStorage.getItem('devopsx_grade') : null)
+  );
+
+  useEffect(() => {
+    // Listen for storage changes from other tabs
+    const onStorage = (e) => {
+      if (e.key === 'devopsx_grade') setGradeKey(e.newValue);
+    };
+    // Listen for custom event fired from GradeSelect in same tab
+    const onGradeChange = (e) => setGradeKey(e.detail);
+
+    window.addEventListener('storage', onStorage);
+    window.addEventListener('gradechange', onGradeChange);
+    return () => {
+      window.removeEventListener('storage', onStorage);
+      window.removeEventListener('gradechange', onGradeChange);
+    };
+  }, []);
+
+  const grade = gradeData[gradeKey] || null;
+  if (!grade || collapsed) return null;
+
+  return (
+    <div style={{
+      margin: '0 10px 14px', borderRadius: '14px', overflow: 'hidden',
+      border: isDark ? `1px solid ${grade.accent}35` : `1px solid ${grade.accent}45`,
+      background: isDark
+        ? `linear-gradient(145deg, ${grade.accent}10, rgba(9,15,40,.85))`
+        : `linear-gradient(145deg, ${grade.accent}12, #ffffff)`,
+      boxShadow: isDark ? `0 4px 20px ${grade.accent}15` : `0 4px 16px ${grade.accent}20`,
+    }}>
+      <button
+        onClick={() => setOpen((p) => !p)}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '10px 13px', background: 'none', border: 'none', cursor: 'pointer',
+          borderBottom: open ? (isDark ? `1px solid ${grade.accent}20` : `1px solid ${grade.accent}25`) : 'none',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: grade.accent, boxShadow: `0 0 6px ${grade.accent}` }} />
+          <span style={{ fontSize: '0.68rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: isDark ? grade.accent : '#1d4ed8' }}>
+            {grade.label}
+          </span>
+        </div>
+        {open
+          ? <ChevronUp size={12} style={{ color: isDark ? grade.accent : '#1d4ed8' }} />
+          : <ChevronDown size={12} style={{ color: isDark ? grade.accent : '#1d4ed8' }} />}
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.22 }}
+            style={{ overflow: 'hidden', padding: '8px 10px 10px' }}
+          >
+            {grade.features.map((f) => (
+              <div key={f} style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '4px 3px', borderRadius: '6px' }}>
+                <CheckCircle2 size={10} style={{ color: grade.accent, flexShrink: 0 }} />
+                <span style={{ color: isDark ? 'rgba(203,213,225,.8)' : 'var(--text-secondary)', fontSize: '0.71rem', fontWeight: 500, lineHeight: 1.3 }}>{f}</span>
+              </div>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 // Clean, organized menu structure
 const menuSections = [
@@ -72,6 +182,7 @@ const menuSections = [
 // Single Item Component
 function SidebarItem({ item, collapsed, active }) {
   const { closeMobile } = useSidebar();
+  const { isDark } = useTheme();
 
   return (
     <Link
@@ -87,19 +198,25 @@ function SidebarItem({ item, collapsed, active }) {
         fontSize: '0.825rem',
         fontWeight: active ? 700 : 500,
         textDecoration: 'none',
-        color: active ? '#60a5fa' : 'var(--text-secondary)',
+        color: active
+          ? (isDark ? '#60a5fa' : '#1d4ed8')
+          : 'var(--text-secondary)',
         background: active
-          ? 'linear-gradient(135deg, rgba(59,130,246,.18), rgba(6,182,212,.1))'
+          ? (isDark
+              ? 'linear-gradient(135deg, rgba(59,130,246,.18), rgba(6,182,212,.1))'
+              : 'linear-gradient(135deg, rgba(59,130,246,.12), rgba(6,182,212,.07))')
           : 'transparent',
-        border: active ? '1px solid rgba(59,130,246,.25)' : '1px solid transparent',
+        border: active
+          ? (isDark ? '1px solid rgba(59,130,246,.25)' : '1px solid rgba(59,130,246,.3)')
+          : '1px solid transparent',
         transition: 'all 0.15s ease',
         margin: '2px 0',
         justifyContent: collapsed ? 'center' : 'flex-start',
       }}
       onMouseEnter={(e) => {
         if (!active) {
-          e.currentTarget.style.background = 'rgba(255,255,255,.05)';
-          e.currentTarget.style.color = '#fff';
+          e.currentTarget.style.background = isDark ? 'rgba(255,255,255,.05)' : 'rgba(59,130,246,.08)';
+          e.currentTarget.style.color = isDark ? '#fff' : '#1e3a8a';
         }
       }}
       onMouseLeave={(e) => {
@@ -111,7 +228,7 @@ function SidebarItem({ item, collapsed, active }) {
     >
       <item.icon
         size={16}
-        style={{ color: active ? '#60a5fa' : 'var(--text-muted)', flexShrink: 0 }}
+        style={{ color: active ? (isDark ? '#60a5fa' : '#2563eb') : 'var(--text-muted)', flexShrink: 0 }}
       />
       {!collapsed && (
         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -119,7 +236,7 @@ function SidebarItem({ item, collapsed, active }) {
         </span>
       )}
       {!collapsed && active && (
-        <div style={{ marginLeft: 'auto', width: '6px', height: '6px', borderRadius: '50%', background: '#60a5fa', boxShadow: '0 0 6px #60a5fa', flexShrink: 0 }} />
+        <div style={{ marginLeft: 'auto', width: '6px', height: '6px', borderRadius: '50%', background: isDark ? '#60a5fa' : '#2563eb', boxShadow: isDark ? '0 0 6px #60a5fa' : '0 0 6px #2563eb', flexShrink: 0 }} />
       )}
     </Link>
   );
@@ -129,6 +246,7 @@ function SidebarItem({ item, collapsed, active }) {
 function SidebarSection({ section, collapsed }) {
   const [open, setOpen] = useState(true);
   const location = useLocation();
+  const { isDark } = useTheme();
 
   if (!section.label || section.label === 'MAIN') {
     return (
@@ -158,7 +276,7 @@ function SidebarSection({ section, collapsed }) {
             color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer',
             transition: 'color 0.15s',
           }}
-          onMouseEnter={(e) => e.currentTarget.style.color = '#fff'}
+          onMouseEnter={(e) => e.currentTarget.style.color = isDark ? '#fff' : '#0f172a'}
           onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-muted)'}
         >
           <span>{section.label}</span>
@@ -196,6 +314,10 @@ function SidebarSection({ section, collapsed }) {
 // Main Sidebar Export
 export default function Sidebar() {
   const { collapsed, mobileOpen, isMobile, closeMobile } = useSidebar();
+  const { isDark } = useTheme();
+
+  const sidebarBg = isDark ? 'var(--bg-secondary)' : '#ffffff';
+  const sidebarBorder = isDark ? '1px solid var(--border-subtle)' : '1px solid rgba(59,130,246,.15)';
 
   const sidebarContent = (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -216,10 +338,17 @@ export default function Sidebar() {
         ))}
       </div>
 
+      {/* Grade Feature Panel */}
+      <GradeFeaturePanel collapsed={collapsed && !isMobile} />
+
       {/* Footer Version Note */}
       {!collapsed && (
-        <div style={{ padding: '12px 16px', borderTop: '1px solid var(--border-subtle)', background: 'rgba(0,0,0,.15)' }}>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.7rem', margin: 0 }}>
+        <div style={{
+          padding: '12px 16px',
+          borderTop: isDark ? '1px solid var(--border-subtle)' : '1px solid rgba(59,130,246,.12)',
+          background: isDark ? 'rgba(0,0,0,.15)' : 'rgba(59,130,246,.03)',
+        }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.7rem', margin: 0, fontWeight: 500 }}>
             DevOpsX Platform v1.0
           </p>
         </div>
@@ -237,8 +366,8 @@ export default function Sidebar() {
           position: 'fixed', left: 0, top: 'var(--navbar-height)',
           height: 'calc(100vh - var(--navbar-height))',
           zIndex: 30, overflow: 'hidden',
-          background: 'var(--bg-secondary)',
-          borderRight: '1px solid var(--border-subtle)',
+          background: sidebarBg,
+          borderRight: sidebarBorder,
           boxSizing: 'border-box',
         }}
       >
@@ -255,15 +384,15 @@ export default function Sidebar() {
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={closeMobile}
-            style={{ position: 'fixed', inset: 0, zIndex: 40, background: 'rgba(0,0,0,.65)', backdropFilter: 'blur(4px)' }}
+            style={{ position: 'fixed', inset: 0, zIndex: 40, background: isDark ? 'rgba(0,0,0,.65)' : 'rgba(0,20,80,.35)', backdropFilter: 'blur(4px)' }}
           />
           <motion.aside
             initial={{ x: -260 }} animate={{ x: 0 }} exit={{ x: -260 }}
             transition={{ duration: 0.22 }}
             style={{
               position: 'fixed', left: 0, top: 0, bottom: 0, zIndex: 50,
-              width: '260px', background: 'var(--bg-secondary)',
-              borderRight: '1px solid var(--border-subtle)',
+              width: '260px', background: sidebarBg,
+              borderRight: sidebarBorder,
             }}
           >
             {sidebarContent}

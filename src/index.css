@@ -20,6 +20,40 @@
   --brand-amber:  #f59e0b;
   --brand-red:    #ef4444;
 
+  /* Fonts */
+  --font-sans:  'Inter', system-ui, -apple-system, sans-serif;
+  --font-display:'Space Grotesk', system-ui, sans-serif;
+  --font-mono:  'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Transitions */
+  --t-fast: 120ms ease;
+  --t-base: 200ms ease;
+  --t-slow: 350ms ease;
+
+  /* Radius */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-2xl:32px;
+
+  /* Gradients (same for both modes) */
+  --gradient-brand:    linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+  --gradient-brand-v:  linear-gradient(180deg,  #3b82f6 0%, #06b6d4 100%);
+
+  /* Shadows */
+  --shadow-sm:    0 2px 8px  rgba(0,0,0,.12);
+  --shadow-md:    0 4px 20px rgba(0,0,0,.18);
+  --shadow-lg:    0 8px 40px rgba(0,0,0,.24);
+  --shadow-glow:  0 0 40px  rgba(59,130,246,.25);
+  --shadow-glow-c:0 0 40px  rgba(6,182,212,.18);
+  --shadow-card:  0 4px 24px rgba(0,0,0,.08);
+}
+
+/* ─── DARK MODE (default) ─── */
+:root,
+html.dark {
   /* Backgrounds */
   --bg-primary:    #060b18;
   --bg-secondary:  #0b1220;
@@ -42,37 +76,45 @@
   --text-accent:    #60a5fa;
 
   /* Gradients */
-  --gradient-brand:    linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
-  --gradient-brand-v:  linear-gradient(180deg,  #3b82f6 0%, #06b6d4 100%);
   --gradient-hero:     linear-gradient(135deg, #060b18 0%, #0d1a40 50%, #060b18 100%);
   --gradient-card:     linear-gradient(135deg, #0f1929, #162035);
   --gradient-sidebar:  linear-gradient(180deg, #0b1220, #060b18);
+}
 
-  /* Shadows */
-  --shadow-sm:    0 2px 8px  rgba(0,0,0,.35);
-  --shadow-md:    0 4px 20px rgba(0,0,0,.45);
-  --shadow-lg:    0 8px 40px rgba(0,0,0,.6);
-  --shadow-glow:  0 0 40px  rgba(59,130,246,.18);
-  --shadow-glow-c:0 0 40px  rgba(6,182,212,.18);
-  --shadow-card:  0 4px 24px rgba(0,0,0,.4);
+/* ─── LIGHT MODE ─── */
+html.light {
+  /* Backgrounds — distinct Slate/Indigo tinted canvas so white cards stand out clearly */
+  --bg-primary:    #ebf0fa;
+  --bg-secondary:  #ffffff;
+  --bg-card:       #ffffff;
+  --bg-card-hover: #f5f8ff;
+  --bg-glass:      rgba(255, 255, 255, 0.88);
+  --bg-glass-hover:rgba(255, 255, 255, 0.98);
+  --bg-input:      #f0f4ff;
 
-  /* Radius */
-  --radius-xs: 6px;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
-  --radius-2xl:32px;
+  /* Borders — defined, clean borders so elements don't look washed out */
+  --border-subtle: rgba(59, 130, 246, 0.20);
+  --border-muted:  rgba(59, 130, 246, 0.32);
+  --border-brand:  rgba(59, 130, 246, 0.60);
+  --border-focus:  rgba(59, 130, 246, 0.80);
 
-  /* Fonts */
-  --font-sans:  'Inter', system-ui, -apple-system, sans-serif;
-  --font-display:'Space Grotesk', system-ui, sans-serif;
-  --font-mono:  'JetBrains Mono', 'Fira Code', monospace;
+  /* Text — deep contrast dark blue & slate */
+  --text-primary:   #0f172a;
+  --text-secondary: #334155;
+  --text-muted:     #64748b;
+  --text-accent:    #1d4ed8;
 
-  /* Transitions */
-  --t-fast: 120ms ease;
-  --t-base: 200ms ease;
-  --t-slow: 350ms ease;
+  /* Gradients */
+  --gradient-hero:    linear-gradient(135deg, #e0e7ff 0%, #dbeafe 60%, #e0e7ff 100%);
+  --gradient-card:    linear-gradient(135deg, #ffffff, #f5f8ff);
+  --gradient-sidebar: linear-gradient(180deg, #ffffff, #f0f4ff);
+
+  /* Shadows — crisp card elevation */
+  --shadow-sm:    0 1px 3px rgba(15,23,42,.08), 0 1px 2px rgba(15,23,42,.04);
+  --shadow-md:    0 4px 14px rgba(15,23,42,.08), 0 2px 4px rgba(15,23,42,.04);
+  --shadow-lg:    0 10px 30px rgba(15,23,42,.12), 0 4px 8px rgba(15,23,42,.04);
+  --shadow-glow:  0 0 30px  rgba(59,130,246,.25);
+  --shadow-card:  0 2px 10px rgba(15,23,42,.06), 0 1px 3px rgba(15,23,42,.04);
 }
 
 /* ─────────────────── Base Reset ─────────────────── */
@@ -86,6 +128,8 @@ html {
   scroll-behavior: smooth;
   font-size: 16px;
   -webkit-text-size-adjust: 100%;
+  /* smooth theme transitions */
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 body {
@@ -96,6 +140,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 a { color: inherit; text-decoration: none; }
@@ -156,7 +201,7 @@ button { cursor: pointer; border: none; background: none; }
 }
 
 .glass-card {
-  background: rgba(15, 25, 41, 0.8);
+  background: var(--bg-card);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--border-muted);
@@ -206,14 +251,25 @@ button { cursor: pointer; border: none; background: none; }
 }
 
 .btn-ghost {
-  background: rgba(255,255,255,.06);
+  background: var(--bg-glass);
   color: var(--text-secondary);
   border: 1px solid var(--border-subtle);
 }
 .btn-ghost:hover {
-  background: rgba(255,255,255,.1);
+  background: var(--bg-glass-hover);
   color: var(--text-primary);
   border-color: var(--border-muted);
+}
+
+/* Light mode: ghost button gets blue tint */
+html.light .btn-ghost {
+  background: rgba(59,130,246,.06);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+}
+html.light .btn-ghost:hover {
+  background: rgba(59,130,246,.12);
+  color: var(--brand-blue);
 }
 
 /* ─────────────────── Form Inputs ─────────────────── */
@@ -233,6 +289,12 @@ button { cursor: pointer; border: none; background: none; }
 .input:focus {
   border-color: var(--border-focus);
   box-shadow: 0 0 0 3px rgba(59,130,246,.12);
+}
+
+/* Light mode: input slightly different bg */
+html.light .input {
+  background: #f1f5ff;
+  border-color: rgba(59,130,246,.2);
 }
 
 /* ─────────────────── Badges / Pills ─────────────────── */
@@ -281,18 +343,24 @@ button { cursor: pointer; border: none; background: none; }
   100% { background-position:  200% 0; }
 }
 .skeleton {
-  background: linear-gradient(90deg, #111827 25%, #1a2540 50%, #111827 75%);
+  background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-card-hover) 50%, var(--bg-card) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.6s infinite;
   border-radius: var(--radius-sm);
+}
+
+/* Light mode skeleton */
+html.light .skeleton {
+  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
 }
 
 /* ─────────────────── Background Utilities ─────────────────── */
 /* Dot/grid pattern */
 .bg-grid {
   background-image:
-    linear-gradient(rgba(59,130,246,.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(59,130,246,.04) 1px, transparent 1px);
+    linear-gradient(var(--border-subtle) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
   background-size: 56px 56px;
 }
 
@@ -361,9 +429,16 @@ button { cursor: pointer; border: none; background: none; }
 /* ─────────────────── Recharts overrides ─────────────────── */
 .recharts-cartesian-grid-horizontal line,
 .recharts-cartesian-grid-vertical line {
-  stroke: rgba(255,255,255,.05);
+  stroke: var(--border-subtle);
 }
 .recharts-tooltip-wrapper { z-index: 100; }
+
+/* Light mode recharts tooltip */
+html.light .recharts-tooltip-wrapper .recharts-default-tooltip {
+  background: #fff !important;
+  border-color: var(--border-muted) !important;
+  color: var(--text-primary) !important;
+}
 
 /* ─────────────────── Course Card ─────────────────── */
 .course-card-img {
@@ -458,7 +533,7 @@ hr {
   position: relative;
 }
 .sidebar-nav-item:hover {
-  background: rgba(255,255,255,.06);
+  background: var(--bg-glass-hover);
   color: var(--text-primary);
 }
 .sidebar-nav-item.active {
@@ -467,6 +542,15 @@ hr {
   font-weight: 600;
   border-left: 2px solid var(--brand-blue);
   padding-left: 10px;
+}
+
+html.light .sidebar-nav-item:hover {
+  background: rgba(59,130,246,.08);
+  color: #1e3a8a;
+}
+html.light .sidebar-nav-item.active {
+  background: linear-gradient(135deg, rgba(59,130,246,.14), rgba(6,182,212,.08));
+  color: #1d4ed8;
 }
 
 /* ─────────────────── Navbar ─────────────────── */
@@ -491,12 +575,16 @@ hr {
 
 /* ─────────────────── Auth Pages ─────────────────── */
 .auth-card {
-  background: rgba(15,25,41,.85);
+  background: var(--bg-card);
   backdrop-filter: blur(28px);
   -webkit-backdrop-filter: blur(28px);
   border: 1px solid var(--border-muted);
   border-radius: var(--radius-2xl);
-  box-shadow: 0 32px 80px rgba(0,0,0,.6);
+  box-shadow: var(--shadow-lg);
+}
+
+html.light .auth-card {
+  box-shadow: 0 20px 60px rgba(59,130,246,.15);
 }
 
 /* ─────────────────── Dashboard Chart ─────────────────── */
@@ -524,5 +612,11 @@ hr {
 .hero-bg {
   background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(59,130,246,.15) 0%, transparent 70%),
               radial-gradient(ellipse 60% 40% at 80% 80%, rgba(139,92,246,.08) 0%, transparent 60%),
+              var(--bg-primary);
+}
+
+html.light .hero-bg {
+  background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(59,130,246,.12) 0%, transparent 70%),
+              radial-gradient(ellipse 60% 40% at 80% 80%, rgba(99,102,241,.06) 0%, transparent 60%),
               var(--bg-primary);
 }

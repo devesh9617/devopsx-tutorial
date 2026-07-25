@@ -11,6 +11,7 @@ import CourseCard from '../../components/cards/CourseCard';
 import Pagination from '../../components/ui/Pagination';
 import EmptyState from '../../components/ui/EmptyState';
 import { useDebounce } from '../../hooks/index';
+import { useTheme } from '../../context/ThemeContext';
 import PageWrapper, { PageHeader } from '../../components/ui/PageWrapper';
 
 const COURSES_PER_PAGE = 8;
@@ -25,6 +26,7 @@ const sortOptions = [
 ];
 
 export default function AllCourses() {
+  const { isDark } = useTheme();
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get('search') || '');
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'All');
@@ -108,14 +110,14 @@ export default function AllCourses() {
 
             {/* Sidebar Title */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', paddingBottom: '12px', borderBottom: '1px solid var(--border-subtle)' }}>
-              <span style={{ color: '#fff', fontSize: '0.875rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px', letterSpacing: '-0.01em' }}>
-                <SlidersHorizontal size={15} color="#60a5fa" /> Refine Search
+              <span style={{ color: 'var(--text-primary)', fontSize: '0.875rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px', letterSpacing: '-0.01em' }}>
+                <SlidersHorizontal size={15} color="#3b82f6" /> Refine Search
               </span>
               {hasFilters && (
                 <button
                   onClick={resetFilters}
                   title="Reset all filters"
-                  style={{ background: 'none', border: 'none', color: '#f87171', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                  style={{ background: 'none', border: 'none', color: '#ef4444', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
                 >
                   <RotateCcw size={11} /> Reset
                 </button>
@@ -139,10 +141,10 @@ export default function AllCourses() {
                     paddingLeft: '34px', paddingRight: search ? '28px' : '12px',
                     paddingTop: '9px', paddingBottom: '9px',
                     borderRadius: '12px', fontSize: '0.78rem',
-                    background: 'rgba(255,255,255,.05)', border: '1px solid var(--border-muted)',
-                    color: '#f1f5f9', outline: 'none', transition: 'all 0.15s ease',
+                    background: 'var(--bg-input)', border: '1px solid var(--border-muted)',
+                    color: 'var(--text-primary)', outline: 'none', transition: 'all 0.15s ease',
                   }}
-                  onFocus={(e) => { e.target.style.borderColor = 'rgba(59,130,246,.5)'; e.target.style.boxShadow = '0 0 0 3px rgba(59,130,246,.1)'; }}
+                  onFocus={(e) => { e.target.style.borderColor = 'var(--brand-blue)'; e.target.style.boxShadow = '0 0 0 3px rgba(59,130,246,.15)'; }}
                   onBlur={(e)  => { e.target.style.borderColor = 'var(--border-muted)'; e.target.style.boxShadow = 'none'; }}
                 />
                 {search && (
@@ -154,9 +156,7 @@ export default function AllCourses() {
                   </button>
                 )}
               </div>
-            </div>
-
-            {/* Categories Menu */}
+            </div>            {/* Categories Menu */}
             <div style={{ marginBottom: '20px' }}>
               <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: '8px' }}>
                 Categories
@@ -169,19 +169,19 @@ export default function AllCourses() {
                       key={cat}
                       onClick={() => { setSelectedCategory(cat); setCurrentPage(1); }}
                       style={{
-                        display: 'flex', alignItems: 'center', justifyBetween: 'space-between', justifyContent: 'space-between',
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                         padding: '7px 10px', borderRadius: '10px', fontSize: '0.78rem',
-                        background: active ? 'rgba(59,130,246,.15)' : 'transparent',
-                        color: active ? '#60a5fa' : 'var(--text-secondary)',
+                        background: active ? (isDark ? 'rgba(59,130,246,.18)' : 'rgba(59,130,246,.12)') : 'transparent',
+                        color: active ? (isDark ? '#60a5fa' : '#1d4ed8') : 'var(--text-secondary)',
                         fontWeight: active ? 700 : 500,
                         border: 'none', cursor: 'pointer', transition: 'all 0.12s ease',
                         textAlign: 'left',
                       }}
-                      onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = 'rgba(255,255,255,.05)'; }}
+                      onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = isDark ? 'rgba(255,255,255,.05)' : 'rgba(59,130,246,.06)'; }}
                       onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = 'transparent'; }}
                     >
                       <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{cat}</span>
-                      {active && <Check size={12} color="#60a5fa" />}
+                      {active && <Check size={12} color={isDark ? '#60a5fa' : '#1d4ed8'} />}
                     </button>
                   );
                 })}
@@ -203,9 +203,11 @@ export default function AllCourses() {
                       style={{
                         padding: '7px 12px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: active ? 700 : 500,
                         textAlign: 'left', cursor: 'pointer', transition: 'all 0.15s ease',
-                        background: active ? 'linear-gradient(135deg, rgba(59,130,246,.25), rgba(6,182,212,.15))' : 'rgba(255,255,255,.03)',
-                        color: active ? '#93c5fd' : 'var(--text-secondary)',
-                        border: `1px solid ${active ? 'rgba(59,130,246,.4)' : 'rgba(255,255,255,.06)'}`,
+                        background: active
+                          ? (isDark ? 'linear-gradient(135deg, rgba(59,130,246,.25), rgba(6,182,212,.15))' : 'rgba(59,130,246,.12)')
+                          : (isDark ? 'rgba(255,255,255,.03)' : 'rgba(59,130,246,.04)'),
+                        color: active ? (isDark ? '#93c5fd' : '#1d4ed8') : 'var(--text-secondary)',
+                        border: `1px solid ${active ? 'rgba(59,130,246,.4)' : 'var(--border-subtle)'}`,
                       }}
                     >
                       {lvl}
@@ -220,7 +222,12 @@ export default function AllCourses() {
               <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: '8px' }}>
                 Access Type
               </label>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px', background: 'rgba(0,0,0,.3)', padding: '3px', borderRadius: '12px', border: '1px solid rgba(255,255,255,.06)' }}>
+              <div style={{
+                display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px',
+                background: isDark ? 'rgba(0,0,0,.3)' : 'rgba(59,130,246,.06)',
+                padding: '3px', borderRadius: '12px',
+                border: '1px solid var(--border-subtle)',
+              }}>
                 {priceFilters.map((p) => {
                   const active = selectedPrice === p;
                   return (
@@ -249,9 +256,9 @@ export default function AllCourses() {
         <div style={{ minWidth: 0, flex: 1 }}>
 
           {/* Controls Bar */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px', marginBottom: '16px', background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', padding: '12px 18px', borderRadius: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px', marginBottom: '16px', background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', padding: '12px 18px', borderRadius: '16px', boxShadow: isDark ? 'none' : '0 2px 8px rgba(15,23,42,.04)' }}>
             <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 500 }}>
-              Showing <strong style={{ color: '#fff' }}>{paginated.length}</strong> of <strong style={{ color: '#fff' }}>{filtered.length}</strong> courses
+              Showing <strong style={{ color: 'var(--text-primary)' }}>{paginated.length}</strong> of <strong style={{ color: 'var(--text-primary)' }}>{filtered.length}</strong> courses
             </span>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -260,23 +267,23 @@ export default function AllCourses() {
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
                 style={{
-                  background: 'rgba(255,255,255,.05)', border: '1px solid var(--border-subtle)',
-                  color: '#fff', borderRadius: '10px', padding: '6px 12px', fontSize: '0.78rem', outline: 'none', cursor: 'pointer',
+                  background: 'var(--bg-input)', border: '1px solid var(--border-subtle)',
+                  color: 'var(--text-primary)', borderRadius: '10px', padding: '6px 12px', fontSize: '0.78rem', outline: 'none', cursor: 'pointer',
                 }}
               >
                 {sortOptions.map((opt) => (
-                  <option key={opt.value} value={opt.value} style={{ background: '#0f1929' }}>{opt.label}</option>
+                  <option key={opt.value} value={opt.value} style={{ background: isDark ? '#0f1929' : '#ffffff', color: isDark ? '#ffffff' : '#0f172a' }}>{opt.label}</option>
                 ))}
               </select>
 
               {/* View Toggle */}
-              <div style={{ display: 'flex', gap: '4px', background: 'rgba(0,0,0,.2)', padding: '3px', borderRadius: '10px', border: '1px solid rgba(255,255,255,.06)' }}>
+              <div style={{ display: 'flex', gap: '4px', background: isDark ? 'rgba(0,0,0,.2)' : 'rgba(59,130,246,.06)', padding: '3px', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
                 <button
                   onClick={() => setViewMode('grid')}
                   style={{
                     padding: '5px 10px', borderRadius: '8px', border: 'none',
-                    background: viewMode === 'grid' ? 'rgba(59,130,246,.25)' : 'transparent',
-                    color: viewMode === 'grid' ? '#60a5fa' : 'var(--text-muted)', cursor: 'pointer',
+                    background: viewMode === 'grid' ? (isDark ? 'rgba(59,130,246,.25)' : 'rgba(59,130,246,.15)') : 'transparent',
+                    color: viewMode === 'grid' ? (isDark ? '#60a5fa' : '#1d4ed8') : 'var(--text-muted)', cursor: 'pointer',
                     display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', fontWeight: 700,
                   }}
                 >
@@ -286,8 +293,8 @@ export default function AllCourses() {
                   onClick={() => setViewMode('list')}
                   style={{
                     padding: '5px 10px', borderRadius: '8px', border: 'none',
-                    background: viewMode === 'list' ? 'rgba(59,130,246,.25)' : 'transparent',
-                    color: viewMode === 'list' ? '#60a5fa' : 'var(--text-muted)', cursor: 'pointer',
+                    background: viewMode === 'list' ? (isDark ? 'rgba(59,130,246,.25)' : 'rgba(59,130,246,.15)') : 'transparent',
+                    color: viewMode === 'list' ? (isDark ? '#60a5fa' : '#1d4ed8') : 'var(--text-muted)', cursor: 'pointer',
                     display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', fontWeight: 700,
                   }}
                 >

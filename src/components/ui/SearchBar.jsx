@@ -44,19 +44,19 @@ export default function SearchBar({ size = 'md', className = '', placeholder, va
         onChange={setVal}
         onKeyDown={handleKeyDown}
         placeholder={ph}
-        className="w-full rounded-xl text-white outline-none transition-all"
+        className="w-full rounded-xl outline-none transition-all"
         style={{
           height: s.height,
           fontSize: s.fontSize,
           paddingLeft: s.pl,
           paddingRight: val ? '80px' : '12px',
-          background: 'rgba(255,255,255,.07)',
+          background: 'var(--bg-input)',
           border: '1px solid var(--border-muted)',
           color: 'var(--text-primary)',
         }}
         onFocus={(e) => {
-          e.target.style.borderColor = 'rgba(59,130,246,.55)';
-          e.target.style.boxShadow = '0 0 0 3px rgba(59,130,246,.1)';
+          e.target.style.borderColor = 'var(--brand-blue)';
+          e.target.style.boxShadow = '0 0 0 3px rgba(59,130,246,.15)';
         }}
         onBlur={(e) => {
           e.target.style.borderColor = 'var(--border-muted)';

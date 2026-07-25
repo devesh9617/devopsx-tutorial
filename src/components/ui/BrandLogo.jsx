@@ -46,11 +46,11 @@ export default function BrandLogo({ size = 'md', iconOnly = false, className = '
           }}
         >
           {/* "DevOpsX" */}
-          <span style={{ color: '#fff' }}>
+          <span style={{ color: 'var(--text-primary)' }}>
             DevOps
             <span
               style={{
-                background: 'linear-gradient(90deg,#60a5fa,#22d3ee)',
+                background: 'linear-gradient(90deg,#3b82f6,#06b6d4)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
               }}
@@ -58,12 +58,12 @@ export default function BrandLogo({ size = 'md', iconOnly = false, className = '
               X
             </span>
           </span>
-          {/* "learning" suffix — styled like the screenshot */}
+          {/* "learning" suffix */}
           <span
             style={{
               fontSize: `calc(${s.textSize} * 0.72)`,
               fontWeight: 600,
-              color: '#7dd3fc',
+              color: 'var(--text-accent)',
               letterSpacing: '0.01em',
               marginLeft: '1px',
             }}

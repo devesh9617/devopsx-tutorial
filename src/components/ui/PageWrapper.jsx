@@ -31,11 +31,11 @@ export default function PageWrapper({ children, className = '' }) {
 /**
  * Page header section — title, subtitle, optional badge + actions
  */
-export function PageHeader({ icon: Icon, iconColor = '#60a5fa', badge, title, subtitle, actions }) {
+export function PageHeader({ icon: Icon, iconColor = '#3b82f6', badge, title, subtitle, actions }) {
   return (
     <div style={{ marginBottom: '24px' }}>
       {badge && (
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', padding: '5px 14px', borderRadius: '999px', background: 'rgba(59,130,246,.1)', border: '1px solid rgba(59,130,246,.2)', color: '#93c5fd', fontSize: '0.75rem', fontWeight: 600, marginBottom: '12px' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', padding: '5px 14px', borderRadius: '999px', background: 'rgba(59,130,246,.1)', border: '1px solid rgba(59,130,246,.25)', color: 'var(--text-accent)', fontSize: '0.75rem', fontWeight: 700, marginBottom: '12px' }}>
           {Icon && <Icon size={12} color={iconColor} />}
           {badge}
         </div>
@@ -48,7 +48,7 @@ export function PageHeader({ icon: Icon, iconColor = '#60a5fa', badge, title, su
             </div>
           )}
           <div>
-            <h1 style={{ color: '#fff', fontFamily: 'var(--font-display)', fontSize: 'clamp(1.3rem, 3vw, 1.75rem)', fontWeight: 800, letterSpacing: '-0.02em', margin: 0, lineHeight: 1.2 }}>
+            <h1 style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-display)', fontSize: 'clamp(1.3rem, 3vw, 1.75rem)', fontWeight: 800, letterSpacing: '-0.02em', margin: 0, lineHeight: 1.2 }}>
               {title}
             </h1>
             {subtitle && (

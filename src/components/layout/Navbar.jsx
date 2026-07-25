@@ -75,11 +75,15 @@ export default function Navbar() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          background: scrolled ? 'rgba(6,11,24,0.96)' : 'rgba(6,11,24,0.85)',
+          background: isDark
+            ? (scrolled ? 'rgba(6,11,24,0.97)' : 'rgba(6,11,24,0.88)')
+            : (scrolled ? 'rgba(255,255,255,0.97)' : 'rgba(255,255,255,0.90)'),
           backdropFilter: 'blur(24px)',
           WebkitBackdropFilter: 'blur(24px)',
-          borderBottom: '1px solid var(--border-subtle)',
-          boxShadow: scrolled ? '0 8px 32px rgba(0,0,0,.4)' : 'none',
+          borderBottom: isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(59,130,246,0.15)',
+          boxShadow: scrolled
+            ? (isDark ? '0 8px 32px rgba(0,0,0,.4)' : '0 4px 20px rgba(59,130,246,.12)')
+            : 'none',
           transition: 'all 0.25s ease',
           boxSizing: 'border-box',
         }}
@@ -91,12 +95,19 @@ export default function Navbar() {
             aria-label="Toggle sidebar"
             style={{
               padding: '8px', borderRadius: '10px',
-              background: 'rgba(255,255,255,.05)', border: '1px solid var(--border-subtle)',
+              background: isDark ? 'rgba(255,255,255,.05)' : 'rgba(59,130,246,.07)',
+              border: isDark ? '1px solid rgba(255,255,255,.08)' : '1px solid rgba(59,130,246,.15)',
               color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center',
               transition: 'all 0.15s',
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,.1)'; e.currentTarget.style.color = '#fff'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,.05)'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = isDark ? 'rgba(255,255,255,.1)' : 'rgba(59,130,246,.14)';
+              e.currentTarget.style.color = isDark ? '#fff' : '#1d4ed8';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = isDark ? 'rgba(255,255,255,.05)' : 'rgba(59,130,246,.07)';
+              e.currentTarget.style.color = 'var(--text-secondary)';
+            }}
           >
             <Menu size={18} />
           </button>
@@ -122,15 +133,35 @@ export default function Navbar() {
             <Search size={17} />
           </button>
 
-          {/* Theme Toggle */}
+          {/* Theme Toggle — premium pill style */}
           <button
             onClick={toggleTheme}
             aria-label="Toggle theme"
-            style={{ padding: '8px', borderRadius: '10px', background: 'rgba(255,255,255,.05)', border: '1px solid var(--border-subtle)', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex' }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,.1)'; e.currentTarget.style.color = '#fff'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,.05)'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
+            title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '6px',
+              padding: '6px 12px', borderRadius: '999px',
+              background: isDark
+                ? 'linear-gradient(135deg, rgba(251,191,36,.12), rgba(251,191,36,.06))'
+                : 'linear-gradient(135deg, rgba(59,130,246,.12), rgba(6,182,212,.07))',
+              border: isDark ? '1px solid rgba(251,191,36,.25)' : '1px solid rgba(59,130,246,.25)',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'scale(1.05)';
+              e.currentTarget.style.boxShadow = isDark
+                ? '0 0 14px rgba(251,191,36,.2)'
+                : '0 0 14px rgba(59,130,246,.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
           >
-            {isDark ? <Sun size={17} color="#fbbf24" /> : <Moon size={17} />}
+            {isDark
+              ? <><Sun size={14} color="#fbbf24" /><span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#fbbf24' }}>Light</span></>
+              : <><Moon size={14} color="#3b82f6" /><span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#3b82f6' }}>Dark</span></>}
           </button>
 
           {user ? (
@@ -165,12 +196,12 @@ export default function Navbar() {
                         position: 'absolute', right: 0, top: 'calc(100% + 8px)',
                         width: '320px', borderRadius: '16px', overflow: 'hidden',
                         background: 'var(--bg-card)', border: '1px solid var(--border-muted)',
-                        boxShadow: '0 20px 50px rgba(0,0,0,.6)',
+                        boxShadow: isDark ? '0 20px 50px rgba(0,0,0,.6)' : '0 12px 36px rgba(59,130,246,.18)',
                       }}
                     >
-                      <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyBetween: 'space-between', justifyContent: 'space-between' }}>
-                        <h4 style={{ color: '#fff', fontSize: '0.85rem', fontWeight: 700, margin: 0 }}>Notifications</h4>
-                        <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '999px', background: 'rgba(59,130,246,.2)', color: '#60a5fa', fontWeight: 700 }}>
+                      <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <h4 style={{ color: 'var(--text-primary)', fontSize: '0.85rem', fontWeight: 700, margin: 0 }}>Notifications</h4>
+                        <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '999px', background: isDark ? 'rgba(59,130,246,.2)' : 'rgba(59,130,246,.12)', color: isDark ? '#60a5fa' : '#2563eb', fontWeight: 700 }}>
                           {unreadCount} unread
                         </span>
                       </div>
@@ -179,16 +210,16 @@ export default function Navbar() {
                           key={n.id}
                           style={{
                             padding: '12px 16px', borderBottom: '1px solid var(--border-subtle)',
-                            background: n.unread ? 'rgba(59,130,246,.04)' : 'transparent',
+                            background: n.unread ? (isDark ? 'rgba(59,130,246,.06)' : 'rgba(59,130,246,.05)') : 'transparent',
                             cursor: 'pointer', transition: 'background 0.15s',
                           }}
                         >
-                          <p style={{ color: '#fff', fontSize: '0.8rem', margin: 0, lineHeight: 1.4 }}>{n.text}</p>
+                          <p style={{ color: 'var(--text-primary)', fontSize: '0.8rem', margin: 0, lineHeight: 1.4 }}>{n.text}</p>
                           <p style={{ color: 'var(--text-muted)', fontSize: '0.7rem', margin: '4px 0 0' }}>{n.time}</p>
                         </div>
                       ))}
-                      <div style={{ padding: '10px', textAlign: 'center', background: 'rgba(0,0,0,.2)' }}>
-                        <button style={{ background: 'none', border: 'none', color: '#60a5fa', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}>
+                      <div style={{ padding: '10px', textAlign: 'center', background: isDark ? 'rgba(0,0,0,.2)' : 'rgba(59,130,246,.04)' }}>
+                        <button style={{ background: 'none', border: 'none', color: isDark ? '#60a5fa' : '#2563eb', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}>
                           View all notifications
                         </button>
                       </div>
@@ -204,7 +235,8 @@ export default function Navbar() {
                   style={{
                     display: 'flex', alignItems: 'center', gap: '8px',
                     padding: '4px 8px', borderRadius: '12px',
-                    background: 'rgba(255,255,255,.05)', border: '1px solid var(--border-subtle)',
+                    background: isDark ? 'rgba(255,255,255,.05)' : 'rgba(59,130,246,.07)',
+                    border: isDark ? '1px solid var(--border-subtle)' : '1px solid rgba(59,130,246,.15)',
                     cursor: 'pointer', transition: 'all 0.15s',
                   }}
                 >
@@ -213,7 +245,7 @@ export default function Navbar() {
                     alt={user.name}
                     style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', border: '1.5px solid rgba(59,130,246,.5)' }}
                   />
-                  <span className="hidden sm:block" style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 600 }}>{user.name.split(' ')[0]}</span>
+                  <span className="hidden sm:block" style={{ color: 'var(--text-primary)', fontSize: '0.8rem', fontWeight: 600 }}>{user.name.split(' ')[0]}</span>
                   <ChevronDown size={13} style={{ color: 'var(--text-muted)', transform: showProfile ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
                 </button>
 
@@ -225,12 +257,12 @@ export default function Navbar() {
                         position: 'absolute', right: 0, top: 'calc(100% + 8px)',
                         width: '210px', borderRadius: '16px', overflow: 'hidden',
                         background: 'var(--bg-card)', border: '1px solid var(--border-muted)',
-                        boxShadow: '0 20px 50px rgba(0,0,0,.6)',
+                        boxShadow: isDark ? '0 20px 50px rgba(0,0,0,.6)' : '0 12px 36px rgba(59,130,246,.18)',
                       }}
                     >
                       {/* User Summary */}
-                      <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--border-subtle)', background: 'rgba(255,255,255,.02)' }}>
-                        <p style={{ color: '#fff', fontSize: '0.85rem', fontWeight: 700, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.name}</p>
+                      <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--border-subtle)', background: isDark ? 'rgba(255,255,255,.02)' : 'rgba(59,130,246,.03)' }}>
+                        <p style={{ color: 'var(--text-primary)', fontSize: '0.85rem', fontWeight: 700, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.name}</p>
                         <p style={{ color: 'var(--text-muted)', fontSize: '0.72rem', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.email}</p>
                       </div>
 
@@ -253,10 +285,16 @@ export default function Navbar() {
                               color: 'var(--text-secondary)', fontSize: '0.8rem', fontWeight: 500,
                               textDecoration: 'none', transition: 'all 0.12s',
                             }}
-                            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(59,130,246,.12)'; e.currentTarget.style.color = '#fff'; }}
-                            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.background = isDark ? 'rgba(59,130,246,.12)' : 'rgba(59,130,246,.1)';
+                              e.currentTarget.style.color = isDark ? '#fff' : '#1d4ed8';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.background = 'transparent';
+                              e.currentTarget.style.color = 'var(--text-secondary)';
+                            }}
                           >
-                            <Icon size={14} color="#60a5fa" />
+                            <Icon size={14} color={isDark ? '#60a5fa' : '#2563eb'} />
                             {label}
                           </Link>
                         ))}

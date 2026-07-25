@@ -3,8 +3,10 @@
 // ============================================================
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function Pagination({ currentPage, totalPages, onPageChange }) {
+  const { isDark } = useTheme();
   if (totalPages <= 1) return null;
 
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -22,31 +24,42 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
     prev = p;
   });
 
+  const btnBg = isDark ? 'var(--bg-card)' : '#ffffff';
+  const btnBorder = isDark ? '1px solid var(--border-subtle)' : '1px solid rgba(59,130,246,.25)';
+  const btnColor = isDark ? 'var(--text-secondary)' : 'var(--text-primary)';
+
   return (
-    <div className="flex items-center gap-2 justify-center mt-8">
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center', marginTop: '32px' }}>
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="p-2 rounded-xl border border-white/10 text-gray-400 hover:text-white hover:border-blue-500/50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        style={{
+          width: '38px', height: '38px', borderRadius: '12px',
+          background: btnBg, border: btnBorder, color: btnColor,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+          opacity: currentPage === 1 ? 0.4 : 1, transition: 'all 0.15s',
+        }}
       >
-        <ChevronLeft size={18} />
+        <ChevronLeft size={16} />
       </button>
 
       {items.map((item, idx) =>
         item === '...' ? (
-          <span key={`ellipsis-${idx}`} className="px-2 text-gray-500">…</span>
+          <span key={`ellipsis-${idx}`} style={{ padding: '0 6px', color: 'var(--text-muted)' }}>…</span>
         ) : (
           <button
             key={item}
             onClick={() => onPageChange(item)}
-            className={`
-              w-10 h-10 rounded-xl text-sm font-semibold transition-all duration-200
-              ${currentPage === item
-                ? 'text-white shadow-lg shadow-blue-500/25'
-                : 'text-gray-400 border border-white/10 hover:border-blue-500/50 hover:text-white'
-              }
-            `}
-            style={currentPage === item ? { background: 'linear-gradient(135deg,#3b82f6,#06b6d4)' } : {}}
+            style={{
+              width: '38px', height: '38px', borderRadius: '12px',
+              fontSize: '0.85rem', fontWeight: 700,
+              cursor: 'pointer', transition: 'all 0.15s',
+              border: currentPage === item ? 'none' : btnBorder,
+              background: currentPage === item ? 'linear-gradient(135deg,#3b82f6,#06b6d4)' : btnBg,
+              color: currentPage === item ? '#ffffff' : btnColor,
+              boxShadow: currentPage === item ? '0 4px 14px rgba(59,130,246,.35)' : 'none',
+            }}
           >
             {item}
           </button>
@@ -56,9 +69,15 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="p-2 rounded-xl border border-white/10 text-gray-400 hover:text-white hover:border-blue-500/50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        style={{
+          width: '38px', height: '38px', borderRadius: '12px',
+          background: btnBg, border: btnBorder, color: btnColor,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+          opacity: currentPage === totalPages ? 0.4 : 1, transition: 'all 0.15s',
+        }}
       >
-        <ChevronRight size={18} />
+        <ChevronRight size={16} />
       </button>
     </div>
   );

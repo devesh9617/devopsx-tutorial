@@ -201,7 +201,13 @@ export default function GradeSelect() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 + i * 0.08, duration: 0.35 }}
-              onClick={() => { setSelected(grade.id); setShowFeatures(grade.id); }}
+              onClick={() => {
+                setSelected(grade.id);
+                setShowFeatures(grade.id);
+                localStorage.setItem('devopsx_grade', grade.id);
+                // Notify Sidebar in same tab
+                window.dispatchEvent(new CustomEvent('gradechange', { detail: grade.id }));
+              }}
               style={{
                 position: 'relative',
                 background: isSelected
