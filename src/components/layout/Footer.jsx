@@ -8,12 +8,15 @@ import BrandLogo from '../ui/BrandLogo';
 
 const footerLinks = {
   courses: [
+    { label: 'Cloud Computing', to: '/courses?category=Cloud+Computing' },
+    { label: 'AI & Machine Learning', to: '/courses?category=AI+%26+Machine+Learning' },
+    /*
     { label: 'DevOps',          to: '/courses?category=DevOps' },
-    { label: 'Cloud Computing', to: '/courses?category=cloud' },
     { label: 'Web Development', to: '/courses?category=web-development' },
     { label: 'Data Science',    to: '/courses?category=data-science' },
     { label: 'Cyber Security',  to: '/courses?category=cyber-security' },
     { label: 'Linux',           to: '/courses?category=linux' },
+    */
   ],
   resources: [
     { label: 'TextBooks',         to: '/textbooks' },

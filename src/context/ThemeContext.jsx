@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 
 // ============================================================
 // ThemeContext — Dark/Light mode toggle with localStorage
-// Dark mode is the default
+// Light mode is the default
 // ============================================================
 
 const ThemeContext = createContext(null);
@@ -10,7 +10,7 @@ const ThemeContext = createContext(null);
 export function ThemeProvider({ children }) {
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem('devopsx_theme');
-    return saved ? saved === 'dark' : true; // Default: dark
+    return saved ? saved === 'dark' : false; // Default: light
   });
 
   useEffect(() => {

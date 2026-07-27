@@ -15,7 +15,7 @@ import { useTheme } from '../../context/ThemeContext';
 import PageWrapper, { PageHeader } from '../../components/ui/PageWrapper';
 
 const COURSES_PER_PAGE = 8;
-const levels = ['All Levels', 'Beginner', 'Intermediate', 'Advanced'];
+const levels = ['All Segments', 'Basic', 'Intermediate', 'Advanced'];
 const priceFilters = ['All', 'Free', 'Paid'];
 const sortOptions = [
   { value: 'popular', label: 'Most Popular' },
@@ -30,7 +30,7 @@ export default function AllCourses() {
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get('search') || '');
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'All');
-  const [selectedLevel, setSelectedLevel] = useState('All Levels');
+  const [selectedLevel, setSelectedLevel] = useState('All Segments');
   const [selectedPrice, setSelectedPrice] = useState(
     searchParams.get('filter') === 'free' ? 'Free' : 'All'
   );
@@ -53,7 +53,7 @@ export default function AllCourses() {
       );
     }
     if (selectedCategory !== 'All') result = result.filter((c) => c.category === selectedCategory);
-    if (selectedLevel !== 'All Levels') result = result.filter((c) => c.level === selectedLevel);
+    if (selectedLevel !== 'All Segments') result = result.filter((c) => c.level === selectedLevel);
     if (selectedPrice === 'Free') result = result.filter((c) => c.isFree);
     if (selectedPrice === 'Paid') result = result.filter((c) => !c.isFree);
 
@@ -72,9 +72,9 @@ export default function AllCourses() {
   const paginated = filtered.slice((currentPage - 1) * COURSES_PER_PAGE, currentPage * COURSES_PER_PAGE);
 
   const resetFilters = () => {
-    setSearch(''); setSelectedCategory('All'); setSelectedLevel('All Levels'); setSelectedPrice('All'); setSortBy('popular');
+    setSearch(''); setSelectedCategory('All'); setSelectedLevel('All Segments'); setSelectedPrice('All'); setSortBy('popular');
   };
-  const hasFilters = search || selectedCategory !== 'All' || selectedLevel !== 'All Levels' || selectedPrice !== 'All';
+  const hasFilters = search || selectedCategory !== 'All' || selectedLevel !== 'All Segments' || selectedPrice !== 'All';
 
   return (
     <PageWrapper>
@@ -83,8 +83,8 @@ export default function AllCourses() {
         icon={BookOpen}
         iconColor="#3b82f6"
         badge="EXPLORE COURSES"
-        title="Recorded Classes & Courses"
-        subtitle={`Showing ${filtered.length} courses across all engineering domains`}
+        title="Cloud Computing & AI Courses"
+        subtitle={`Showing ${filtered.length} courses organized by Basic, Intermediate & Advanced segments`}
       />
 
       {/* Main Grid */}
@@ -188,10 +188,10 @@ export default function AllCourses() {
               </div>
             </div>
 
-            {/* Skill Level Filter */}
+            {/* Course Segment Filter */}
             <div style={{ marginBottom: '20px' }}>
               <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: '8px' }}>
-                Skill Level
+                Course Segment
               </label>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 {levels.map((lvl) => {

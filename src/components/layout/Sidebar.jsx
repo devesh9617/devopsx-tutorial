@@ -148,12 +148,14 @@ const menuSections = [
     label: 'TECH & CLOUD',
     icon: Server,
     items: [
-      { icon: Server,    label: 'DevOps & Docker',  to: '/courses?category=DevOps' },
       { icon: Cloud,     label: 'Cloud (AWS/Azure)',to: '/courses?category=Cloud+Computing' },
+      { icon: Brain,     label: 'AI & Machine Learning', to: '/courses?category=AI+%26+Machine+Learning' },
+      /*
+      { icon: Server,    label: 'DevOps & Docker',  to: '/courses?category=DevOps' },
       { icon: Globe,     label: 'Web Development', to: '/courses?category=Web+Development' },
       { icon: Terminal,  label: 'Linux & SysAdmin',  to: '/courses?category=Linux' },
-      { icon: Brain,     label: 'AI & Data Science', to: '/courses?category=Data+Science' },
       { icon: Shield,    label: 'Cyber Security',   to: '/courses?category=Cyber+Security' },
+      */
     ],
   },
   {

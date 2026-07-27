@@ -40,6 +40,7 @@ const tracks = [
     tags: ['What is AI?', 'Machine Learning', 'Neural Networks'],
     more: 3,
   },
+  /*
   {
     id: 'web',
     icon: Globe,
@@ -66,6 +67,7 @@ const tracks = [
     tags: ['Linux Basics', 'Git & GitHub', 'CI/CD'],
     more: 3,
   },
+  */
 ];
 
 export default function Onboarding() {
@@ -256,7 +258,7 @@ export default function Onboarding() {
         </motion.button>
 
         <p style={{ color: 'rgba(148,163,184,.35)', fontSize: '0.72rem', marginTop: '10px' }}>
-          You can select all 4 or any combination you prefer
+          You can select both or any combination you prefer
         </p>
       </motion.div>
     </div>

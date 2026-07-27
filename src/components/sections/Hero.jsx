@@ -14,7 +14,7 @@ const stats = [
   { icon: Award,    value: '100+', label: 'Projects' },
 ];
 
-const popularTags = ['DevOps', 'AWS', 'Kubernetes', 'Docker', 'React', 'Python', 'AI & ML'];
+const popularTags = ['Cloud Computing', 'AWS', 'Artificial Intelligence', 'Machine Learning', 'Python', 'AI & ML'];
 
 const containerVar = {
   hidden: {},
@@ -164,16 +164,7 @@ export default function Hero() {
               margin: '0 0 20px',
             }}
           >
-            Master{' '}
-            <span style={{
-              background: isDark
-                ? 'linear-gradient(135deg,#60a5fa 0%,#22d3ee 100%)'
-                : 'linear-gradient(135deg,#1d4ed8 0%,#0284c7 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}>
-              DevOps, Cloud
-            </span>
+            Master Cloud Computing & AI
             <br />
             & Modern Engineering
           </motion.h1>
