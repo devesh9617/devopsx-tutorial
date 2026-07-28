@@ -83,38 +83,38 @@ html.dark {
 
 /* ─── LIGHT MODE ─── */
 html.light {
-  /* Backgrounds — distinct Slate/Indigo tinted canvas so white cards stand out clearly */
-  --bg-primary:    #ebf0fa;
+  /* Backgrounds — crisp light canvas so white cards pop out */
+  --bg-primary:    #f1f5f9;
   --bg-secondary:  #ffffff;
   --bg-card:       #ffffff;
-  --bg-card-hover: #f5f8ff;
-  --bg-glass:      rgba(255, 255, 255, 0.88);
-  --bg-glass-hover:rgba(255, 255, 255, 0.98);
-  --bg-input:      #f0f4ff;
+  --bg-card-hover: #f8fafc;
+  --bg-glass:      rgba(255, 255, 255, 0.95);
+  --bg-glass-hover:rgba(255, 255, 255, 1);
+  --bg-input:      #ffffff;
 
-  /* Borders — defined, clean borders so elements don't look washed out */
-  --border-subtle: rgba(59, 130, 246, 0.20);
-  --border-muted:  rgba(59, 130, 246, 0.32);
-  --border-brand:  rgba(59, 130, 246, 0.60);
-  --border-focus:  rgba(59, 130, 246, 0.80);
+  /* Borders — clear, defined borders for high visual contrast */
+  --border-subtle: #cbd5e1;
+  --border-muted:  #94a3b8;
+  --border-brand:  #2563eb;
+  --border-focus:  #1d4ed8;
 
-  /* Text — deep contrast dark blue & slate */
+  /* Text — deep contrast dark slate & blue */
   --text-primary:   #0f172a;
   --text-secondary: #334155;
   --text-muted:     #64748b;
   --text-accent:    #1d4ed8;
 
   /* Gradients */
-  --gradient-hero:    linear-gradient(135deg, #e0e7ff 0%, #dbeafe 60%, #e0e7ff 100%);
-  --gradient-card:    linear-gradient(135deg, #ffffff, #f5f8ff);
-  --gradient-sidebar: linear-gradient(180deg, #ffffff, #f0f4ff);
+  --gradient-hero:    linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 60%, #f1f5f9 100%);
+  --gradient-card:    linear-gradient(135deg, #ffffff, #f8fafc);
+  --gradient-sidebar: linear-gradient(180deg, #ffffff, #f1f5f9);
 
-  /* Shadows — crisp card elevation */
+  /* Shadows — crisp card elevation & borders */
   --shadow-sm:    0 1px 3px rgba(15,23,42,.08), 0 1px 2px rgba(15,23,42,.04);
-  --shadow-md:    0 4px 14px rgba(15,23,42,.08), 0 2px 4px rgba(15,23,42,.04);
-  --shadow-lg:    0 10px 30px rgba(15,23,42,.12), 0 4px 8px rgba(15,23,42,.04);
-  --shadow-glow:  0 0 30px  rgba(59,130,246,.25);
-  --shadow-card:  0 2px 10px rgba(15,23,42,.06), 0 1px 3px rgba(15,23,42,.04);
+  --shadow-md:    0 4px 16px rgba(15,23,42,.10), 0 2px 4px rgba(15,23,42,.04);
+  --shadow-lg:    0 12px 36px rgba(15,23,42,.14), 0 4px 8px rgba(15,23,42,.06);
+  --shadow-glow:  0 0 30px  rgba(37,99,235,.20);
+  --shadow-card:  0 4px 16px rgba(15,23,42,.08), 0 1px 3px rgba(15,23,42,.04);
 }
 
 /* ─────────────────── Base Reset ─────────────────── */
