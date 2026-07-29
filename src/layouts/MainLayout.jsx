@@ -3,6 +3,7 @@
 // ============================================================
 
 import { motion } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
 import { useSidebar } from '../context/SidebarContext';
 import Navbar from '../components/layout/Navbar';
 import Sidebar from '../components/layout/Sidebar';
@@ -10,14 +11,20 @@ import Footer from '../components/layout/Footer';
 
 export default function MainLayout({ children }) {
   const { collapsed, isMobile } = useSidebar();
-  const sidebarWidth = isMobile ? 0 : collapsed ? 72 : 260;
+  const location = useLocation();
+
+  // Hide sidebar on Book Details page (/textbooks/:id) so it opens as full page like reference image
+  const isBookDetailsPage = /^\/textbooks\/[^\/]+$/.test(location.pathname);
+  const hideSidebar = isBookDetailsPage;
+
+  const sidebarWidth = hideSidebar || isMobile ? 0 : collapsed ? 72 : 260;
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
       <Navbar />
-      <Sidebar />
+      {!hideSidebar && <Sidebar />}
 
-      {/* Main content — shifts right to make room for sidebar */}
+      {/* Main content — shifts right for sidebar or takes full width when sidebar is hidden */}
       <motion.div
         animate={{ marginLeft: sidebarWidth }}
         transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
@@ -32,3 +39,4 @@ export default function MainLayout({ children }) {
     </div>
   );
 }
+

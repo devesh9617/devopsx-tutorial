@@ -1,15 +1,15 @@
 // ============================================================
-// TextBooks Page — DevOpsX Digital Library (Ultra-Professional Design)
+// TextBooks Page — DevOpsX Digital Library & Programs
 // ============================================================
 
 import { useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
 import { Search, BookOpen, X, RotateCcw } from 'lucide-react';
 import { books, bookCategories } from '../../data/books';
 import BookCard from '../../components/cards/BookCard';
 import EmptyState from '../../components/ui/EmptyState';
 import { useDebounce } from '../../hooks/index';
 import PageWrapper, { PageHeader, FilterPill } from '../../components/ui/PageWrapper';
+import LearningProgramsSection from '../../components/sections/LearningProgramsSection';
 
 export default function TextBooks() {
   const [search, setSearch] = useState('');
@@ -50,8 +50,16 @@ export default function TextBooks() {
         subtitle={`Access ${filtered.length} free technical books, NCERT textbooks, and reference guides. Read online or download PDF for free.`}
       />
 
+      {/* Image 1 Style Learning Programs Section */}
+      <LearningProgramsSection />
+
       {/* Controls Area */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '24px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '24px', marginTop: '16px' }}>
+
+        {/* Section Heading */}
+        <h3 style={{ color: 'var(--text-primary)', fontSize: '1.25rem', fontWeight: 800, margin: '0 0 4px' }}>
+          Explore All Books & Textbooks
+        </h3>
 
         {/* Search Input Bar */}
         <div style={{ position: 'relative', maxWidth: '520px' }}>

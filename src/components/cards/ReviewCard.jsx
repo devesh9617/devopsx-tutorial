@@ -8,24 +8,24 @@ import { Quote, ThumbsUp, CheckCircle2, Star } from 'lucide-react';
 export default function ReviewCard({ review, index = 0 }) {
   return (
     <motion.article
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: Math.min(index * 0.05, 0.3), duration: 0.35 }}
+      transition={{ delay: Math.min(index * 0.05, 0.25), duration: 0.25 }}
       style={{
         position: 'relative',
         background: 'var(--bg-card)',
         border: '1px solid var(--border-subtle)',
-        borderRadius: '20px',
-        padding: '22px',
+        borderRadius: '12px',
+        padding: '20px',
         display: 'flex',
         flexDirection: 'column',
-        boxShadow: '0 4px 24px rgba(0,0,0,.3)',
-        transition: 'all 0.25s ease',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+        transition: 'all 0.2s ease-in-out',
       }}
       whileHover={{
-        transform: 'translateY(-4px)',
-        borderColor: 'rgba(59,130,246,.35)',
-        boxShadow: '0 12px 36px rgba(0,0,0,.45), 0 0 20px rgba(59,130,246,.12)',
+        transform: 'translateY(-3px)',
+        borderColor: 'rgba(59,130,246,0.3)',
+        boxShadow: '0 6px 16px rgba(0,0,0,0.2)',
       }}
     >
       {/* Background Subtle Quote Icon */}

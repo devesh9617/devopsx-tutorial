@@ -23,26 +23,24 @@ export default function CourseCard({ course, index = 0, viewMode = 'grid' }) {
 
   return (
     <motion.article
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: Math.min(index * 0.04, 0.3), duration: 0.3 }}
+      transition={{ delay: Math.min(index * 0.04, 0.25), duration: 0.25 }}
       style={{
         background: 'var(--bg-card)',
-        border: isDark ? '1px solid var(--border-subtle)' : '1px solid rgba(59,130,246,.25)',
-        borderRadius: '16px',
+        border: '1px solid var(--border-subtle)',
+        borderRadius: '12px',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: isList ? 'row' : 'column',
         position: 'relative',
-        boxShadow: isDark ? '0 4px 20px rgba(0,0,0,.3)' : '0 2px 10px rgba(15,23,42,.06), 0 1px 3px rgba(15,23,42,.04)',
-        transition: 'all 0.25s ease',
+        boxShadow: isDark ? '0 2px 8px rgba(0,0,0,0.2)' : '0 2px 8px rgba(0,0,0,0.04)',
+        transition: 'all 0.2s ease-in-out',
       }}
       whileHover={{
         transform: 'translateY(-3px)',
-        borderColor: isDark ? 'rgba(59,130,246,.4)' : 'rgba(59,130,246,.55)',
-        boxShadow: isDark
-          ? '0 12px 32px rgba(0,0,0,.45), 0 0 20px rgba(59,130,246,.15)'
-          : '0 8px 24px rgba(59,130,246,.16), 0 2px 6px rgba(0,0,0,.04)',
+        borderColor: isDark ? 'rgba(59,130,246,0.3)' : 'rgba(59,130,246,0.4)',
+        boxShadow: isDark ? '0 6px 16px rgba(0,0,0,0.35)' : '0 6px 16px rgba(0,0,0,0.08)',
       }}
     >
       {/* ── Thumbnail ── */}
@@ -52,30 +50,29 @@ export default function CourseCard({ course, index = 0, viewMode = 'grid' }) {
         aspectRatio: isList ? '16/10' : '16/9',
         flexShrink: 0,
         overflow: 'hidden',
+        background: isDark ? '#111827' : '#f3f4f6',
       }}>
         <img
           src={course.thumbnail}
           alt={course.title}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.4s ease' }}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
           loading="lazy"
         />
-        {/* Subtle shadow overlay */}
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,.3) 0%, transparent 40%, rgba(0,0,0,.7) 100%)', pointerEvents: 'none' }} />
 
         {/* Top Badges */}
-        <div style={{ position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+        <div style={{ position: 'absolute', top: '8px', left: '8px', display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
           {course.isNew && (
-            <span style={{ padding: '2px 8px', borderRadius: '999px', fontSize: '0.65rem', fontWeight: 800, color: '#fff', background: 'linear-gradient(135deg,#3b82f6,#06b6d4)' }}>
+            <span style={{ padding: '2px 8px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 700, color: '#fff', background: '#2563eb' }}>
               NEW
             </span>
           )}
           {course.isFree && (
-            <span style={{ padding: '2px 8px', borderRadius: '999px', fontSize: '0.65rem', fontWeight: 800, color: '#fff', background: '#10b981' }}>
+            <span style={{ padding: '2px 8px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 700, color: '#fff', background: '#10b981' }}>
               FREE
             </span>
           )}
           {course.isBestseller && (
-            <span style={{ padding: '2px 8px', borderRadius: '999px', fontSize: '0.65rem', fontWeight: 800, color: '#111', background: '#fbbf24' }}>
+            <span style={{ padding: '2px 8px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 700, color: '#111', background: '#fbbf24' }}>
               BESTSELLER
             </span>
           )}
@@ -85,10 +82,9 @@ export default function CourseCard({ course, index = 0, viewMode = 'grid' }) {
         <button
           onClick={(e) => { e.preventDefault(); user && toggleWishlist(course.id); }}
           style={{
-            position: 'absolute', top: '10px', right: '10px',
-            width: '32px', height: '32px', borderRadius: '50%',
-            background: wishlisted ? 'rgba(239,68,68,.9)' : 'rgba(0,0,0,.6)',
-            backdropFilter: 'blur(8px)',
+            position: 'absolute', top: '8px', right: '8px',
+            width: '30px', height: '30px', borderRadius: '50%',
+            background: wishlisted ? '#ef4444' : 'rgba(17,24,39,0.7)',
             border: 'none', cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             transition: 'all 0.15s ease',
@@ -99,11 +95,11 @@ export default function CourseCard({ course, index = 0, viewMode = 'grid' }) {
 
         {/* Bottom thumbnail info */}
         {enrolled && (
-          <div style={{ position: 'absolute', bottom: '10px', left: '10px', display: 'flex', alignItems: 'center', gap: '4px', padding: '3px 10px', borderRadius: '999px', fontSize: '0.68rem', fontWeight: 700, color: '#fff', background: 'rgba(16,185,129,.85)', backdropFilter: 'blur(6px)' }}>
+          <div style={{ position: 'absolute', bottom: '8px', left: '8px', display: 'flex', alignItems: 'center', gap: '4px', padding: '3px 8px', borderRadius: '4px', fontSize: '0.68rem', fontWeight: 700, color: '#fff', background: '#10b981' }}>
             <Award size={11} /> Enrolled
           </div>
         )}
-        <div style={{ position: 'absolute', bottom: '10px', right: '10px', display: 'flex', alignItems: 'center', gap: '4px', padding: '3px 8px', borderRadius: '999px', fontSize: '0.68rem', color: '#fff', background: 'rgba(0,0,0,.65)', backdropFilter: 'blur(6px)' }}>
+        <div style={{ position: 'absolute', bottom: '8px', right: '8px', display: 'flex', alignItems: 'center', gap: '4px', padding: '3px 8px', borderRadius: '4px', fontSize: '0.68rem', color: '#fff', background: 'rgba(17,24,39,0.75)' }}>
           <Clock size={10} /> {course.duration}
         </div>
       </div>
@@ -112,7 +108,7 @@ export default function CourseCard({ course, index = 0, viewMode = 'grid' }) {
       <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
         {/* Category & Level */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-          <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: '999px', fontWeight: 700, background: lc.bg, color: lc.text, border: `1px solid ${lc.border}` }}>
+          <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: '4px', fontWeight: 600, background: lc.bg, color: lc.text, border: `1px solid ${lc.border}` }}>
             {course.level}
           </span>
           <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -122,7 +118,7 @@ export default function CourseCard({ course, index = 0, viewMode = 'grid' }) {
 
         {/* Title */}
         <Link to={`/courses/${course.slug}`} style={{ textDecoration: 'none', marginBottom: '8px' }}>
-          <h3 style={{ color: 'var(--text-primary)', fontSize: '0.9rem', fontWeight: 700, lineHeight: 1.35, margin: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+          <h3 style={{ color: 'var(--text-primary)', fontSize: '0.9rem', fontWeight: 600, lineHeight: 1.4, margin: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
             {course.title}
           </h3>
         </Link>
@@ -150,22 +146,19 @@ export default function CourseCard({ course, index = 0, viewMode = 'grid' }) {
           </span>
         </div>
 
-        {/* Divider */}
-        <div style={{ height: '1px', background: 'var(--border-subtle)', marginBottom: '12px' }} />
-
-        {/* Price & Action */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+        {/* Action / Price */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', pt: '8px' }}>
           {course.isFree ? (
-            <span style={{ fontSize: '1.1rem', fontWeight: 800, color: isDark ? '#34d399' : '#059669' }}>Free</span>
+            <span style={{ fontSize: '1.05rem', fontWeight: 700, color: isDark ? '#34d399' : '#059669' }}>Free</span>
           ) : (
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-              <span style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)' }}>₹{course.price.toLocaleString()}</span>
+              <span style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>₹{course.price.toLocaleString()}</span>
               {course.originalPrice > course.price && (
                 <>
                   <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>
                     ₹{course.originalPrice.toLocaleString()}
                   </span>
-                  <span style={{ fontSize: '0.68rem', fontWeight: 700, color: isDark ? '#34d399' : '#059669' }}>{discount}% off</span>
+                  <span style={{ fontSize: '0.68rem', fontWeight: 600, color: isDark ? '#34d399' : '#059669' }}>{discount}% off</span>
                 </>
               )}
             </div>
@@ -174,10 +167,10 @@ export default function CourseCard({ course, index = 0, viewMode = 'grid' }) {
           <Link
             to={`/courses/${course.slug}`}
             style={{
-              padding: '7px 14px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 700,
-              color: '#fff', background: 'linear-gradient(135deg,#3b82f6,#06b6d4)', textDecoration: 'none',
-              display: 'inline-flex', alignItems: 'center', gap: '4px', boxShadow: '0 4px 12px rgba(59,130,246,.25)',
-              transition: 'opacity 0.15s',
+              padding: '8px 14px', borderRadius: '6px', fontSize: '0.78rem', fontWeight: 600,
+              color: '#fff', background: '#2563eb', textDecoration: 'none',
+              display: 'inline-flex', alignItems: 'center', gap: '4px',
+              transition: 'background 0.15s',
             }}
           >
             {enrolled ? 'Resume' : 'Enroll'} <ArrowRight size={12} />

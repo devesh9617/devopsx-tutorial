@@ -12,6 +12,7 @@ const Home = lazy(() => import('../pages/Home/index'));
 const AllCourses = lazy(() => import('../pages/AllCourses/index'));
 const CourseDetails = lazy(() => import('../pages/CourseDetails/index'));
 const TextBooks = lazy(() => import('../pages/TextBooks/index'));
+const BookDetails = lazy(() => import('../pages/BookDetails/index'));
 const Notes = lazy(() => import('../pages/Notes/index'));
 const Assignments = lazy(() => import('../pages/Assignments/index'));
 const Practice = lazy(() => import('../pages/Practice/index'));
@@ -56,6 +57,7 @@ export default function AppRouter() {
           <Route path="/courses" element={<AllCourses />} />
           <Route path="/courses/:slug" element={<CourseDetails />} />
           <Route path="/textbooks" element={<TextBooks />} />
+          <Route path="/textbooks/:id" element={<BookDetails />} />
           <Route path="/notes" element={<Notes />} />
           <Route path="/assignments" element={<Assignments />} />
           <Route path="/practice" element={<Practice />} />

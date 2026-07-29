@@ -1,5 +1,5 @@
 // ============================================================
-// GradeSelect — "What is your current grade?" (Theme Aware)
+// GradeSelect — "View Learning Programs" (Original Grades + Image UI)
 // Step 2 of onboarding.
 // ============================================================
 
@@ -8,8 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   BookOpen, GraduationCap, Users, CheckCircle2, ArrowRight,
-  ArrowLeft, BookMarked, Video, FileText, ClipboardList,
-  Brain, Terminal, Code2, Database, Cpu, Layers,
+  ArrowLeft, Calendar, Award, Sparkles, Check, BookMarked,
+  Video, FileText, ClipboardList, Brain, Terminal, Code2, Database, Cpu, Layers,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -18,12 +18,18 @@ import BrandLogo from '../../components/ui/BrandLogo';
 const grades = [
   {
     id: 'grade-5-8',
-    icon: BookMarked,
-    iconColor: '#059669',
-    iconBg: 'rgba(52,211,153,.15)',
     label: 'Class 5 – 8',
     sublabel: 'Middle School',
     desc: 'Foundation-level courses, guided learning, AI tools exploration',
+    image: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?w=600&auto=format&fit=crop',
+    accent: '#059669',
+    badge: 'Class 5-8',
+    details: [
+      { icon: BookOpen, label: 'Classes', val: 'Class 5th to 8th' },
+      { icon: Calendar, label: 'Duration', val: 'Flexible / Guided' },
+      { icon: Users, label: 'Learners', val: '4-5 Learners per class' },
+      { icon: Award, label: 'Curriculum', val: 'Aligned as per CBSE, ICSE, State Boards' },
+    ],
     features: [
       'Ebooks & Study Material',
       'Video Courses',
@@ -37,16 +43,21 @@ const grades = [
       'Prompt Libraries',
       'Learning Support',
     ],
-    accent: '#059669',
   },
   {
     id: 'grade-9-12',
-    icon: GraduationCap,
-    iconColor: '#2563eb',
-    iconBg: 'rgba(59,130,246,.15)',
     label: 'Class 9 – 12',
     sublabel: 'High School',
     desc: 'Syllabus-aligned courses, AI tools, advanced projects & exam prep',
+    image: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=600&auto=format&fit=crop',
+    accent: '#2563eb',
+    badge: 'Class 9-12',
+    details: [
+      { icon: BookOpen, label: 'Classes', val: 'Class 9th to 12th' },
+      { icon: Calendar, label: 'Duration', val: 'Term / Semester' },
+      { icon: Users, label: 'Learners', val: '8-10 Learners per class' },
+      { icon: Award, label: 'Curriculum', val: 'Aligned with Board & High School Syllabus' },
+    ],
     features: [
       'Ebooks & Courses',
       'Assignments & Syllabus',
@@ -59,16 +70,21 @@ const grades = [
       'Peer Learning Tool',
       'Learning Support',
     ],
-    accent: '#2563eb',
   },
   {
     id: 'college',
-    icon: Users,
-    iconColor: '#7c3aed',
-    iconBg: 'rgba(167,139,250,.15)',
     label: 'College / Graduate',
     sublabel: 'Undergraduate & above',
     desc: 'Advanced AI, Machine Learning, Python, real-world projects & certifications',
+    image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=600&auto=format&fit=crop',
+    accent: '#7c3aed',
+    badge: 'College & Above',
+    details: [
+      { icon: BookOpen, label: 'Classes', val: 'Undergraduate & Graduate' },
+      { icon: Calendar, label: 'Duration', val: 'Self-Paced / Guided' },
+      { icon: Users, label: 'Learners', val: '10-15 Learners per batch' },
+      { icon: Award, label: 'Curriculum', val: 'DevOps & AI Industry Standard' },
+    ],
     features: [
       'Ebooks & Courses',
       'Video Lectures',
@@ -81,8 +97,14 @@ const grades = [
       'AI Automation',
       'Project Portfolio',
     ],
-    accent: '#7c3aed',
   },
+];
+
+const whatsYouLearnPoints = [
+  'Enhance productivity with AI for everyday tasks',
+  'Understand the fundamentals of AI & Cloud Infrastructure',
+  'Master ChatGPT, Grok, Gemini, & Copilot tools',
+  'Add advanced prompt engineering & automation techniques',
 ];
 
 function featureIcon(label) {
@@ -104,14 +126,20 @@ export default function GradeSelect() {
   const { user } = useAuth();
   const { isDark } = useTheme();
   const navigate = useNavigate();
-  const [selected, setSelected] = useState(null);
+  const [selected, setSelected] = useState('grade-5-8');
   const [loading, setLoading] = useState(false);
 
   const handleContinue = async () => {
     if (!selected) return;
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 650));
+    await new Promise((r) => setTimeout(r, 600));
     navigate('/dashboard');
+  };
+
+  const selectGradeItem = (id) => {
+    setSelected(id);
+    localStorage.setItem('devopsx_grade', id);
+    window.dispatchEvent(new CustomEvent('gradechange', { detail: id }));
   };
 
   const selectedGrade = grades.find((g) => g.id === selected);
@@ -124,26 +152,22 @@ export default function GradeSelect() {
         : 'linear-gradient(145deg, #f8fafc 0%, #eff6ff 55%, #f8fafc 100%)',
       color: isDark ? '#f8fafc' : '#0f172a',
       display: 'flex', flexDirection: 'column', alignItems: 'center',
-      justifyContent: 'flex-start', padding: '36px 20px 48px',
+      justifyContent: 'flex-start', padding: '32px 20px 48px',
       fontFamily: 'var(--font-sans)', position: 'relative', overflow: 'hidden',
       transition: 'background 0.2s ease',
     }}>
-      {/* Ambient blobs */}
-      <motion.div animate={{ scale: [1, 1.2, 1], opacity: isDark ? [0.18, 0.32, 0.18] : [0.3, 0.5, 0.3] }} transition={{ duration: 8, repeat: Infinity }}
-        style={{ position: 'absolute', width: '550px', height: '550px', borderRadius: '50%', top: '-180px', right: '-160px', background: isDark ? 'radial-gradient(circle, rgba(167,139,250,.3) 0%, transparent 65%)' : 'radial-gradient(circle, rgba(167,139,250,.15) 0%, transparent 65%)', pointerEvents: 'none' }} />
-      <motion.div animate={{ scale: [1, 1.15, 1], opacity: isDark ? [0.12, 0.22, 0.12] : [0.2, 0.4, 0.2] }} transition={{ duration: 10, repeat: Infinity, delay: 3 }}
-        style={{ position: 'absolute', width: '480px', height: '480px', borderRadius: '50%', bottom: '-150px', left: '-140px', background: isDark ? 'radial-gradient(circle, rgba(59,130,246,.25) 0%, transparent 65%)' : 'radial-gradient(circle, rgba(59,130,246,.15) 0%, transparent 65%)', pointerEvents: 'none' }} />
+      {/* Ambient background grid */}
       <div style={{ position: 'absolute', inset: 0, backgroundImage: isDark ? 'linear-gradient(rgba(59,130,246,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,.025) 1px, transparent 1px)' : 'linear-gradient(rgba(59,130,246,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,.06) 1px, transparent 1px)', backgroundSize: '56px 56px', pointerEvents: 'none' }} />
 
-      {/* Logo */}
-      <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}
-        style={{ marginBottom: '36px', position: 'relative', zIndex: 2 }}>
+      {/* Top Logo */}
+      <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}
+        style={{ marginBottom: '24px', position: 'relative', zIndex: 2 }}>
         <BrandLogo size="lg" />
       </motion.div>
 
       {/* Progress Steps */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.05 }}
-        style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '32px', position: 'relative', zIndex: 2 }}>
+        style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '28px', position: 'relative', zIndex: 2 }}>
         {['Choose Track', 'Select Grade', 'Get Started'].map((step, i) => {
           const done = i < 1;
           const active = i === 1;
@@ -169,138 +193,225 @@ export default function GradeSelect() {
         })}
       </motion.div>
 
-      {/* Headline */}
-      <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.38 }}
-        style={{ textAlign: 'center', marginBottom: '40px', position: 'relative', zIndex: 2 }}>
-        <p style={{ color: isDark ? '#60a5fa' : '#2563eb', fontSize: '0.78rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', margin: '0 0 10px' }}>
-          Step 2 of 2
-        </p>
-        <h1 style={{ color: isDark ? '#fff' : '#0f172a', fontFamily: 'var(--font-display)', fontSize: 'clamp(1.6rem, 4vw, 2.3rem)', fontWeight: 900, letterSpacing: '-0.03em', margin: '0 0 10px', lineHeight: 1.1 }}>
-          What is your current grade?
+      {/* Main Headline (Image Header Style) */}
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.35 }}
+        style={{ textAlign: 'center', marginBottom: '36px', position: 'relative', zIndex: 2 }}>
+        <h1 style={{ color: isDark ? '#fff' : '#0f172a', fontFamily: 'var(--font-display)', fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', fontWeight: 900, letterSpacing: '-0.02em', margin: '0 0 6px', lineHeight: 1.1 }}>
+          View Learning Programs
         </h1>
-        <p style={{ color: isDark ? 'rgba(148,163,184,.55)' : '#64748b', fontSize: '0.875rem', margin: 0 }}>
-          We will personalize your dashboard, resources and courses accordingly
+        <h3 style={{ color: isDark ? '#60a5fa' : '#2563eb', fontSize: '1.15rem', fontWeight: 800, margin: '0 0 6px' }}>
+          Pick a learning program & get started!
+        </h3>
+        <p style={{ color: isDark ? 'rgba(148,163,184,.7)' : '#64748b', fontSize: '0.9rem', margin: 0 }}>
+          Choose from our Best Courses for your grade ⭐️
         </p>
       </motion.div>
 
-      {/* Grade Cards */}
+      {/* Main Layout: Left Column + Right Cards Grid (Exact Image Layout) */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-        gap: '16px',
-        width: '100%', maxWidth: '860px',
+        gridTemplateColumns: 'minmax(250px, 280px) 1fr',
+        gap: '28px',
+        width: '100%', maxWidth: '1080px',
         position: 'relative', zIndex: 2,
-        marginBottom: '32px',
+        marginBottom: '28px',
+        alignItems: 'start',
       }}>
-        {grades.map((grade, i) => {
-          const Icon = grade.icon;
-          const isSelected = selected === grade.id;
-          return (
-            <motion.button
-              key={grade.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 + i * 0.08, duration: 0.35 }}
-              onClick={() => {
-                setSelected(grade.id);
-                localStorage.setItem('devopsx_grade', grade.id);
-                window.dispatchEvent(new CustomEvent('gradechange', { detail: grade.id }));
-              }}
-              style={{
-                position: 'relative',
-                background: isSelected
-                  ? (isDark ? `linear-gradient(145deg, ${grade.accent}12, ${grade.accent}08)` : '#f0f9ff')
-                  : (isDark ? 'rgba(13,22,52,0.88)' : '#ffffff'),
-                border: `1.5px solid ${
-                  isSelected
-                    ? grade.accent
-                    : (isDark ? 'rgba(255,255,255,.07)' : '#e2e8f0')
-                }`,
-                borderRadius: '22px',
-                padding: '24px 20px',
-                textAlign: 'left',
-                cursor: 'pointer',
-                boxShadow: isSelected
-                  ? (isDark ? `0 0 0 3px ${grade.accent}22, 0 16px 40px rgba(0,0,0,.45)` : `0 0 0 3px rgba(37,99,235,.15), 0 12px 32px rgba(37,99,235,.08)`)
-                  : (isDark ? '0 8px 28px rgba(0,0,0,.35)' : '0 4px 16px rgba(15,23,42,.04)'),
-                transition: 'all 0.22s ease',
-                outline: 'none',
-              }}
-              whileHover={{ y: -4, boxShadow: isDark ? '0 22px 52px rgba(0,0,0,.5)' : '0 14px 36px rgba(15,23,42,.08)' }}
-              whileTap={{ scale: 0.985 }}
-            >
-              {/* Checkmark */}
-              <AnimatePresence>
+
+        {/* Left Column: What you'll learn */}
+        <motion.div
+          initial={{ opacity: 0, x: -16 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.15 }}
+          style={{
+            background: isDark ? 'rgba(13,22,52,0.85)' : '#ffffff',
+            border: `1px solid ${isDark ? 'rgba(255,255,255,.08)' : '#e2e8f0'}`,
+            borderRadius: '20px',
+            padding: '24px 20px',
+            boxShadow: isDark ? '0 10px 30px rgba(0,0,0,.35)' : '0 6px 20px rgba(15,23,42,.04)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '22px' }}>
+            <Sparkles size={20} color="#2563eb" />
+            <h2 style={{ color: isDark ? '#fff' : '#0f172a', fontSize: '1.2rem', fontWeight: 900, margin: 0 }}>
+              What you'll learn
+            </h2>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+            {whatsYouLearnPoints.map((pt, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                <CheckCircle2 size={16} color="#10b981" style={{ flexShrink: 0, marginTop: '2px' }} />
+                <span style={{ color: isDark ? 'rgba(226,232,240,.85)' : '#334155', fontSize: '0.85rem', lineHeight: 1.5, fontWeight: 500 }}>
+                  {pt}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {selectedGrade && (
+            <div style={{ marginTop: '24px', paddingTop: '18px', borderTop: `1px solid ${isDark ? 'rgba(255,255,255,.08)' : '#e2e8f0'}` }}>
+              <p style={{ fontSize: '0.72rem', fontWeight: 700, color: selectedGrade.accent, textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 6px' }}>
+                Selected Track:
+              </p>
+              <p style={{ fontSize: '0.9rem', fontWeight: 900, color: isDark ? '#fff' : '#0f172a', margin: 0 }}>
+                {selectedGrade.label}
+              </p>
+              <p style={{ fontSize: '0.75rem', color: isDark ? 'rgba(148,163,184,.6)' : '#64748b', margin: '2px 0 0' }}>
+                {selectedGrade.sublabel}
+              </p>
+            </div>
+          )}
+        </motion.div>
+
+        {/* Right Column: 3 Original Grade Cards with Image Layout */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))',
+          gap: '18px',
+        }}>
+          {grades.map((grade, i) => {
+            const isSelected = selected === grade.id;
+            return (
+              <motion.div
+                key={grade.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 + i * 0.08, duration: 0.35 }}
+                onClick={() => selectGradeItem(grade.id)}
+                style={{
+                  position: 'relative',
+                  background: isDark ? 'rgba(13,22,52,0.95)' : '#ffffff',
+                  border: `2px solid ${
+                    isSelected
+                      ? grade.accent
+                      : (isDark ? 'rgba(255,255,255,.08)' : '#e2e8f0')
+                  }`,
+                  borderRadius: '16px',
+                  overflow: 'hidden',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  cursor: 'pointer',
+                  boxShadow: isSelected
+                    ? `0 0 0 3px ${grade.accent}33, 0 12px 32px rgba(0,0,0,.25)`
+                    : (isDark ? '0 6px 20px rgba(0,0,0,.3)' : '0 4px 14px rgba(15,23,42,.04)'),
+                  transition: 'all 0.2s ease',
+                }}
+                whileHover={{ y: -4 }}
+              >
+                {/* Checkmark Indicator when Selected */}
                 {isSelected && (
-                  <motion.div initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }}
-                    style={{ position: 'absolute', top: '16px', right: '16px' }}>
-                    <CheckCircle2 size={20} color={grade.accent} fill={grade.accent + '22'} />
-                  </motion.div>
+                  <div style={{
+                    position: 'absolute', top: '10px', right: '10px', zIndex: 10,
+                    width: '24px', height: '24px', borderRadius: '50%',
+                    background: grade.accent, color: '#fff',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                  }}>
+                    <Check size={14} strokeWidth={3} />
+                  </div>
                 )}
-              </AnimatePresence>
 
-              {/* Icon */}
-              <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: grade.iconBg, border: `1px solid ${grade.iconColor}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '14px' }}>
-                <Icon size={24} color={grade.iconColor} strokeWidth={1.75} />
-              </div>
+                {/* Top Banner Image */}
+                <div style={{ position: 'relative', width: '100%', height: '140px', overflow: 'hidden', background: isDark ? '#111827' : '#e2e8f0' }}>
+                  <img
+                    src={grade.image}
+                    alt={grade.label}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                  <span style={{
+                    position: 'absolute', top: '10px', left: '10px',
+                    padding: '2px 8px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 800,
+                    color: '#fff', background: grade.accent,
+                  }}>
+                    {grade.sublabel}
+                  </span>
+                </div>
 
-              {/* Labels */}
-              <h3 style={{ color: isDark ? '#fff' : '#0f172a', fontSize: '1.1rem', fontWeight: 900, margin: '0 0 3px', letterSpacing: '-0.02em' }}>
-                {grade.label}
-              </h3>
-              <p style={{ color: grade.accent, fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', margin: '0 0 10px' }}>
-                {grade.sublabel}
-              </p>
-              <p style={{ color: isDark ? 'rgba(148,163,184,.55)' : '#64748b', fontSize: '0.8rem', margin: '0 0 18px', lineHeight: 1.5 }}>
-                {grade.desc}
-              </p>
+                {/* Card Body */}
+                <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                  {/* Title & Sublabel */}
+                  <h3 style={{ color: isDark ? '#fff' : '#0f172a', fontSize: '1.05rem', fontWeight: 900, margin: '0 0 4px' }}>
+                    {grade.label}
+                  </h3>
+                  <p style={{ color: isDark ? 'rgba(148,163,184,.7)' : '#64748b', fontSize: '0.78rem', margin: '0 0 14px', lineHeight: 1.4 }}>
+                    {grade.desc}
+                  </p>
 
-              {/* Feature count pill */}
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', borderRadius: '999px', background: isSelected ? grade.accent + '18' : (isDark ? 'rgba(255,255,255,.05)' : '#f1f5f9'), border: `1px solid ${isSelected ? grade.accent + '35' : (isDark ? 'rgba(255,255,255,.08)' : '#e2e8f0')}`, fontSize: '0.72rem', fontWeight: 700, color: isSelected ? grade.accent : (isDark ? 'rgba(148,163,184,.5)' : '#64748b') }}>
-                {grade.features.length} features unlocked
-              </div>
-            </motion.button>
-          );
-        })}
+                  {/* Icon Bullet List */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '18px', marginTop: 'auto' }}>
+                    {grade.details.map((d, idx) => {
+                      const DIcon = d.icon;
+                      return (
+                        <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem' }}>
+                          <DIcon size={13} color={grade.accent} style={{ flexShrink: 0 }} />
+                          <span style={{ fontWeight: 600, color: isDark ? 'rgba(148,163,184,.7)' : '#64748b' }}>{d.label}:</span>
+                          <span style={{ fontWeight: 700, color: isDark ? '#e2e8f0' : '#1e293b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{d.val}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Bottom Action Button (Image Style) */}
+                  <button
+                    onClick={(e) => { e.stopPropagation(); selectGradeItem(grade.id); }}
+                    style={{
+                      width: '100%', padding: '10px', borderRadius: '8px',
+                      border: 'none',
+                      background: isSelected
+                        ? 'linear-gradient(135deg, #2563eb, #0284c7)'
+                        : 'linear-gradient(135deg, #f97316, #ea580c)',
+                      color: '#fff', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer',
+                      boxShadow: isSelected ? '0 4px 12px rgba(37,99,235,.3)' : '0 4px 12px rgba(234,88,12,0.25)',
+                      transition: 'opacity 0.15s',
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
+                    onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                  >
+                    {isSelected ? '✓ Grade Selected' : 'Select Grade'}
+                  </button>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+
       </div>
 
-      {/* Feature Preview Panel */}
+      {/* Feature Preview Panel for Selected Original Grade */}
       <AnimatePresence>
         {selectedGrade && (
           <motion.div
             key={selectedGrade.id}
-            initial={{ opacity: 0, y: 16, height: 0 }}
-            animate={{ opacity: 1, y: 0, height: 'auto' }}
-            exit={{ opacity: 0, y: 8, height: 0 }}
-            transition={{ duration: 0.3 }}
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.25 }}
             style={{
-              width: '100%', maxWidth: '860px', marginBottom: '32px',
+              width: '100%', maxWidth: '1080px', marginBottom: '32px',
               background: isDark
                 ? `linear-gradient(135deg, ${selectedGrade.accent}0f, rgba(13,22,52,.9))`
                 : '#ffffff',
               border: `1px solid ${isDark ? selectedGrade.accent + '30' : '#e2e8f0'}`,
-              borderRadius: '20px', padding: '22px 24px',
+              borderRadius: '18px', padding: '20px 24px',
               position: 'relative', zIndex: 2, overflow: 'hidden',
-              boxShadow: isDark ? 'none' : '0 10px 30px rgba(15,23,42,.05)',
+              boxShadow: isDark ? 'none' : '0 8px 24px rgba(15,23,42,.04)',
             }}
           >
             <p style={{ color: selectedGrade.accent, fontSize: '0.72rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 14px' }}>
-              What you get with {selectedGrade.label}
+              What you get with {selectedGrade.label} ({selectedGrade.sublabel})
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '8px' }}>
               {selectedGrade.features.map((feature, i) => {
                 const FIcon = featureIcon(feature);
                 return (
-                  <motion.div
+                  <div
                     key={feature}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.04 }}
                     style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 12px', borderRadius: '10px', background: isDark ? 'rgba(255,255,255,.04)' : '#f8fafc', border: isDark ? '1px solid rgba(255,255,255,.06)' : '1px solid #e2e8f0' }}
                   >
                     <FIcon size={14} color={selectedGrade.accent} style={{ flexShrink: 0 }} />
                     <span style={{ color: isDark ? '#e2e8f0' : '#1e293b', fontSize: '0.8rem', fontWeight: 600 }}>{feature}</span>
-                  </motion.div>
+                  </div>
                 );
               })}
             </div>
@@ -308,13 +419,13 @@ export default function GradeSelect() {
         )}
       </AnimatePresence>
 
-      {/* Action Buttons */}
-      <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
+      {/* Navigation Buttons Stack */}
+      <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
         style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
         <div style={{ display: 'flex', gap: '12px' }}>
           <button
             onClick={() => navigate('/onboarding')}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '12px 22px', borderRadius: '12px', background: isDark ? 'rgba(255,255,255,.06)' : '#ffffff', border: isDark ? '1px solid rgba(255,255,255,.1)' : '1px solid #cbd5e1', color: isDark ? 'rgba(148,163,184,.7)' : '#475569', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer' }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '12px 22px', borderRadius: '10px', background: isDark ? 'rgba(255,255,255,.06)' : '#ffffff', border: isDark ? '1px solid rgba(255,255,255,.1)' : '1px solid #cbd5e1', color: isDark ? 'rgba(148,163,184,.7)' : '#475569', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer' }}
           >
             <ArrowLeft size={15} /> Back
           </button>
@@ -326,11 +437,10 @@ export default function GradeSelect() {
             whileTap={selected && !loading ? { scale: 0.98 } : {}}
             style={{
               display: 'inline-flex', alignItems: 'center', gap: '10px',
-              padding: '12px 36px', borderRadius: '12px', border: 'none',
-              background: selected ? 'linear-gradient(135deg, #2563eb, #0284c7)' : (isDark ? 'rgba(255,255,255,.07)' : '#e2e8f0'),
-              color: selected ? '#fff' : (isDark ? 'rgba(255,255,255,.2)' : '#94a3b8'),
-              fontWeight: 800, fontSize: '0.95rem', cursor: selected ? 'pointer' : 'not-allowed',
-              boxShadow: selected ? '0 8px 24px rgba(37,99,235,.35)' : 'none',
+              padding: '12px 36px', borderRadius: '10px', border: 'none',
+              background: 'linear-gradient(135deg, #2563eb, #0284c7)',
+              color: '#fff', fontWeight: 800, fontSize: '0.95rem', cursor: 'pointer',
+              boxShadow: '0 8px 24px rgba(37,99,235,.35)',
               transition: 'all 0.22s ease',
             }}
           >
@@ -339,7 +449,7 @@ export default function GradeSelect() {
           </motion.button>
         </div>
 
-        <p style={{ color: isDark ? 'rgba(148,163,184,.3)' : '#94a3b8', fontSize: '0.73rem', textAlign: 'center' }}>
+        <p style={{ color: isDark ? 'rgba(148,163,184,.35)' : '#94a3b8', fontSize: '0.73rem', textAlign: 'center' }}>
           Your grade can be updated anytime from your Profile settings
         </p>
       </motion.div>
