@@ -13,9 +13,10 @@ export default function MainLayout({ children }) {
   const { collapsed, isMobile } = useSidebar();
   const location = useLocation();
 
-  // Hide sidebar on Book Details page (/textbooks/:id) so it opens as full page like reference image
+  // Hide sidebar on Book Details, Checkout, Payment, and Order Success pages so they render full page
   const isBookDetailsPage = /^\/textbooks\/[^\/]+$/.test(location.pathname);
-  const hideSidebar = isBookDetailsPage;
+  const isCheckoutFlow = /^\/(checkout|payment|order-success)/.test(location.pathname);
+  const hideSidebar = isBookDetailsPage || isCheckoutFlow;
 
   const sidebarWidth = hideSidebar || isMobile ? 0 : collapsed ? 72 : 260;
 

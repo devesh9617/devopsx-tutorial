@@ -28,6 +28,9 @@ const Login = lazy(() => import('../pages/Login/index'));
 const Register = lazy(() => import('../pages/Register/index'));
 const Onboarding = lazy(() => import('../pages/Onboarding/index'));
 const GradeSelect = lazy(() => import('../pages/GradeSelect/index'));
+const Checkout = lazy(() => import('../pages/Checkout/index'));
+const Payment = lazy(() => import('../pages/Payment/index'));
+const OrderSuccess = lazy(() => import('../pages/OrderSuccess/index'));
 const NotFound = lazy(() => import('../pages/NotFound/index'));
 
 // Wrapper that renders MainLayout with Outlet for nested routes
@@ -58,6 +61,9 @@ export default function AppRouter() {
           <Route path="/courses/:slug" element={<CourseDetails />} />
           <Route path="/textbooks" element={<TextBooks />} />
           <Route path="/textbooks/:id" element={<BookDetails />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/payment" element={<Payment />} />
+          <Route path="/order-success" element={<OrderSuccess />} />
           <Route path="/notes" element={<Notes />} />
           <Route path="/assignments" element={<Assignments />} />
           <Route path="/practice" element={<Practice />} />
