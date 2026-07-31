@@ -38,7 +38,7 @@ export default function Payment() {
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px',
           padding: '16px', borderRadius: '12px', background: '#ffffff',
-          border: '1px solid #eaecf0', fontSize: '0.85rem', color: '#667085',
+          border: '1px solid #dde5f5', fontSize: '0.85rem', color: '#667085',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#027a48' }}>
             <CheckCircle2 size={16} color="#027a48" />
@@ -49,14 +49,14 @@ export default function Payment() {
             <CheckCircle2 size={16} color="#027a48" />
             <span>Checkout</span>
           </div>
-          <span style={{ width: '40px', height: '1px', background: '#7c3aed' }} />
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#7c3aed', fontWeight: 700 }}>
-            <span style={{ width: '22px', height: '22px', borderRadius: '50%', background: '#7c3aed', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', fontWeight: 700 }}>3</span>
+          <span style={{ width: '40px', height: '1px', background: '#2563eb' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#2563eb', fontWeight: 700 }}>
+            <span style={{ width: '22px', height: '22px', borderRadius: '50%', background: '#2563eb', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', fontWeight: 700 }}>3</span>
             <span>Payment</span>
           </div>
-          <span style={{ width: '40px', height: '1px', background: '#eaecf0' }} />
+          <span style={{ width: '40px', height: '1px', background: '#dde5f5' }} />
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#98a2b3' }}>
-            <span style={{ width: '22px', height: '22px', borderRadius: '50%', background: '#f2f4f7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', fontWeight: 700 }}>4</span>
+            <span style={{ width: '22px', height: '22px', borderRadius: '50%', background: '#f0f5ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', fontWeight: 700 }}>4</span>
             <span>Confirmation</span>
           </div>
         </div>
@@ -66,7 +66,7 @@ export default function Payment() {
           <h1 style={{ color: '#101828', fontFamily: 'Inter, sans-serif', fontSize: '1.75rem', fontWeight: 800, margin: 0 }}>
             Secure Payment
           </h1>
-          <Lock size={18} color="#7c3aed" />
+          <Lock size={18} color="#2563eb" />
         </div>
         <p style={{ color: '#667085', fontSize: '0.88rem', margin: '-16px 0 0' }}>
           Complete your payment to get instant access to the course and books.
@@ -93,14 +93,14 @@ export default function Payment() {
                   onClick={() => setSelectedMethod('card')}
                   style={{
                     padding: '16px', borderRadius: '10px',
-                    border: `2px solid ${selectedMethod === 'card' ? '#7c3aed' : '#eaecf0'}`,
-                    background: selectedMethod === 'card' ? '#f5f3ff' : '#ffffff',
+                    border: `2px solid ${selectedMethod === 'card' ? '#2563eb' : '#dde5f5'}`,
+                    background: selectedMethod === 'card' ? '#eff6ff' : '#ffffff',
                     cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <input type="radio" checked={selectedMethod === 'card'} readOnly />
-                    <CreditCard size={18} color="#7c3aed" />
+                    <CreditCard size={18} color="#2563eb" />
                     <div>
                       <strong style={{ fontSize: '0.88rem', color: '#101828', display: 'block' }}>Credit / Debit / ATM Card</strong>
                       <span style={{ fontSize: '0.72rem', color: '#667085' }}>Visa, Mastercard, RuPay & more</span>
@@ -125,13 +125,13 @@ export default function Payment() {
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <input type="radio" checked={selectedMethod === 'upi'} readOnly />
-                    <Smartphone size={18} color="#7c3aed" />
+                    <Smartphone size={18} color="#2563eb" />
                     <div>
                       <strong style={{ fontSize: '0.88rem', color: '#101828', display: 'block' }}>UPI</strong>
                       <span style={{ fontSize: '0.72rem', color: '#667085' }}>Pay using Google Pay, PhonePe, Paytm UPI</span>
                     </div>
                   </div>
-                  <span style={{ padding: '2px 6px', borderRadius: '4px', background: '#5f259f', color: '#fff', fontSize: '0.65rem', fontWeight: 800 }}>UPI</span>
+                  <span style={{ padding: '2px 6px', borderRadius: '4px', background: '#2563eb', color: '#fff', fontSize: '0.65rem', fontWeight: 800 }}>UPI</span>
                 </div>
 
                 {/* Option 3: Net Banking */}
@@ -146,7 +146,7 @@ export default function Payment() {
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <input type="radio" checked={selectedMethod === 'netbanking'} readOnly />
-                    <Building2 size={18} color="#7c3aed" />
+                    <Building2 size={18} color="#2563eb" />
                     <div>
                       <strong style={{ fontSize: '0.88rem', color: '#101828', display: 'block' }}>Net Banking</strong>
                       <span style={{ fontSize: '0.72rem', color: '#667085' }}>All major banks supported</span>
@@ -166,7 +166,7 @@ export default function Payment() {
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <input type="radio" checked={selectedMethod === 'wallet'} readOnly />
-                    <Wallet size={18} color="#7c3aed" />
+                    <Wallet size={18} color="#2563eb" />
                     <div>
                       <strong style={{ fontSize: '0.88rem', color: '#101828', display: 'block' }}>Wallets</strong>
                       <span style={{ fontSize: '0.72rem', color: '#667085' }}>PhonePe, Paytm, Amazon Pay & more</span>
@@ -245,7 +245,7 @@ export default function Payment() {
                   {/* Security Guarantee Bar */}
                   <div style={{ padding: '12px', borderRadius: '8px', background: '#f9fafb', border: '1px solid #eaecf0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.74rem', color: '#667085' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Lock size={14} color="#7c3aed" />
+                      <Lock size={14} color="#2563eb" />
                       <span>Your payment is 100% secure</span>
                     </div>
                     <div style={{ display: 'flex', gap: '6px', fontWeight: 700 }}>
@@ -258,9 +258,9 @@ export default function Payment() {
                     type="submit"
                     style={{
                       width: '100%', padding: '14px', borderRadius: '10px', border: 'none',
-                      background: '#7c3aed', color: '#ffffff', fontSize: '0.95rem', fontWeight: 800,
+                      background: 'linear-gradient(135deg, #1d4ed8, #2563eb)', color: '#ffffff', fontSize: '0.95rem', fontWeight: 800,
                       cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                      boxShadow: '0 4px 14px rgba(124,58,237,0.3)', transition: 'opacity 0.15s',
+                      boxShadow: '0 4px 14px rgba(37,99,235,0.35)', transition: 'all 0.15s',
                     }}
                     onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
                     onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
@@ -333,7 +333,7 @@ export default function Payment() {
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                 <strong style={{ fontSize: '0.95rem', color: '#101828' }}>Total Amount</strong>
-                <span style={{ fontSize: '1.6rem', fontWeight: 900, color: '#7c3aed' }}>₹799</span>
+                <span style={{ fontSize: '1.6rem', fontWeight: 900, color: '#2563eb' }}>₹799</span>
               </div>
 
               <div style={{ padding: '8px 12px', borderRadius: '6px', background: '#ecfdf3', border: '1px solid #abefc6', color: '#027a48', fontSize: '0.76rem', fontWeight: 700, textAlign: 'center' }}>
@@ -347,7 +347,7 @@ export default function Payment() {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '0.78rem', color: '#475467' }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                  <Award size={16} color="#7c3aed" style={{ flexShrink: 0, marginTop: '2px' }} />
+                  <Award size={16} color="#2563eb" style={{ flexShrink: 0, marginTop: '2px' }} />
                   <div>
                     <strong style={{ color: '#101828', display: 'block' }}>Lifetime Access</strong>
                     <span>Watch anytime, anywhere</span>
@@ -355,7 +355,7 @@ export default function Payment() {
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                  <Award size={16} color="#7c3aed" style={{ flexShrink: 0, marginTop: '2px' }} />
+                  <Award size={16} color="#2563eb" style={{ flexShrink: 0, marginTop: '2px' }} />
                   <div>
                     <strong style={{ color: '#101828', display: 'block' }}>Certificate of Completion</strong>
                     <span>Share on LinkedIn & resume</span>
@@ -363,7 +363,7 @@ export default function Payment() {
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                  <Award size={16} color="#7c3aed" style={{ flexShrink: 0, marginTop: '2px' }} />
+                  <Award size={16} color="#2563eb" style={{ flexShrink: 0, marginTop: '2px' }} />
                   <div>
                     <strong style={{ color: '#101828', display: 'block' }}>Access on all Devices</strong>
                     <span>Mobile, Laptop & TV</span>

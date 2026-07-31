@@ -281,21 +281,21 @@ export default function GradeSelect() {
                 onClick={() => selectGradeItem(grade.id)}
                 style={{
                   position: 'relative',
-                  background: isDark ? 'rgba(13,22,52,0.95)' : '#ffffff',
-                  border: `2px solid ${
-                    isSelected
-                      ? grade.accent
-                      : (isDark ? 'rgba(255,255,255,.08)' : '#e2e8f0')
-                  }`,
+                  background: isSelected
+                    ? (isDark ? 'rgba(10,25,70,0.98)' : '#eef4ff')
+                    : (isDark ? 'rgba(13,22,52,0.95)' : '#ffffff'),
+                  border: isSelected
+                    ? `3px solid ${grade.accent}`
+                    : `2px solid ${isDark ? 'rgba(255,255,255,.18)' : '#b3c3ea'}`,
                   borderRadius: '16px',
                   overflow: 'hidden',
                   display: 'flex',
                   flexDirection: 'column',
                   cursor: 'pointer',
                   boxShadow: isSelected
-                    ? `0 0 0 3px ${grade.accent}33, 0 12px 32px rgba(0,0,0,.25)`
-                    : (isDark ? '0 6px 20px rgba(0,0,0,.3)' : '0 4px 14px rgba(15,23,42,.04)'),
-                  transition: 'all 0.2s ease',
+                    ? `0 0 0 4px ${grade.accent}30, 0 16px 40px rgba(0,0,0,.32)`
+                    : (isDark ? '0 4px 16px rgba(0,0,0,.25)' : '0 2px 10px rgba(30,64,175,.1)'),
+                  transition: 'all 0.22s ease',
                 }}
                 whileHover={{ y: -4 }}
               >
@@ -331,7 +331,15 @@ export default function GradeSelect() {
                 {/* Card Body */}
                 <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1 }}>
                   {/* Title & Sublabel */}
-                  <h3 style={{ color: isDark ? '#fff' : '#0f172a', fontSize: '1.05rem', fontWeight: 900, margin: '0 0 4px' }}>
+                  <h3 style={{
+                    color: isSelected
+                      ? (isDark ? '#ffffff' : '#0f172a')
+                      : (isDark ? '#e2e8f0' : '#1e293b'),
+                    fontSize: '1.05rem',
+                    fontWeight: isSelected ? 900 : 700,
+                    margin: '0 0 4px',
+                    letterSpacing: isSelected ? '-0.01em' : 'normal',
+                  }}>
                     {grade.label}
                   </h3>
                   <p style={{ color: isDark ? 'rgba(148,163,184,.7)' : '#64748b', fontSize: '0.78rem', margin: '0 0 14px', lineHeight: 1.4 }}>
@@ -359,10 +367,10 @@ export default function GradeSelect() {
                       width: '100%', padding: '10px', borderRadius: '8px',
                       border: 'none',
                       background: isSelected
-                        ? 'linear-gradient(135deg, #2563eb, #0284c7)'
-                        : 'linear-gradient(135deg, #f97316, #ea580c)',
+                        ? 'linear-gradient(135deg, #1d4ed8, #0284c7)'
+                        : 'linear-gradient(135deg, #2563eb, #3b82f6)',
                       color: '#fff', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer',
-                      boxShadow: isSelected ? '0 4px 12px rgba(37,99,235,.3)' : '0 4px 12px rgba(234,88,12,0.25)',
+                      boxShadow: isSelected ? '0 4px 12px rgba(29,78,216,.35)' : '0 4px 12px rgba(37,99,235,.3)',
                       transition: 'opacity 0.15s',
                     }}
                     onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}

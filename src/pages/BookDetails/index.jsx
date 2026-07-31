@@ -172,7 +172,7 @@ export default function BookDetails() {
                   onClick={() => setSelectedImage(idx)}
                   style={{
                     width: '54px', height: '70px', borderRadius: '6px', overflow: 'hidden',
-                    border: `2px solid ${selectedImage === idx ? '#101828' : '#eaecf0'}`,
+                    border: `2px solid ${selectedImage === idx ? '#2563eb' : '#dde5f5'}`,
                     cursor: 'pointer', opacity: selectedImage === idx ? 1 : 0.7, transition: 'all 0.15s',
                   }}
                 >
@@ -313,12 +313,13 @@ export default function BookDetails() {
                 onClick={handleBuyNow}
                 style={{
                   flex: 1.2, padding: '12px 24px', borderRadius: '8px', border: 'none',
-                  background: '#000000', color: '#ffffff',
+                  background: 'linear-gradient(135deg, #1d4ed8, #2563eb)', color: '#ffffff',
                   fontSize: '0.88rem', fontWeight: 700, cursor: 'pointer',
-                  transition: 'opacity 0.15s',
+                  boxShadow: '0 4px 14px rgba(37,99,235,.35)',
+                  transition: 'all 0.15s',
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
-                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.9'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'none'; }}
               >
                 Buy Now
               </button>
@@ -327,12 +328,12 @@ export default function BookDetails() {
                 onClick={handleAddToCart}
                 style={{
                   flex: 1, padding: '11px 18px', borderRadius: '8px',
-                  background: '#ffffff', border: '1px solid #d0d5dd',
-                  color: '#101828', fontSize: '0.86rem', fontWeight: 700,
+                  background: '#eff6ff', border: '1.5px solid #bfdbfe',
+                  color: '#1d4ed8', fontSize: '0.86rem', fontWeight: 700,
                   cursor: 'pointer', transition: 'all 0.15s',
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = '#f9fafb'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = '#ffffff'; }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = '#dbeafe'; e.currentTarget.style.borderColor = '#2563eb'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = '#eff6ff'; e.currentTarget.style.borderColor = '#bfdbfe'; }}
               >
                 Add to Cart
               </button>
@@ -477,8 +478,8 @@ export default function BookDetails() {
                 onClick={() => setActiveTab(tab.id)}
                 style={{
                   padding: '16px 20px', background: 'none', border: 'none',
-                  borderBottom: activeTab === tab.id ? '2px solid #101828' : '2px solid transparent',
-                  color: activeTab === tab.id ? '#101828' : '#667085',
+                  borderBottom: activeTab === tab.id ? '2px solid #2563eb' : '2px solid transparent',
+                  color: activeTab === tab.id ? '#2563eb' : '#667085',
                   fontSize: '0.85rem', fontWeight: activeTab === tab.id ? 700 : 500,
                   cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.15s',
                 }}
@@ -717,8 +718,8 @@ export default function BookDetails() {
                     display: 'flex', flexDirection: 'column', gap: '8px', cursor: 'pointer',
                     transition: 'all 0.15s ease', boxShadow: '0 1px 2px rgba(16,24,40,0.03)',
                   }}
-                  onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.borderColor = '#d0d5dd'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.borderColor = '#eaecf0'; }}
+                  onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.borderColor = '#2563eb'; e.currentTarget.style.boxShadow = '0 4px 14px rgba(37,99,235,.12)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.borderColor = '#dde5f5'; e.currentTarget.style.boxShadow = 'none'; }}
                 >
                   <div style={{ width: '100%', aspectRatio: '3/4', borderRadius: '6px', overflow: 'hidden', background: '#f8fafc', boxShadow: '-4px 6px 14px rgba(0,0,0,0.1)' }}>
                     <img src={relBook.cover} alt={relBook.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />

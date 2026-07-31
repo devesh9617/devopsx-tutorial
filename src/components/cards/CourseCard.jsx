@@ -28,19 +28,21 @@ export default function CourseCard({ course, index = 0, viewMode = 'grid' }) {
       transition={{ delay: Math.min(index * 0.04, 0.25), duration: 0.25 }}
       style={{
         background: 'var(--bg-card)',
-        border: '1px solid var(--border-subtle)',
+        border: isDark ? '1.5px solid rgba(255,255,255,.1)' : '1.5px solid #b3c3ea',
         borderRadius: '12px',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: isList ? 'row' : 'column',
         position: 'relative',
-        boxShadow: isDark ? '0 2px 8px rgba(0,0,0,0.2)' : '0 2px 8px rgba(0,0,0,0.04)',
+        boxShadow: isDark ? '0 2px 10px rgba(0,0,0,0.25)' : '0 2px 10px rgba(30,64,175,.08)',
         transition: 'all 0.2s ease-in-out',
       }}
       whileHover={{
-        transform: 'translateY(-3px)',
-        borderColor: isDark ? 'rgba(59,130,246,0.3)' : 'rgba(59,130,246,0.4)',
-        boxShadow: isDark ? '0 6px 16px rgba(0,0,0,0.35)' : '0 6px 16px rgba(0,0,0,0.08)',
+        y: -4,
+        borderColor: isDark ? 'rgba(59,130,246,0.55)' : '#2563eb',
+        boxShadow: isDark
+          ? '0 8px 24px rgba(0,0,0,.4), 0 0 0 1px rgba(59,130,246,.2)'
+          : '0 8px 24px rgba(30,64,175,.18), 0 0 0 1px rgba(37,99,235,.15)',
       }}
     >
       {/* ── Thumbnail ── */}
@@ -118,7 +120,11 @@ export default function CourseCard({ course, index = 0, viewMode = 'grid' }) {
 
         {/* Title */}
         <Link to={`/courses/${course.slug}`} style={{ textDecoration: 'none', marginBottom: '8px' }}>
-          <h3 style={{ color: 'var(--text-primary)', fontSize: '0.9rem', fontWeight: 600, lineHeight: 1.4, margin: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+          <h3 style={{
+            color: 'var(--text-primary)', fontSize: '0.9rem', fontWeight: 700,
+            lineHeight: 1.4, margin: 0,
+            display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+          }}>
             {course.title}
           </h3>
         </Link>

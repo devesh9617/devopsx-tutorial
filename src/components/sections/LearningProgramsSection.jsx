@@ -194,14 +194,14 @@ export default function LearningProgramsSection() {
                   })}
                 </div>
 
-                {/* Bottom Orange/Primary Action Button */}
+                  {/* Bottom Blue Action Button */}
                 <button
                   onClick={() => navigate(prog.link)}
                   style={{
                     width: '100%', padding: '10px', borderRadius: '8px',
-                    border: 'none', background: 'linear-gradient(135deg, #f97316, #ea580c)',
+                    border: 'none', background: 'linear-gradient(135deg, #2563eb, #3b82f6)',
                     color: '#fff', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer',
-                    boxShadow: '0 4px 12px rgba(234,88,12,0.25)', transition: 'opacity 0.15s',
+                    boxShadow: '0 4px 12px rgba(37,99,235,0.3)', transition: 'opacity 0.15s',
                   }}
                   onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
                   onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}

@@ -22,19 +22,21 @@ export default function BookCard({ book, index = 0 }) {
         transition={{ delay: Math.min(index * 0.04, 0.25), duration: 0.25 }}
         style={{
           background: 'var(--bg-card)',
-          border: '1px solid var(--border-subtle)',
+          border: isDark ? '1.5px solid rgba(255,255,255,.1)' : '1.5px solid #b3c3ea',
           borderRadius: '12px',
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
           position: 'relative',
-          boxShadow: isDark ? '0 2px 8px rgba(0,0,0,0.2)' : '0 2px 8px rgba(0,0,0,0.04)',
+          boxShadow: isDark ? '0 2px 10px rgba(0,0,0,0.25)' : '0 2px 10px rgba(30,64,175,.08)',
           transition: 'all 0.2s ease-in-out',
         }}
         whileHover={{
-          transform: 'translateY(-3px)',
-          borderColor: isDark ? 'rgba(59,130,246,0.3)' : 'rgba(59,130,246,0.4)',
-          boxShadow: isDark ? '0 6px 16px rgba(0,0,0,0.35)' : '0 6px 16px rgba(0,0,0,0.08)',
+          y: -4,
+          borderColor: isDark ? 'rgba(59,130,246,0.55)' : '#2563eb',
+          boxShadow: isDark
+            ? '0 8px 24px rgba(0,0,0,.4), 0 0 0 1px rgba(59,130,246,.2)'
+            : '0 8px 24px rgba(30,64,175,.18), 0 0 0 1px rgba(37,99,235,.15)',
         }}
       >
         {/* Cover Image (3:4 Aspect Ratio) - Navigates to Full Description Page */}
@@ -67,7 +69,12 @@ export default function BookCard({ book, index = 0 }) {
           {/* Title - Navigates to Full Description Page */}
           <h3
             onClick={handleCardClick}
-            style={{ color: 'var(--text-primary)', fontSize: '0.9rem', fontWeight: 600, lineHeight: 1.4, margin: '0 0 6px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', cursor: 'pointer' }}
+            style={{
+              color: 'var(--text-primary)', fontSize: '0.9rem', fontWeight: 700,
+              lineHeight: 1.4, margin: '0 0 6px',
+              display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+              cursor: 'pointer',
+            }}
           >
             {book.title}
           </h3>
@@ -90,32 +97,54 @@ export default function BookCard({ book, index = 0 }) {
           </div>
 
           {/* Action Buttons */}
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <button
               onClick={handleCardClick}
               style={{
-                flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '5px',
-                padding: '8px 12px', borderRadius: '6px', fontSize: '0.78rem', fontWeight: 600,
-                color: '#fff', background: '#2563eb', border: 'none', cursor: 'pointer',
-                transition: 'background 0.15s',
+                flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                padding: '9px 14px', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 700,
+                color: '#fff',
+                background: 'linear-gradient(135deg, #2563eb, #3b82f6)',
+                border: 'none', cursor: 'pointer',
+                boxShadow: '0 3px 10px rgba(37,99,235,.3)',
+                transition: 'all 0.15s',
+                whiteSpace: 'nowrap',
               }}
-              onMouseEnter={(e) => e.currentTarget.style.background = '#1d4ed8'}
-              onMouseLeave={(e) => e.currentTarget.style.background = '#2563eb'}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, #1d4ed8, #2563eb)';
+                e.currentTarget.style.boxShadow = '0 5px 16px rgba(29,78,216,.4)';
+                e.currentTarget.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, #2563eb, #3b82f6)';
+                e.currentTarget.style.boxShadow = '0 3px 10px rgba(37,99,235,.3)';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
             >
-              <Eye size={13} /> View Description Page
+              <Eye size={13} /> View Details
             </button>
 
             <button
               onClick={(e) => { e.stopPropagation(); setShowModal(true); }}
-              title="Quick Popup Preview"
+              title="Quick Preview"
               style={{
-                padding: '8px 10px', borderRadius: '6px',
-                background: 'transparent', border: '1px solid var(--border-subtle)',
-                color: 'var(--text-primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                padding: '9px 11px', borderRadius: '8px', flexShrink: 0,
+                background: isDark ? 'rgba(255,255,255,.06)' : '#eff6ff',
+                border: isDark ? '1.5px solid rgba(255,255,255,.12)' : '1.5px solid #bfdbfe',
+                color: isDark ? '#93c5fd' : '#2563eb',
+                cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
                 transition: 'all 0.15s',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-glass-hover)'; e.currentTarget.style.borderColor = '#2563eb'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'var(--border-subtle)'; }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = isDark ? 'rgba(59,130,246,.15)' : '#dbeafe';
+                e.currentTarget.style.borderColor = '#2563eb';
+                e.currentTarget.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = isDark ? 'rgba(255,255,255,.06)' : '#eff6ff';
+                e.currentTarget.style.borderColor = isDark ? 'rgba(255,255,255,.12)' : '#bfdbfe';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
             >
               <Download size={13} />
             </button>
