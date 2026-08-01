@@ -32,6 +32,7 @@ const Checkout = lazy(() => import('../pages/Checkout/index'));
 const Payment = lazy(() => import('../pages/Payment/index'));
 const OrderSuccess = lazy(() => import('../pages/OrderSuccess/index'));
 const NotFound = lazy(() => import('../pages/NotFound/index'));
+const Subscription = lazy(() => import('../pages/Subscription/index'));
 
 // Wrapper that renders MainLayout with Outlet for nested routes
 function LayoutWrapper() {
@@ -75,6 +76,7 @@ export default function AppRouter() {
           <Route path="/categories" element={<Categories />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/subscription" element={<Subscription />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

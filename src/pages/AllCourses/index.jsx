@@ -1,50 +1,112 @@
 // ============================================================
-// All Courses Page — DevOpsX (Refined Professional Filters)
+// All Courses Page — Reference Design (DITTO match)
 // ============================================================
 
 import { useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
-import { Search, Grid3X3, List, X, SlidersHorizontal, BookOpen, Layers, Check, RotateCcw } from 'lucide-react';
-import { useSearchParams } from 'react-router-dom';
-import { courses } from '../../data/courses';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
+import {
+  Search,
+  ChevronRight,
+  RotateCcw,
+  SlidersHorizontal,
+  ChevronLeft,
+  Check,
+  ArrowRight,
+  GraduationCap,
+} from 'lucide-react';
+import { courses, courseCategories, categoryIcons } from '../../data/courses';
 import CourseCard from '../../components/cards/CourseCard';
-import Pagination from '../../components/ui/Pagination';
-import EmptyState from '../../components/ui/EmptyState';
-import { useDebounce } from '../../hooks/index';
 import { useTheme } from '../../context/ThemeContext';
-import PageWrapper, { PageHeader } from '../../components/ui/PageWrapper';
 
 const COURSES_PER_PAGE = 8;
-const levels = ['All Segments', 'Basic', 'Intermediate', 'Advanced'];
-const priceFilters = ['All', 'Free', 'Paid'];
-const sortOptions = [
-  { value: 'popular', label: 'Most Popular' },
-  { value: 'newest', label: 'Newest' },
+
+const LEVELS = [
+  { label: 'Beginner', id: 'Beginner' },
+  { label: 'Intermediate', id: 'Intermediate' },
+  { label: 'Advanced', id: 'Advanced' },
+];
+
+const DURATIONS = [
+  { label: '0 - 10 Hours', min: 0, max: 10, id: 'd1' },
+  { label: '10 - 30 Hours', min: 10, max: 30, id: 'd2' },
+  { label: '30+ Hours', min: 30, max: 999, id: 'd3' },
+];
+
+const SORT_OPTIONS = [
+  { value: 'popular', label: 'Popular' },
+  { value: 'newest', label: 'Newest First' },
   { value: 'rating', label: 'Highest Rated' },
-  { value: 'price-low', label: 'Price: Low to High' },
-  { value: 'price-high', label: 'Price: High to Low' },
+  { value: 'price_asc', label: 'Price: Low to High' },
+  { value: 'price_desc', label: 'Price: High to Low' },
 ];
 
 export default function AllCourses() {
   const { isDark } = useTheme();
-  const [searchParams] = useSearchParams();
-  const [search, setSearch] = useState(searchParams.get('search') || '');
-  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'All');
-  const [selectedLevel, setSelectedLevel] = useState('All Segments');
-  const [selectedPrice, setSelectedPrice] = useState(
-    searchParams.get('filter') === 'free' ? 'Free' : 'All'
-  );
-  const [sortBy, setSortBy] = useState('popular');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [viewMode, setViewMode] = useState('grid');
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const debouncedSearch = useDebounce(search, 300);
-  const categoryNames = ['All', ...new Set(courses.map((c) => c.category))];
+  const selectedCategory = searchParams.get('category') || 'All Categories';
+  const [search, setSearch] = useState('');
+  const [selectedLevels, setSelectedLevels] = useState([]);
+  const [selectedDurations, setSelectedDurations] = useState([]);
+  const [sort, setSort] = useState('popular');
+  const [page, setPage] = useState(1);
+
+  // Entire side panel collapsible state (true = open, false = collapsed)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  const handleCategoryChange = (cat) => {
+    const params = new URLSearchParams(searchParams);
+    if (cat && cat !== 'All Categories') {
+      params.set('category', cat);
+    } else {
+      params.delete('category');
+    }
+    setSearchParams(params);
+    setPage(1);
+  };
+
+  const toggleLevel = (val) => {
+    setSelectedLevels((prev) =>
+      prev.includes(val) ? prev.filter((v) => v !== val) : [...prev, val]
+    );
+    setPage(1);
+  };
+
+  const toggleDuration = (id) => {
+    setSelectedDurations((prev) =>
+      prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id]
+    );
+    setPage(1);
+  };
+
+  const resetFilters = () => {
+    setSearch('');
+    handleCategoryChange('All Categories');
+    setSelectedLevels([]);
+    setSelectedDurations([]);
+    setSort('popular');
+    setPage(1);
+  };
+
+  const hasFilters =
+    search ||
+    selectedCategory !== 'All Categories' ||
+    selectedLevels.length > 0 ||
+    selectedDurations.length > 0;
+
+  const activeFilterCount =
+    (selectedCategory !== 'All Categories' ? 1 : 0) +
+    selectedLevels.length +
+    selectedDurations.length +
+    (search ? 1 : 0);
 
   const filtered = useMemo(() => {
-    let result = courses;
-    if (debouncedSearch) {
-      const q = debouncedSearch.toLowerCase();
+    let result = [...courses];
+
+    if (search) {
+      const q = search.toLowerCase();
       result = result.filter(
         (c) =>
           c.title.toLowerCase().includes(q) ||
@@ -52,286 +114,825 @@ export default function AllCourses() {
           c.tags.some((t) => t.toLowerCase().includes(q))
       );
     }
-    if (selectedCategory !== 'All') result = result.filter((c) => c.category === selectedCategory);
-    if (selectedLevel !== 'All Segments') result = result.filter((c) => c.level === selectedLevel);
-    if (selectedPrice === 'Free') result = result.filter((c) => c.isFree);
-    if (selectedPrice === 'Paid') result = result.filter((c) => !c.isFree);
 
-    switch (sortBy) {
-      case 'newest': result = [...result].sort((a, b) => new Date(b.lastUpdated) - new Date(a.lastUpdated)); break;
-      case 'rating': result = [...result].sort((a, b) => b.rating - a.rating); break;
-      case 'price-low': result = [...result].sort((a, b) => a.price - b.price); break;
-      case 'price-high': result = [...result].sort((a, b) => b.price - a.price); break;
-      default: result = [...result].sort((a, b) => b.students - a.students);
+    if (selectedCategory !== 'All Categories') {
+      result = result.filter((c) => c.category === selectedCategory);
     }
 
+    if (selectedLevels.length > 0) {
+      result = result.filter((c) => selectedLevels.includes(c.level));
+    }
+
+    if (selectedDurations.length > 0) {
+      result = result.filter((c) => {
+        const h = c.durationHours || 20;
+        return selectedDurations.some((dId) => {
+          const dObj = DURATIONS.find((d) => d.id === dId);
+          return dObj && h >= dObj.min && h <= dObj.max;
+        });
+      });
+    }
+
+    result.sort((a, b) => {
+      if (sort === 'price_asc') return a.price - b.price;
+      if (sort === 'price_desc') return b.price - a.price;
+      if (sort === 'rating') return b.rating - a.rating;
+      if (sort === 'newest') return b.id - a.id;
+      return (b.students || 0) - (a.students || 0); // popular
+    });
+
     return result;
-  }, [debouncedSearch, selectedCategory, selectedLevel, selectedPrice, sortBy]);
+  }, [search, selectedCategory, selectedLevels, selectedDurations, sort]);
 
   const totalPages = Math.ceil(filtered.length / COURSES_PER_PAGE);
-  const paginated = filtered.slice((currentPage - 1) * COURSES_PER_PAGE, currentPage * COURSES_PER_PAGE);
+  const paginated = filtered.slice((page - 1) * COURSES_PER_PAGE, page * COURSES_PER_PAGE);
 
-  const resetFilters = () => {
-    setSearch(''); setSelectedCategory('All'); setSelectedLevel('All Segments'); setSelectedPrice('All'); setSortBy('popular');
+  const border = isDark ? 'rgba(255,255,255,.08)' : '#e9ecef';
+
+  const renderPaginationPages = () => {
+    const pages = [];
+    if (totalPages <= 6) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1, 2, 3, 4);
+      if (page > 5) pages.push('...');
+      if (page > 4 && page < totalPages - 1) pages.push(page);
+      pages.push('...', totalPages);
+    }
+    return pages;
   };
-  const hasFilters = search || selectedCategory !== 'All' || selectedLevel !== 'All Segments' || selectedPrice !== 'All';
 
   return (
-    <PageWrapper>
-      {/* Header */}
-      <PageHeader
-        icon={BookOpen}
-        iconColor="#3b82f6"
-        badge="EXPLORE COURSES"
-        title="Cloud Computing & AI Courses"
-        subtitle={`Showing ${filtered.length} courses organized by Basic, Intermediate & Advanced segments`}
-      />
-
-      {/* Main Grid */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '240px minmax(0, 1fr)',
-        gap: '24px',
-        alignItems: 'start',
-        width: '100%',
-      }}>
-
-        {/* Desktop Sidebar Filter Panel */}
-        <div className="hidden lg:block" style={{ width: '240px', flexShrink: 0 }}>
-          <div style={{
-            background: 'var(--bg-card)',
-            border: '1px solid var(--border-subtle)',
-            borderRadius: '20px',
-            padding: '20px',
-            position: 'sticky',
-            top: '80px',
-            boxShadow: '0 8px 32px rgba(0,0,0,.3)',
-          }}>
-
-            {/* Sidebar Title */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', paddingBottom: '12px', borderBottom: '1px solid var(--border-subtle)' }}>
-              <span style={{ color: 'var(--text-primary)', fontSize: '0.875rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px', letterSpacing: '-0.01em' }}>
-                <SlidersHorizontal size={15} color="#3b82f6" /> Refine Search
-              </span>
-              {hasFilters && (
-                <button
-                  onClick={resetFilters}
-                  title="Reset all filters"
-                  style={{ background: 'none', border: 'none', color: '#ef4444', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
-                >
-                  <RotateCcw size={11} /> Reset
-                </button>
-              )}
-            </div>
-
-            {/* Keyword Search Input */}
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: '8px' }}>
-                Keywords
-              </label>
-              <div style={{ position: 'relative' }}>
-                <Search size={14} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', pointerEvents: 'none' }} />
-                <input
-                  type="text"
-                  value={search}
-                  onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
-                  placeholder="Search course title..."
-                  style={{
-                    width: '100%', boxSizing: 'border-box',
-                    paddingLeft: '34px', paddingRight: search ? '28px' : '12px',
-                    paddingTop: '9px', paddingBottom: '9px',
-                    borderRadius: '12px', fontSize: '0.78rem',
-                    background: 'var(--bg-input)', border: '1px solid var(--border-muted)',
-                    color: 'var(--text-primary)', outline: 'none', transition: 'all 0.15s ease',
-                  }}
-                  onFocus={(e) => { e.target.style.borderColor = 'var(--brand-blue)'; e.target.style.boxShadow = '0 0 0 3px rgba(59,130,246,.15)'; }}
-                  onBlur={(e)  => { e.target.style.borderColor = 'var(--border-muted)'; e.target.style.boxShadow = 'none'; }}
-                />
-                {search && (
-                  <button
-                    onClick={() => setSearch('')}
-                    style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '2px' }}
-                  >
-                    <X size={12} />
-                  </button>
-                )}
-              </div>
-            </div>            {/* Categories Menu */}
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: '8px' }}>
-                Categories
-              </label>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                {categoryNames.slice(0, 9).map((cat) => {
-                  const active = selectedCategory === cat;
-                  return (
-                    <button
-                      key={cat}
-                      onClick={() => { setSelectedCategory(cat); setCurrentPage(1); }}
-                      style={{
-                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                        padding: '7px 10px', borderRadius: '10px', fontSize: '0.78rem',
-                        background: active ? (isDark ? 'rgba(59,130,246,.18)' : 'rgba(59,130,246,.12)') : 'transparent',
-                        color: active ? (isDark ? '#60a5fa' : '#1d4ed8') : 'var(--text-secondary)',
-                        fontWeight: active ? 700 : 500,
-                        border: 'none', cursor: 'pointer', transition: 'all 0.12s ease',
-                        textAlign: 'left',
-                      }}
-                      onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = isDark ? 'rgba(255,255,255,.05)' : 'rgba(59,130,246,.06)'; }}
-                      onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = 'transparent'; }}
-                    >
-                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{cat}</span>
-                      {active && <Check size={12} color={isDark ? '#60a5fa' : '#1d4ed8'} />}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Course Segment Filter */}
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: '8px' }}>
-                Course Segment
-              </label>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                {levels.map((lvl) => {
-                  const active = selectedLevel === lvl;
-                  return (
-                    <button
-                      key={lvl}
-                      onClick={() => { setSelectedLevel(lvl); setCurrentPage(1); }}
-                      style={{
-                        padding: '7px 12px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: active ? 700 : 500,
-                        textAlign: 'left', cursor: 'pointer', transition: 'all 0.15s ease',
-                        background: active
-                          ? (isDark ? 'linear-gradient(135deg, rgba(59,130,246,.25), rgba(6,182,212,.15))' : 'rgba(59,130,246,.12)')
-                          : (isDark ? 'rgba(255,255,255,.03)' : 'rgba(59,130,246,.04)'),
-                        color: active ? (isDark ? '#93c5fd' : '#1d4ed8') : 'var(--text-secondary)',
-                        border: `1px solid ${active ? 'rgba(59,130,246,.4)' : 'var(--border-subtle)'}`,
-                      }}
-                    >
-                      {lvl}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Access Type Filter */}
-            <div>
-              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: '8px' }}>
-                Access Type
-              </label>
-              <div style={{
-                display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px',
-                background: isDark ? 'rgba(0,0,0,.3)' : 'rgba(59,130,246,.06)',
-                padding: '3px', borderRadius: '12px',
-                border: '1px solid var(--border-subtle)',
-              }}>
-                {priceFilters.map((p) => {
-                  const active = selectedPrice === p;
-                  return (
-                    <button
-                      key={p}
-                      onClick={() => { setSelectedPrice(p); setCurrentPage(1); }}
-                      style={{
-                        padding: '6px 0', borderRadius: '9px', fontSize: '0.72rem', fontWeight: active ? 700 : 500,
-                        textAlign: 'center', cursor: 'pointer', border: 'none', transition: 'all 0.15s ease',
-                        background: active ? 'linear-gradient(135deg,#3b82f6,#06b6d4)' : 'transparent',
-                        color: active ? '#fff' : 'var(--text-muted)',
-                        boxShadow: active ? '0 2px 8px rgba(59,130,246,.3)' : 'none',
-                      }}
-                    >
-                      {p}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-          </div>
+    <div style={{ background: 'var(--bg-primary)', minHeight: '100vh' }}>
+      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '28px 28px 56px' }}>
+        {/* ── Breadcrumb ── */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            fontSize: '0.78rem',
+            color: 'var(--text-muted)',
+            marginBottom: '24px',
+          }}
+        >
+          <Link
+            to="/"
+            style={{ color: 'var(--text-muted)', textDecoration: 'none' }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = '#6366f1')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+          >
+            Home
+          </Link>
+          <ChevronRight size={13} />
+          <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>Courses</span>
+          {selectedCategory !== 'All Categories' && (
+            <>
+              <ChevronRight size={13} />
+              <span style={{ color: '#6366f1', fontWeight: 600 }}>{selectedCategory}</span>
+            </>
+          )}
         </div>
 
-        {/* Content Area */}
-        <div style={{ minWidth: 0, flex: 1 }}>
+        {/* ── Main Layout ── */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', position: 'relative' }}>
+          {/* Quick Expand handle when collapsed */}
+          {!isSidebarOpen && (
+            <motion.button
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              onClick={() => setIsSidebarOpen(true)}
+              title="Expand Filters"
+              style={{
+                position: 'sticky',
+                top: '84px',
+                zIndex: 15,
+                width: '38px',
+                height: '38px',
+                borderRadius: '10px',
+                background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
+                color: '#fff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 6px 16px rgba(99,102,241,.38)',
+                marginRight: '16px',
+                flexShrink: 0,
+                transition: 'transform .15s',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.06)')}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+            >
+              <ChevronRight size={20} />
+            </motion.button>
+          )}
 
-          {/* Controls Bar */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px', marginBottom: '16px', background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', padding: '12px 18px', borderRadius: '16px', boxShadow: isDark ? 'none' : '0 2px 8px rgba(15,23,42,.04)' }}>
-            <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 500 }}>
-              Showing <strong style={{ color: 'var(--text-primary)' }}>{paginated.length}</strong> of <strong style={{ color: 'var(--text-primary)' }}>{filtered.length}</strong> courses
-            </span>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              {/* Sort dropdown */}
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
+          {/* Collapsible Left Side Filter Panel */}
+          <AnimatePresence initial={false}>
+            {isSidebarOpen && (
+              <motion.aside
+                initial={{ width: 0, opacity: 0, marginRight: 0 }}
+                animate={{ width: 220, opacity: 1, marginRight: 32 }}
+                exit={{ width: 0, opacity: 0, marginRight: 0 }}
+                transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
                 style={{
-                  background: 'var(--bg-input)', border: '1px solid var(--border-subtle)',
-                  color: 'var(--text-primary)', borderRadius: '10px', padding: '6px 12px', fontSize: '0.78rem', outline: 'none', cursor: 'pointer',
+                  flexShrink: 0,
+                  position: 'sticky',
+                  top: '80px',
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
                 }}
               >
-                {sortOptions.map((opt) => (
-                  <option key={opt.value} value={opt.value} style={{ background: isDark ? '#0f1929' : '#ffffff', color: isDark ? '#ffffff' : '#0f172a' }}>{opt.label}</option>
-                ))}
-              </select>
+                <div style={{ width: '220px' }}>
+                  {/* Panel Header */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      marginBottom: '16px',
+                      paddingBottom: '8px',
+                      borderBottom: `1px solid ${border}`,
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: 'var(--text-primary)',
+                        fontSize: '0.85rem',
+                        fontWeight: 800,
+                      }}
+                    >
+                      Categories
+                    </span>
+                    <button
+                      onClick={() => setIsSidebarOpen(false)}
+                      title="Collapse Sidebar"
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '7px',
+                        background: isDark ? 'rgba(255,255,255,.06)' : 'rgba(99,102,241,.08)',
+                        border: 'none',
+                        color: 'var(--text-muted)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        transition: 'all .15s',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.color = '#6366f1';
+                        e.currentTarget.style.background = isDark
+                          ? 'rgba(99,102,241,.2)'
+                          : 'rgba(99,102,241,.14)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.color = 'var(--text-muted)';
+                        e.currentTarget.style.background = isDark
+                          ? 'rgba(255,255,255,.06)'
+                          : 'rgba(99,102,241,.08)';
+                      }}
+                    >
+                      <ChevronLeft size={16} />
+                    </button>
+                  </div>
 
-              {/* View Toggle */}
-              <div style={{ display: 'flex', gap: '4px', background: isDark ? 'rgba(0,0,0,.2)' : 'rgba(59,130,246,.06)', padding: '3px', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
-                <button
-                  onClick={() => setViewMode('grid')}
+                  {/* Categories List */}
+                  <div style={{ marginBottom: '24px' }}>
+                    <ul
+                      style={{
+                        listStyle: 'none',
+                        padding: 0,
+                        margin: 0,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '2px',
+                      }}
+                    >
+                      {courseCategories.map((cat) => {
+                        const active = selectedCategory === cat;
+                        return (
+                          <li key={cat}>
+                            <button
+                              onClick={() => handleCategoryChange(cat)}
+                              style={{
+                                width: '100%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                padding: '7px 10px',
+                                borderRadius: '8px',
+                                border: 'none',
+                                background: active
+                                  ? isDark
+                                    ? 'rgba(99,102,241,.18)'
+                                    : 'rgba(99,102,241,.1)'
+                                  : 'transparent',
+                                color: active ? '#6366f1' : 'var(--text-secondary)',
+                                fontSize: '0.78rem',
+                                fontWeight: active ? 700 : 500,
+                                cursor: 'pointer',
+                                textAlign: 'left',
+                                transition: 'all .15s',
+                              }}
+                              onMouseEnter={(e) => {
+                                if (!active)
+                                  e.currentTarget.style.background = isDark
+                                    ? 'rgba(255,255,255,.04)'
+                                    : 'rgba(99,102,241,.06)';
+                              }}
+                              onMouseLeave={(e) => {
+                                if (!active) e.currentTarget.style.background = 'transparent';
+                              }}
+                            >
+                              <span
+                                style={{
+                                  flex: 1,
+                                  lineHeight: 1.3,
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                }}
+                              >
+                                {cat}
+                              </span>
+                              {active && (
+                                <div
+                                  style={{
+                                    width: '6px',
+                                    height: '6px',
+                                    borderRadius: '50%',
+                                    background: '#6366f1',
+                                    flexShrink: 0,
+                                  }}
+                                />
+                              )}
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+
+                  {/* Divider */}
+                  <div style={{ height: '1px', background: border, marginBottom: '20px' }} />
+
+                  {/* Level Filter */}
+                  <div style={{ marginBottom: '20px' }}>
+                    <h4
+                      style={{
+                        color: 'var(--text-primary)',
+                        fontSize: '0.8rem',
+                        fontWeight: 800,
+                        margin: '0 0 10px',
+                      }}
+                    >
+                      Level
+                    </h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      {LEVELS.map(({ label, id }) => (
+                        <label
+                          key={id}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            cursor: 'pointer',
+                            fontSize: '0.78rem',
+                            color: 'var(--text-secondary)',
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedLevels.includes(id)}
+                            onChange={() => toggleLevel(id)}
+                            style={{
+                              accentColor: '#6366f1',
+                              width: '14px',
+                              height: '14px',
+                              cursor: 'pointer',
+                              flexShrink: 0,
+                            }}
+                          />
+                          {label}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Duration Filter */}
+                  <div style={{ marginBottom: '20px' }}>
+                    <h4
+                      style={{
+                        color: 'var(--text-primary)',
+                        fontSize: '0.8rem',
+                        fontWeight: 800,
+                        margin: '0 0 10px',
+                      }}
+                    >
+                      Duration
+                    </h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      {DURATIONS.map(({ label, id }) => (
+                        <label
+                          key={id}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            cursor: 'pointer',
+                            fontSize: '0.78rem',
+                            color: 'var(--text-secondary)',
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedDurations.includes(id)}
+                            onChange={() => toggleDuration(id)}
+                            style={{
+                              accentColor: '#6366f1',
+                              width: '14px',
+                              height: '14px',
+                              cursor: 'pointer',
+                              flexShrink: 0,
+                            }}
+                          />
+                          {label}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Reset Filters Button */}
+                  {hasFilters && (
+                    <button
+                      onClick={resetFilters}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        padding: '7px 12px',
+                        borderRadius: '8px',
+                        background: isDark ? 'rgba(99,102,241,.12)' : 'rgba(99,102,241,.08)',
+                        border: '1px solid rgba(99,102,241,.2)',
+                        color: '#6366f1',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        width: '100%',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <RotateCcw size={12} /> Reset Filters
+                    </button>
+                  )}
+                </div>
+              </motion.aside>
+            )}
+          </AnimatePresence>
+
+          {/* ── Content Area ── */}
+          <div style={{ flex: 1, minWidth: 0, transition: 'all 0.28s ease' }}>
+            {/* Header + Search & Sort */}
+            <div style={{ marginBottom: '24px' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: '12px',
+                  marginBottom: '4px',
+                }}
+              >
+                <h1
                   style={{
-                    padding: '5px 10px', borderRadius: '8px', border: 'none',
-                    background: viewMode === 'grid' ? (isDark ? 'rgba(59,130,246,.25)' : 'rgba(59,130,246,.15)') : 'transparent',
-                    color: viewMode === 'grid' ? (isDark ? '#60a5fa' : '#1d4ed8') : 'var(--text-muted)', cursor: 'pointer',
-                    display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', fontWeight: 700,
+                    fontFamily: 'var(--font-display)',
+                    fontSize: '1.6rem',
+                    fontWeight: 800,
+                    color: 'var(--text-primary)',
+                    margin: 0,
+                    letterSpacing: '-0.02em',
                   }}
                 >
-                  <Grid3X3 size={13} /> Grid
-                </button>
+                  All Courses {selectedCategory !== 'All Categories' ? `— ${selectedCategory}` : ''}
+                </h1>
+
+                {/* Filter toggle button */}
                 <button
-                  onClick={() => setViewMode('list')}
+                  onClick={() => setIsSidebarOpen((p) => !p)}
+                  title={isSidebarOpen ? 'Hide Filters' : 'Show Filters'}
                   style={{
-                    padding: '5px 10px', borderRadius: '8px', border: 'none',
-                    background: viewMode === 'list' ? (isDark ? 'rgba(59,130,246,.25)' : 'rgba(59,130,246,.15)') : 'transparent',
-                    color: viewMode === 'list' ? (isDark ? '#60a5fa' : '#1d4ed8') : 'var(--text-muted)', cursor: 'pointer',
-                    display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', fontWeight: 700,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '8px',
+                    background: isSidebarOpen
+                      ? isDark
+                        ? 'rgba(99,102,241,.2)'
+                        : 'rgba(99,102,241,.1)'
+                      : isDark
+                      ? 'rgba(255,255,255,.06)'
+                      : '#ffffff',
+                    border: `1px solid ${isSidebarOpen ? '#6366f1' : border}`,
+                    color: isSidebarOpen ? '#6366f1' : 'var(--text-primary)',
+                    cursor: 'pointer',
+                    position: 'relative',
+                    transition: 'all .15s',
                   }}
                 >
-                  <List size={13} /> List
+                  <SlidersHorizontal size={16} />
+                  {activeFilterCount > 0 && (
+                    <span
+                      style={{
+                        position: 'absolute',
+                        top: '-4px',
+                        right: '-4px',
+                        width: '16px',
+                        height: '16px',
+                        borderRadius: '50%',
+                        background: '#6366f1',
+                        color: '#fff',
+                        fontSize: '0.62rem',
+                        fontWeight: 800,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      {activeFilterCount}
+                    </span>
+                  )}
                 </button>
               </div>
+
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', margin: '0 0 18px' }}>
+                Explore our expert-designed courses and start your learning journey
+              </p>
+
+              {/* Search + Sort Row */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                {/* Search Input */}
+                <div style={{ position: 'relative', flex: '1 1 280px', minWidth: '200px', maxWidth: '420px' }}>
+                  <Search
+                    size={15}
+                    style={{
+                      position: 'absolute',
+                      left: '12px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      color: 'var(--text-muted)',
+                      pointerEvents: 'none',
+                    }}
+                  />
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => {
+                      setSearch(e.target.value);
+                      setPage(1);
+                    }}
+                    placeholder="Search courses..."
+                    style={{
+                      width: '100%',
+                      boxSizing: 'border-box',
+                      paddingLeft: '36px',
+                      paddingRight: '14px',
+                      paddingTop: '9px',
+                      paddingBottom: '9px',
+                      borderRadius: '8px',
+                      fontSize: '0.82rem',
+                      outline: 'none',
+                      background: 'var(--bg-card)',
+                      border: `1px solid ${border}`,
+                      color: 'var(--text-primary)',
+                      transition: 'border-color .15s',
+                    }}
+                    onFocus={(e) => (e.target.style.borderColor = '#6366f1')}
+                    onBlur={(e) => (e.target.style.borderColor = border)}
+                  />
+                </div>
+
+                {/* Sort Dropdown */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto' }}>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '0.78rem', whiteSpace: 'nowrap' }}>
+                    Sort by:
+                  </span>
+                  <select
+                    value={sort}
+                    onChange={(e) => {
+                      setSort(e.target.value);
+                      setPage(1);
+                    }}
+                    style={{
+                      padding: '8px 12px',
+                      borderRadius: '8px',
+                      border: `1px solid ${border}`,
+                      background: 'var(--bg-card)',
+                      color: 'var(--text-primary)',
+                      fontSize: '0.8rem',
+                      outline: 'none',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {SORT_OPTIONS.map((o) => (
+                      <option key={o.value} value={o.value}>
+                        {o.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Courses Grid — 4 Columns */}
+            {paginated.length === 0 ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)' }}
+              >
+                <p style={{ fontSize: '2rem', marginBottom: '12px' }}>🎓</p>
+                <p
+                  style={{
+                    fontSize: '0.9rem',
+                    fontWeight: 600,
+                    color: 'var(--text-primary)',
+                    margin: '0 0 6px',
+                  }}
+                >
+                  No courses found
+                </p>
+                <p style={{ fontSize: '0.8rem', margin: '0 0 16px' }}>
+                  Try a different search query or reset your filters
+                </p>
+                <button
+                  onClick={resetFilters}
+                  style={{
+                    padding: '9px 20px',
+                    borderRadius: '8px',
+                    border: '1px solid #6366f1',
+                    background: 'transparent',
+                    color: '#6366f1',
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Reset Filters
+                </button>
+              </motion.div>
+            ) : (
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))',
+                  gap: '18px',
+                }}
+              >
+                {paginated.map((course, i) => (
+                  <CourseCard key={course.id} course={course} index={i} />
+                ))}
+              </div>
+            )}
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginTop: '28px',
+                  flexWrap: 'wrap',
+                  gap: '12px',
+                }}
+              >
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.78rem', margin: 0 }}>
+                  Showing {Math.min((page - 1) * COURSES_PER_PAGE + 1, filtered.length)} to{' '}
+                  {Math.min(page * COURSES_PER_PAGE, filtered.length)} of {filtered.length} courses
+                </p>
+                <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                  {renderPaginationPages().map((p, i) =>
+                    p === '...' ? (
+                      <span
+                        key={`dot-${i}`}
+                        style={{ padding: '0 4px', color: 'var(--text-muted)', fontSize: '0.8rem' }}
+                      >
+                        ...
+                      </span>
+                    ) : (
+                      <button
+                        key={p}
+                        onClick={() => {
+                          setPage(p);
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '6px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          border: `1px solid ${page === p ? '#6366f1' : border}`,
+                          background: page === p ? '#6366f1' : 'var(--bg-card)',
+                          color: page === p ? '#fff' : 'var(--text-secondary)',
+                          fontSize: '0.8rem',
+                          fontWeight: page === p ? 700 : 500,
+                          cursor: 'pointer',
+                          transition: 'all .15s',
+                        }}
+                        onMouseEnter={(e) => {
+                          if (page !== p) e.currentTarget.style.borderColor = '#6366f1';
+                        }}
+                        onMouseLeave={(e) => {
+                          if (page !== p) e.currentTarget.style.borderColor = border;
+                        }}
+                      >
+                        {p}
+                      </button>
+                    )
+                  )}
+                  {page < totalPages && (
+                    <button
+                      onClick={() => {
+                        setPage((p) => p + 1);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      style={{
+                        width: 'auto',
+                        height: '32px',
+                        padding: '0 10px',
+                        gap: '3px',
+                        borderRadius: '6px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        border: `1px solid ${border}`,
+                        background: 'var(--bg-card)',
+                        color: 'var(--text-secondary)',
+                        fontSize: '0.8rem',
+                        fontWeight: 500,
+                        cursor: 'pointer',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = '#6366f1';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = border;
+                      }}
+                    >
+                      <ChevronRight size={14} />
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ── Bottom Subscription Banner (Unlock Unlimited Learning) ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          style={{
+            marginTop: '56px',
+            background: isDark
+              ? 'linear-gradient(135deg,rgba(99,102,241,.18),rgba(139,92,246,.12))'
+              : 'linear-gradient(135deg,#f3f4f6,#eef2ff)',
+            border: '1.5px solid rgba(99,102,241,.25)',
+            borderRadius: '20px',
+            padding: '36px 40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '32px',
+          }}
+        >
+          {/* Left 3D Cap / Icon + Info */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flex: '1 1 340px' }}>
+            <div
+              style={{
+                width: '72px',
+                height: '72px',
+                borderRadius: '20px',
+                background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 8px 24px rgba(99,102,241,.4)',
+                flexShrink: 0,
+              }}
+            >
+              <GraduationCap size={36} color="#fff" />
+            </div>
+            <div>
+              <h3
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  fontSize: '1.35rem',
+                  fontWeight: 800,
+                  color: 'var(--text-primary)',
+                  margin: '0 0 6px',
+                  letterSpacing: '-0.02em',
+                }}
+              >
+                Unlock Unlimited Learning
+              </h3>
+              <p
+                style={{
+                  color: 'var(--text-secondary)',
+                  fontSize: '0.85rem',
+                  lineHeight: 1.5,
+                  margin: 0,
+                  maxWidth: '420px',
+                }}
+              >
+                Get unlimited access to all courses, books, projects, certificates and premium resources.
+              </p>
             </div>
           </div>
 
-          {/* Grid or List Display */}
-          {paginated.length === 0 ? (
-            <EmptyState
-              icon="search"
-              title="No courses found"
-              description="Try different search keywords or clear your active filters."
-              action={resetFilters}
-              actionLabel="Reset All Filters"
-            />
-          ) : (
-            <div style={{
+          {/* Middle Checklist */}
+          <div
+            style={{
               display: 'grid',
-              gridTemplateColumns: viewMode === 'grid' ? 'repeat(auto-fill, minmax(260px, 1fr))' : '1fr',
-              gap: '16px',
-              marginBottom: '24px',
-            }}>
-              {paginated.map((course, i) => (
-                <CourseCard key={course.id} course={course} index={i} viewMode={viewMode} />
-              ))}
-            </div>
-          )}
+              gridTemplateColumns: '1fr 1fr',
+              gap: '10px 24px',
+              fontSize: '0.82rem',
+              color: 'var(--text-secondary)',
+            }}
+          >
+            {[
+              'Access to 500+ Premium Courses',
+              'Certificates on Completion',
+              'Download E-books & Resources',
+              'Priority Support',
+            ].map((pt) => (
+              <div key={pt} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div
+                  style={{
+                    width: '18px',
+                    height: '18px',
+                    borderRadius: '50%',
+                    background: '#6366f1',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <Check size={11} color="#fff" strokeWidth={3} />
+                </div>
+                <span>{pt}</span>
+              </div>
+            ))}
+          </div>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={(p) => { setCurrentPage(p); window.scrollTo(0, 0); }} />
-          )}
-        </div>
+          {/* Right Action Button */}
+          <div style={{ textAlign: 'center', flexShrink: 0 }}>
+            <button
+              onClick={() => navigate('/subscription')}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '13px 28px',
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
+                color: '#fff',
+                fontSize: '0.9rem',
+                fontWeight: 700,
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 8px 24px rgba(99,102,241,.35)',
+                transition: 'all .2s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 12px 32px rgba(99,102,241,.45)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'none';
+                e.currentTarget.style.boxShadow = '0 8px 24px rgba(99,102,241,.35)';
+              }}
+            >
+              Explore Plans <ArrowRight size={16} />
+            </button>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.72rem', margin: '6px 0 0' }}>
+              Starting from ₹299/month
+            </p>
+          </div>
+        </motion.div>
       </div>
-    </PageWrapper>
+    </div>
   );
 }

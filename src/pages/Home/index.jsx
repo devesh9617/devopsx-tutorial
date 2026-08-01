@@ -1,31 +1,29 @@
 // ============================================================
-// Home Page — DevOpsX
+// Home Page — AI Learning Platform (Reference Design)
 // ============================================================
 
 import Hero from '../../components/sections/Hero';
 import {
-  FeaturedCourses,
-  PopularCategories,
-  TrendingCourses,
-  LearningPaths,
-  LatestBooks,
-  TopInstructors,
-  StudentReviews,
+  TrustedBy,
+  ExploreCategories,
+  FeaturedBooksAndCourses,
+  SubscriptionBanner,
+  Testimonials,
   FAQ,
+  Newsletter,
 } from '../../components/sections/HomeSections';
 
 export default function Home() {
   return (
     <main>
       <Hero />
-      <FeaturedCourses />
-      <PopularCategories />
-      <TrendingCourses />
-      <LearningPaths />
-      <LatestBooks />
-      <TopInstructors />
-      <StudentReviews />
+      <TrustedBy />
+      <ExploreCategories />
+      <FeaturedBooksAndCourses />
+      <SubscriptionBanner />
+      <Testimonials />
       <FAQ />
+      <Newsletter />
     </main>
   );
 }

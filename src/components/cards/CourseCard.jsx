@@ -1,59 +1,56 @@
+// ============================================================
+// CourseCard — Reference Design (DITTO match)
+// ============================================================
+
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Clock, Users, Star, BookOpen, Heart, Award, ArrowRight } from 'lucide-react';
+import { Star, Heart, Play, Clock, BarChart2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 
-export default function CourseCard({ course, index = 0, viewMode = 'grid' }) {
-  const { user, isEnrolled, toggleWishlist, isWishlisted } = useAuth();
+export default function CourseCard({ course, index = 0 }) {
+  const { user, toggleWishlist, isWishlisted } = useAuth();
   const { isDark } = useTheme();
 
-  const enrolled   = isEnrolled(course.id);
   const wishlisted = isWishlisted(course.id);
-  const discount   = Math.round((1 - course.price / course.originalPrice) * 100);
-
-  const levelColors = {
-    Beginner:     { bg: isDark ? 'rgba(16,185,129,.15)' : 'rgba(16,185,129,.12)', text: isDark ? '#34d399' : '#047857', border: 'rgba(16,185,129,.25)' },
-    Intermediate: { bg: isDark ? 'rgba(245,158,11,.15)' : 'rgba(245,158,11,.12)', text: isDark ? '#fbbf24' : '#b45309', border: 'rgba(245,158,11,.25)' },
-    Advanced:     { bg: isDark ? 'rgba(239,68,68,.15)'  : 'rgba(239,68,68,.12)',  text: isDark ? '#f87171' : '#b91c1c', border: 'rgba(239,68,68,.25)'  },
-  };
-  const lc = levelColors[course.level] || levelColors.Beginner;
-
-  const isList = viewMode === 'list';
+  const border = isDark ? 'rgba(255,255,255,.08)' : '#e5e7eb';
 
   return (
     <motion.article
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: Math.min(index * 0.04, 0.25), duration: 0.25 }}
+      transition={{ delay: Math.min(index * 0.04, 0.3), duration: 0.25 }}
       style={{
         background: 'var(--bg-card)',
-        border: isDark ? '1.5px solid rgba(255,255,255,.1)' : '1.5px solid #b3c3ea',
+        border: `1.5px solid ${border}`,
         borderRadius: '12px',
         overflow: 'hidden',
         display: 'flex',
-        flexDirection: isList ? 'row' : 'column',
-        position: 'relative',
-        boxShadow: isDark ? '0 2px 10px rgba(0,0,0,0.25)' : '0 2px 10px rgba(30,64,175,.08)',
-        transition: 'all 0.2s ease-in-out',
+        flexDirection: 'column',
+        boxShadow: isDark
+          ? '0 2px 10px rgba(0,0,0,0.25)'
+          : '0 2px 10px rgba(30,64,175,.06)',
+        transition: 'all 0.2s ease',
       }}
       whileHover={{
         y: -4,
-        borderColor: isDark ? 'rgba(59,130,246,0.55)' : '#2563eb',
+        borderColor: '#6366f1',
         boxShadow: isDark
-          ? '0 8px 24px rgba(0,0,0,.4), 0 0 0 1px rgba(59,130,246,.2)'
-          : '0 8px 24px rgba(30,64,175,.18), 0 0 0 1px rgba(37,99,235,.15)',
+          ? '0 10px 30px rgba(0,0,0,.4)'
+          : '0 10px 30px rgba(99,102,241,.16)',
       }}
     >
-      {/* ── Thumbnail ── */}
-      <div style={{
-        position: 'relative',
-        width: isList ? '240px' : '100%',
-        aspectRatio: isList ? '16/10' : '16/9',
-        flexShrink: 0,
-        overflow: 'hidden',
-        background: isDark ? '#111827' : '#f3f4f6',
-      }}>
+      {/* ── Thumbnail Section with Overlay ── */}
+      <div
+        style={{
+          position: 'relative',
+          width: '100%',
+          aspectRatio: '16/9',
+          overflow: 'hidden',
+          background: isDark ? '#111827' : '#f3f4f6',
+          flexShrink: 0,
+        }}
+      >
         <img
           src={course.thumbnail}
           alt={course.title}
@@ -61,126 +58,192 @@ export default function CourseCard({ course, index = 0, viewMode = 'grid' }) {
           loading="lazy"
         />
 
-        {/* Top Badges */}
-        <div style={{ position: 'absolute', top: '8px', left: '8px', display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-          {course.isNew && (
-            <span style={{ padding: '2px 8px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 700, color: '#fff', background: '#2563eb' }}>
-              NEW
-            </span>
-          )}
-          {course.isFree && (
-            <span style={{ padding: '2px 8px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 700, color: '#fff', background: '#10b981' }}>
-              FREE
-            </span>
-          )}
-          {course.isBestseller && (
-            <span style={{ padding: '2px 8px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 700, color: '#111', background: '#fbbf24' }}>
-              BESTSELLER
-            </span>
-          )}
-        </div>
-
-        {/* Wishlist Button */}
-        <button
-          onClick={(e) => { e.preventDefault(); user && toggleWishlist(course.id); }}
+        {/* Play Button Overlay in center */}
+        <Link
+          to={`/courses/${course.slug}`}
           style={{
-            position: 'absolute', top: '8px', right: '8px',
-            width: '30px', height: '30px', borderRadius: '50%',
-            background: wishlisted ? '#ef4444' : 'rgba(17,24,39,0.7)',
-            border: 'none', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            transition: 'all 0.15s ease',
+            position: 'absolute',
+            inset: 0,
+            background: 'rgba(0,0,0,0.25)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textDecoration: 'none',
+            transition: 'background 0.2s',
           }}
         >
-          <Heart size={14} fill={wishlisted ? '#fff' : 'none'} color="#fff" />
-        </button>
-
-        {/* Bottom thumbnail info */}
-        {enrolled && (
-          <div style={{ position: 'absolute', bottom: '8px', left: '8px', display: 'flex', alignItems: 'center', gap: '4px', padding: '3px 8px', borderRadius: '4px', fontSize: '0.68rem', fontWeight: 700, color: '#fff', background: '#10b981' }}>
-            <Award size={11} /> Enrolled
+          <div
+            style={{
+              width: '38px',
+              height: '38px',
+              borderRadius: '50%',
+              background: 'rgba(255,255,255,0.92)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 4px 14px rgba(0,0,0,0.3)',
+              paddingLeft: '2px',
+            }}
+          >
+            <Play size={16} color="#6366f1" fill="#6366f1" />
           </div>
+        </Link>
+
+        {/* Top-left Badge */}
+        {course.badge && (
+          <span
+            style={{
+              position: 'absolute',
+              top: '10px',
+              left: '10px',
+              padding: '3px 9px',
+              borderRadius: '5px',
+              fontSize: '0.62rem',
+              fontWeight: 800,
+              color: '#111',
+              background: '#fbbf24',
+              letterSpacing: '0.02em',
+              zIndex: 2,
+            }}
+          >
+            {course.badge}
+          </span>
         )}
-        <div style={{ position: 'absolute', bottom: '8px', right: '8px', display: 'flex', alignItems: 'center', gap: '4px', padding: '3px 8px', borderRadius: '4px', fontSize: '0.68rem', color: '#fff', background: 'rgba(17,24,39,0.75)' }}>
-          <Clock size={10} /> {course.duration}
-        </div>
+
+        {/* Top-right Wishlist Heart */}
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            user && toggleWishlist(course.id);
+          }}
+          style={{
+            position: 'absolute',
+            top: '10px',
+            right: '10px',
+            width: '28px',
+            height: '28px',
+            borderRadius: '50%',
+            background: wishlisted ? '#ef4444' : 'rgba(0,0,0,0.45)',
+            border: 'none',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backdropFilter: 'blur(4px)',
+            zIndex: 2,
+            transition: 'transform 0.15s',
+          }}
+        >
+          <Heart size={13} fill={wishlisted ? '#fff' : 'none'} color="#fff" />
+        </button>
       </div>
 
-      {/* ── Content ── */}
-      <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
-        {/* Category & Level */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-          <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: '4px', fontWeight: 600, background: lc.bg, color: lc.text, border: `1px solid ${lc.border}` }}>
-            {course.level}
-          </span>
-          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {course.category}
-          </span>
-        </div>
-
+      {/* ── Content Section ── */}
+      <div style={{ padding: '14px', display: 'flex', flexDirection: 'column', flex: 1 }}>
         {/* Title */}
-        <Link to={`/courses/${course.slug}`} style={{ textDecoration: 'none', marginBottom: '8px' }}>
-          <h3 style={{
-            color: 'var(--text-primary)', fontSize: '0.9rem', fontWeight: 700,
-            lineHeight: 1.4, margin: 0,
-            display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
-          }}>
+        <Link to={`/courses/${course.slug}`} style={{ textDecoration: 'none', marginBottom: '6px' }}>
+          <h3
+            style={{
+              color: 'var(--text-primary)',
+              fontSize: '0.86rem',
+              fontWeight: 700,
+              lineHeight: 1.35,
+              margin: 0,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}
+          >
             {course.title}
           </h3>
         </Link>
 
         {/* Instructor */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-          <img src={course.instructor.avatar} alt={course.instructor.name} style={{ width: '22px', height: '22px', borderRadius: '50%', objectFit: 'cover' }} />
-          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
+          <img
+            src={course.instructor.avatar}
+            alt={course.instructor.name}
+            style={{ width: '18px', height: '18px', borderRadius: '50%', objectFit: 'cover' }}
+          />
+          <span
+            style={{
+              fontSize: '0.72rem',
+              color: 'var(--text-muted)',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
             {course.instructor.name}
           </span>
         </div>
 
-        {/* Stats Row */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '14px', marginTop: 'auto' }}>
+        {/* Rating + Students */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px',
+            fontSize: '0.72rem',
+            color: 'var(--text-muted)',
+            marginBottom: '10px',
+          }}
+        >
+          <span style={{ fontWeight: 800, color: '#f59e0b' }}>{course.rating}</span>
+          <div style={{ display: 'flex', gap: '1px' }}>
+            {[1, 2, 3, 4, 5].map((s) => (
+              <Star
+                key={s}
+                size={10}
+                fill={s <= Math.floor(course.rating) ? '#f59e0b' : 'none'}
+                color={s <= Math.floor(course.rating) ? '#f59e0b' : isDark ? '#4b5563' : '#d1d5db'}
+              />
+            ))}
+          </div>
+          <span>({(course.ratingCount / 1000).toFixed(1)}K)</span>
+          <span>•</span>
+          <span>{(course.students / 1000).toFixed(0)}K+ students</span>
+        </div>
+
+        {/* Duration + Level Meta Row */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            fontSize: '0.7rem',
+            color: 'var(--text-muted)',
+            marginBottom: '12px',
+            marginTop: 'auto',
+            paddingTop: '8px',
+            borderTop: `1px solid ${isDark ? 'rgba(255,255,255,.05)' : '#f3f4f6'}`,
+          }}
+        >
           <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-            <Star size={11} color={isDark ? '#fbbf24' : '#d97706'} fill={isDark ? '#fbbf24' : '#d97706'} />
-            <strong style={{ color: isDark ? '#fbbf24' : '#d97706' }}>{course.rating}</strong>
-            <span>({(course.ratingCount / 1000).toFixed(1)}k)</span>
+            <Clock size={11} /> {course.duration}
           </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-            <Users size={11} /> {(course.students / 1000).toFixed(0)}K
-          </span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-            <BookOpen size={11} /> {course.lessons} lessons
+            <BarChart2 size={11} /> {course.level}
           </span>
         </div>
 
-        {/* Action / Price */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', pt: '8px' }}>
-          {course.isFree ? (
-            <span style={{ fontSize: '1.05rem', fontWeight: 700, color: isDark ? '#34d399' : '#059669' }}>Free</span>
-          ) : (
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-              <span style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>₹{course.price.toLocaleString()}</span>
-              {course.originalPrice > course.price && (
-                <>
-                  <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>
-                    ₹{course.originalPrice.toLocaleString()}
-                  </span>
-                  <span style={{ fontSize: '0.68rem', fontWeight: 600, color: isDark ? '#34d399' : '#059669' }}>{discount}% off</span>
-                </>
-              )}
-            </div>
+        {/* Price Row */}
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+          <span style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+            ₹{course.price.toLocaleString()}
+          </span>
+          {course.originalPrice > course.price && (
+            <span
+              style={{
+                fontSize: '0.7rem',
+                color: 'var(--text-muted)',
+                textDecoration: 'line-through',
+              }}
+            >
+              ₹{course.originalPrice.toLocaleString()}
+            </span>
           )}
-
-          <Link
-            to={`/courses/${course.slug}`}
-            style={{
-              padding: '8px 14px', borderRadius: '6px', fontSize: '0.78rem', fontWeight: 600,
-              color: '#fff', background: '#2563eb', textDecoration: 'none',
-              display: 'inline-flex', alignItems: 'center', gap: '4px',
-              transition: 'background 0.15s',
-            }}
-          >
-            {enrolled ? 'Resume' : 'Enroll'} <ArrowRight size={12} />
-          </Link>
         </div>
       </div>
     </motion.article>

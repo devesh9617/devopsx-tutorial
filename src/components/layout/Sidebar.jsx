@@ -3,15 +3,16 @@
 // ============================================================
 
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  LayoutDashboard, BookOpen, GraduationCap, Briefcase, Code2, FileText,
-  Users, Settings, ChevronDown, Server, Cloud, Shield, Terminal,
-  Layers, Brain, Globe, Database, GitBranch, Cpu, ChevronRight,
+  LayoutDashboard, BookOpen, GraduationCap, Code2, FileText,
+  Users, Settings, ChevronDown, Server, Cloud,
+  Cpu, ChevronRight,
   BookMarked, ClipboardList, FileQuestion, Video, Heart, Award,
-  UserCircle, BarChart3, X, Sparkles, Folder, CheckCircle2, ChevronUp
+  UserCircle, X, CheckCircle2, ChevronUp, Brain,
 } from 'lucide-react';
+import { bookCategories, categoryIcons } from '../../data/books';
 import { useSidebar } from '../../context/SidebarContext';
 import { useTheme } from '../../context/ThemeContext';
 import BrandLogo from '../ui/BrandLogo';
@@ -118,6 +119,98 @@ function GradeFeaturePanel({ collapsed }) {
                 <span style={{ color: isDark ? 'rgba(203,213,225,.8)' : 'var(--text-secondary)', fontSize: '0.71rem', fontWeight: 500, lineHeight: 1.3 }}>{f}</span>
               </div>
             ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// ── Books Categories Panel (shows only on /textbooks) ────────
+function BooksCategoriesPanel({ collapsed }) {
+  const [open, setOpen] = useState(true);
+  const { isDark } = useTheme();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const activeCategory = searchParams.get('category') || 'All Categories';
+
+  // Only show on /textbooks route
+  if (location.pathname !== '/textbooks' || collapsed) return null;
+
+  const handleCategory = (cat) => {
+    const params = new URLSearchParams();
+    if (cat !== 'All Categories') params.set('category', cat);
+    navigate(`/textbooks${params.toString() ? '?' + params.toString() : ''}`);
+  };
+
+  return (
+    <div
+      style={{
+        margin: '0 10px 14px',
+        borderRadius: '14px',
+        overflow: 'hidden',
+        border: isDark ? '1px solid rgba(99,102,241,.25)' : '1px solid rgba(99,102,241,.2)',
+        background: isDark
+          ? 'linear-gradient(145deg, rgba(99,102,241,.1), rgba(9,15,40,.85))'
+          : 'linear-gradient(145deg, rgba(99,102,241,.07), #ffffff)',
+        boxShadow: isDark ? '0 4px 20px rgba(99,102,241,.12)' : '0 4px 16px rgba(99,102,241,.1)',
+      }}
+    >
+      {/* Header */}
+      <button
+        onClick={() => setOpen((p) => !p)}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '10px 13px', background: 'none', border: 'none', cursor: 'pointer',
+          borderBottom: open ? (isDark ? '1px solid rgba(99,102,241,.18)' : '1px solid rgba(99,102,241,.15)') : 'none',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+          <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#6366f1', boxShadow: '0 0 6px #6366f1' }} />
+          <span style={{ fontSize: '0.68rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: isDark ? '#a5b4fc' : '#4f46e5' }}>
+            Book Categories
+          </span>
+        </div>
+        {open
+          ? <ChevronUp size={12} style={{ color: isDark ? '#a5b4fc' : '#4f46e5' }} />
+          : <ChevronDown size={12} style={{ color: isDark ? '#a5b4fc' : '#4f46e5' }} />}
+      </button>
+
+      {/* Category List */}
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.22 }}
+            style={{ overflow: 'hidden', padding: '6px 8px 8px' }}
+          >
+            {bookCategories.map((cat) => {
+              const active = activeCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => handleCategory(cat)}
+                  style={{
+                    width: '100%', display: 'flex', alignItems: 'center', gap: '7px',
+                    padding: '5px 6px', borderRadius: '7px', border: 'none',
+                    background: active ? (isDark ? 'rgba(99,102,241,.22)' : 'rgba(99,102,241,.12)') : 'transparent',
+                    color: active ? '#6366f1' : (isDark ? 'rgba(203,213,225,.8)' : 'var(--text-secondary)'),
+                    fontSize: '0.73rem', fontWeight: active ? 700 : 500,
+                    cursor: 'pointer', textAlign: 'left', transition: 'all .12s',
+                  }}
+                  onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = isDark ? 'rgba(255,255,255,.06)' : 'rgba(99,102,241,.07)'; }}
+                  onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = 'transparent'; }}
+                >
+                  <span style={{ fontSize: '0.8rem', lineHeight: 1, flexShrink: 0 }}>{categoryIcons[cat]}</span>
+                  <span style={{ flex: 1, lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{cat}</span>
+                  {active && <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#6366f1', flexShrink: 0 }} />}
+                </button>
+              );
+            })}
           </motion.div>
         )}
       </AnimatePresence>
