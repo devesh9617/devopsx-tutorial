@@ -226,6 +226,7 @@ const menuSections = [
       { icon: LayoutDashboard, label: 'Dashboard',   to: '/dashboard' },
       { icon: BookOpen,        label: 'All Courses', to: '/courses' },
       { icon: BookMarked,      label: 'My Learning', to: '/my-learning' },
+      { icon: Video,           label: 'Curriculum',  to: '/curriculum' },
     ],
   },
   {

@@ -1,12 +1,13 @@
 // ============================================================
-// Subscription Page — DevOpsX Premium Learning (Reference Match)
+// Subscription Page — Perfect Hybrid (Hero 3D Book + 4-Plan Detailed Grid & Compare Table)
 // ============================================================
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Check,
+  X,
   Play,
   ArrowRight,
   ChevronLeft,
@@ -24,9 +25,12 @@ import {
   Minus,
   CheckCircle2,
   ShieldCheck,
-  Zap,
+  BookOpen,
+  Sparkles,
+  Shield,
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
+import { toast } from 'react-hot-toast';
 
 // Safe SVG for Infinity icon
 function InfinityIconSvg({ size = 20, color = 'currentColor' }) {
@@ -95,63 +99,85 @@ const FEATURES = [
 
 const PLANS = [
   {
-    id: 'monthly',
-    name: 'Monthly Plan',
-    price: 299,
-    originalPrice: null,
-    period: '/month',
-    billedNote: 'Billed monthly',
+    id: 'basic',
+    name: 'Basic',
+    subtitle: 'For learners getting started',
+    monthlyPrice: 299,
+    yearlyNote: '₹3,588 billed yearly',
     popular: false,
     features: [
-      'All Courses Access',
-      'Projects & Resources',
-      'Community Support',
-      'Certificate of Completion',
+      'Access to 100+ Courses',
+      'Access to 2,000+ Books',
+      'Standard Support',
+      'Download Resources',
+      '1 Device Access',
     ],
-    cta: 'Choose Monthly',
   },
   {
-    id: 'yearly',
-    name: 'Yearly Plan',
-    price: 1999,
-    originalPrice: 3600,
-    period: '/year',
-    billedNote: 'Billed yearly',
+    id: 'pro',
+    name: 'Pro',
+    subtitle: 'For serious learners',
+    monthlyPrice: 599,
+    yearlyNote: '₹7,188 billed yearly',
     popular: true,
     badge: 'Most Popular',
-    savePct: 45,
     features: [
-      'All Courses Access',
-      'Projects & Resources',
+      'Access to 300+ Courses',
+      'Access to 6,000+ Books',
+      'Certificates on Completion',
+      'Download Resources',
       'Priority Support',
-      'Certificate of Completion',
+      '2 Device Access',
+      'Live Q&A Sessions',
     ],
-    cta: 'Choose Yearly',
+  },
+  {
+    id: 'premium',
+    name: 'Premium',
+    subtitle: 'For professionals & developers',
+    monthlyPrice: 999,
+    yearlyNote: '₹11,988 billed yearly',
+    popular: false,
+    features: [
+      'Access to 500+ Courses',
+      'Access to 10,000+ Books',
+      'Certificates on Completion',
+      'Download Resources',
+      'Priority Support',
+      '5 Device Access',
+      'Live Classes Access',
+      'Early Access to New Courses',
+    ],
   },
   {
     id: 'lifetime',
-    name: 'Lifetime Plan',
-    price: 3999,
-    originalPrice: 7999,
-    period: '',
-    billedNote: 'One-time payment',
+    name: 'Lifetime',
+    subtitle: 'One-time payment',
+    monthlyPrice: 14999,
+    yearlyNote: 'One-time payment',
+    isLifetime: true,
     popular: false,
     features: [
-      'All Courses Access',
-      'Projects & Resources',
+      'Everything in Premium',
+      'Lifetime Access',
+      'All Future Updates',
+      'Certificates on Completion',
+      'Download Resources',
       'Priority Support',
-      'Lifetime Updates',
-      'Certificate of Completion',
+      'Live Classes Access',
     ],
-    cta: 'Choose Lifetime',
   },
 ];
 
-const GUARANTEES = [
-  { IconComponent: RefreshCw, title: '30-Day Money Back', desc: 'Not satisfied? Get a full refund.' },
-  { IconComponent: Lock, title: 'Secure Payment', desc: 'Your payment information is safe with us.' },
-  { IconComponent: RefreshCw, title: 'Cancel Anytime', desc: 'No hidden fees. Cancel anytime.' },
-  { IconComponent: Monitor, title: 'Access on All Devices', desc: 'Learn on mobile, laptop or TV.' },
+const COMPARISON_ROWS = [
+  { key: 'courses', label: 'Courses Access', Icon: BookOpen, basic: '100+', pro: '300+', premium: '500+', lifetime: '500+' },
+  { key: 'books', label: 'Books Access', Icon: Video, basic: '2,000+', pro: '6,000+', premium: '10,000+', lifetime: '10,000+' },
+  { key: 'certs', label: 'Certificates', Icon: Award, basic: false, pro: true, premium: true, lifetime: true },
+  { key: 'download', label: 'Download Resources', Icon: Download, basic: false, pro: true, premium: true, lifetime: true },
+  { key: 'live', label: 'Live Classes', Icon: Monitor, basic: false, pro: false, premium: true, lifetime: true },
+  { key: 'devices', label: 'Devices', Icon: Monitor, basic: '1', pro: '2', premium: '5', lifetime: 'Unlimited' },
+  { key: 'support', label: 'Support', Icon: Headphones, basic: 'Standard', pro: 'Priority', premium: 'Priority', lifetime: 'Priority' },
+  { key: 'price', label: 'Price (Yearly)', Icon: Sparkles, basic: '₹3,588', pro: '₹7,188', premium: '₹11,988', lifetime: '₹14,999 (One-time)' },
 ];
 
 const TESTIMONIALS = [
@@ -322,7 +348,9 @@ function FAQRow({ item }) {
 
 export default function Subscription() {
   const { isDark } = useTheme();
+  const navigate = useNavigate();
   const [tIdx, setTIdx] = useState(0);
+  const [billingCycle, setBillingCycle] = useState('yearly'); // 'monthly' | 'yearly'
 
   const border = isDark ? 'rgba(255,255,255,.08)' : 'rgba(99,102,241,.18)';
 
@@ -331,9 +359,15 @@ export default function Subscription() {
     document.getElementById('sub-plans')?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const handleSelectPlan = (plan) => {
+    toast.success(`Selected ${plan.name} Plan! Proceeding to checkout...`);
+    navigate('/checkout');
+  };
+
   return (
     <div style={{ background: 'var(--bg-primary)', minHeight: '100vh' }}>
-      {/* ══ HERO SECTION ══════════════════════════════════════ */}
+
+      {/* ══ 1. HERO SECTION (3D BOOK + PLANT SHOWCASE) ════════════ */}
       <section
         style={{
           padding: '56px 32px 64px',
@@ -494,6 +528,7 @@ export default function Subscription() {
                 Start Subscription
               </a>
               <button
+                onClick={() => toast.success('Playing free preview video...')}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -544,7 +579,7 @@ export default function Subscription() {
             </p>
           </motion.div>
 
-          {/* Right: 3D Book & Potted Plant Showcase (Reference Match) */}
+          {/* Right: 3D Book & Potted Plant Showcase */}
           <motion.div
             initial={{ opacity: 0, scale: 0.92, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -674,7 +709,7 @@ export default function Subscription() {
         </div>
       </section>
 
-      {/* ══ FEATURES STRIP ════════════════════════════════════ */}
+      {/* ══ 2. FEATURES STRIP (6 COLUMNS) ════════════════════════ */}
       <section
         style={{
           padding: '36px 32px',
@@ -752,10 +787,11 @@ export default function Subscription() {
         </div>
       </section>
 
-      {/* ══ PRICING SECTION ══════════════════════════════════ */}
+      {/* ══ 3. 4-PLAN DETAILED PRICING SECTION ══════════════════ */}
       <section id="sub-plans" style={{ padding: '64px 32px', background: 'var(--bg-primary)' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '44px' }}>
+          
+          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
             <h2
               style={{
                 fontFamily: 'var(--font-display)',
@@ -766,46 +802,113 @@ export default function Subscription() {
                 letterSpacing: '-0.02em',
               }}
             >
-              Choose Your Plan
+              Choose the Plan That Fits Your Learning Goals
             </h2>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>
-              Simple pricing. No hidden charges.
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: '0 0 24px' }}>
+              Unlimited access to books, courses, projects, and premium resources
             </p>
+
+            {/* Monthly / Yearly Toggle */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '12px',
+              }}
+            >
+              <div
+                style={{
+                  display: 'inline-flex',
+                  background: isDark ? 'rgba(0,0,0,.3)' : 'rgba(99,102,241,.08)',
+                  padding: '4px',
+                  borderRadius: '999px',
+                  border: `1px solid ${border}`,
+                }}
+              >
+                <button
+                  onClick={() => setBillingCycle('monthly')}
+                  style={{
+                    padding: '7px 20px',
+                    borderRadius: '999px',
+                    border: 'none',
+                    background: billingCycle === 'monthly' ? '#6366f1' : 'transparent',
+                    color: billingCycle === 'monthly' ? '#fff' : 'var(--text-muted)',
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    transition: 'all .15s',
+                  }}
+                >
+                  Monthly
+                </button>
+                <button
+                  onClick={() => setBillingCycle('yearly')}
+                  style={{
+                    padding: '7px 20px',
+                    borderRadius: '999px',
+                    border: 'none',
+                    background: billingCycle === 'yearly' ? '#6366f1' : 'transparent',
+                    color: billingCycle === 'yearly' ? '#fff' : 'var(--text-muted)',
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    transition: 'all .15s',
+                  }}
+                >
+                  Yearly
+                </button>
+              </div>
+
+              <span
+                style={{
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  color: '#10b981',
+                  background: 'rgba(16,185,129,.12)',
+                  padding: '4px 10px',
+                  borderRadius: '999px',
+                }}
+              >
+                Save up to 60%
+              </span>
+            </div>
           </div>
 
+          {/* 4 Plan Cards Grid */}
           <div
             style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
               gap: '24px',
               alignItems: 'stretch',
+              marginBottom: '56px',
             }}
           >
-            {/* 3 Plan Cards */}
             {PLANS.map((plan, i) => (
               <motion.div
                 key={plan.id}
-                initial={{ opacity: 0, y: 24 }}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
+                transition={{ delay: i * 0.08 }}
                 style={{
                   position: 'relative',
                   background: plan.popular
                     ? isDark
                       ? 'rgba(99,102,241,.14)'
-                      : 'rgba(238,242,255,1)'
+                      : '#f5f3ff'
                     : 'var(--bg-card)',
                   border: `1.5px solid ${plan.popular ? '#6366f1' : border}`,
                   borderRadius: '18px',
-                  padding: '32px 24px',
+                  padding: '28px 22px',
                   display: 'flex',
                   flexDirection: 'column',
                   boxShadow: plan.popular
-                    ? '0 12px 40px rgba(99,102,241,.22)'
+                    ? '0 12px 36px rgba(99,102,241,.22)'
                     : isDark
                     ? '0 2px 8px rgba(0,0,0,.2)'
-                    : '0 2px 8px rgba(30,64,175,.07)',
+                    : '0 2px 8px rgba(30,64,175,.05)',
                 }}
               >
                 {plan.badge && (
@@ -818,7 +921,7 @@ export default function Subscription() {
                       background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
                       color: '#fff',
                       fontSize: '0.68rem',
-                      fontWeight: 700,
+                      fontWeight: 800,
                       padding: '4px 14px',
                       borderRadius: '999px',
                       boxShadow: '0 4px 12px rgba(99,102,241,.4)',
@@ -832,97 +935,42 @@ export default function Subscription() {
                 <h3
                   style={{
                     color: 'var(--text-primary)',
-                    fontSize: '1.05rem',
-                    fontWeight: 700,
-                    margin: '0 0 16px',
+                    fontSize: '1.15rem',
+                    fontWeight: 800,
+                    margin: '0 0 2px',
                   }}
                 >
                   {plan.name}
                 </h3>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', margin: '0 0 18px' }}>
+                  {plan.subtitle}
+                </p>
 
-                <div style={{ marginBottom: '16px' }}>
+                {/* Price */}
+                <div style={{ marginBottom: '20px' }}>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
                     <span
                       style={{
                         fontFamily: 'var(--font-display)',
-                        fontSize: 'clamp(1.8rem,3vw,2.2rem)',
+                        fontSize: '2rem',
                         fontWeight: 800,
                         color: plan.popular ? '#6366f1' : 'var(--text-primary)',
                       }}
                     >
-                      ₹{plan.price.toLocaleString()}
+                      ₹{plan.monthlyPrice.toLocaleString()}
                     </span>
-                    <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                      {plan.period}
-                    </span>
+                    {!plan.isLifetime && (
+                      <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>/month</span>
+                    )}
                   </div>
-                  {plan.originalPrice && (
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        marginTop: '4px',
-                      }}
-                    >
-                      <span
-                        style={{
-                          color: 'var(--text-muted)',
-                          fontSize: '0.78rem',
-                          textDecoration: 'line-through',
-                        }}
-                      >
-                        ₹{plan.originalPrice.toLocaleString()}
-                      </span>
-                      {plan.savePct && (
-                        <span
-                          style={{
-                            fontSize: '0.7rem',
-                            fontWeight: 700,
-                            color: '#10b981',
-                            background: 'rgba(16,185,129,.12)',
-                            padding: '1px 7px',
-                            borderRadius: '999px',
-                          }}
-                        >
-                          Save {plan.savePct}%
-                        </span>
-                      )}
-                    </div>
-                  )}
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.7rem', margin: '6px 0 0' }}>
-                    {plan.billedNote}
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.72rem', margin: '4px 0 0' }}>
+                    {plan.yearlyNote}
                   </p>
                 </div>
 
-                <ul
-                  style={{
-                    listStyle: 'none',
-                    padding: 0,
-                    margin: '0 0 24px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '10px',
-                    flex: 1,
-                  }}
-                >
-                  {plan.features.map((f) => (
-                    <li
-                      key={f}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        fontSize: '0.82rem',
-                        color: 'var(--text-secondary)',
-                      }}
-                    >
-                      <Check size={14} color="#6366f1" strokeWidth={2.5} /> {f}
-                    </li>
-                  ))}
-                </ul>
-
+                {/* CTA Button */}
                 <button
+                  onClick={() => handleSelectPlan(plan)}
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -932,18 +980,22 @@ export default function Subscription() {
                       : 'transparent',
                     border: `1.5px solid ${plan.popular ? 'transparent' : '#6366f1'}`,
                     color: plan.popular ? '#fff' : '#6366f1',
-                    fontSize: '0.875rem',
+                    fontSize: '0.88rem',
                     fontWeight: 700,
                     cursor: 'pointer',
+                    marginBottom: '24px',
                     boxShadow: plan.popular ? '0 6px 18px rgba(99,102,241,.32)' : 'none',
-                    transition: 'all .2s',
+                    transition: 'all .2s ease-in-out',
                   }}
                   onMouseEnter={(e) => {
                     if (plan.popular) {
                       e.currentTarget.style.transform = 'translateY(-2px)';
-                      e.currentTarget.style.boxShadow = '0 10px 28px rgba(99,102,241,.45)';
+                      e.currentTarget.style.boxShadow = '0 10px 26px rgba(99,102,241,.45)';
                     } else {
-                      e.currentTarget.style.background = 'rgba(99,102,241,.1)';
+                      e.currentTarget.style.background = isDark
+                        ? 'rgba(99,102,241,.18)'
+                        : 'rgba(99,102,241,.08)';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
                     }
                   }}
                   onMouseLeave={(e) => {
@@ -952,81 +1004,228 @@ export default function Subscription() {
                       e.currentTarget.style.boxShadow = '0 6px 18px rgba(99,102,241,.32)';
                     } else {
                       e.currentTarget.style.background = 'transparent';
+                      e.currentTarget.style.transform = 'none';
                     }
                   }}
                 >
-                  {plan.cta}
+                  Get Started
                 </button>
+
+                {/* Features Checklist */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: 'auto' }}>
+                  {plan.features.map((f) => (
+                    <div
+                      key={f}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        fontSize: '0.78rem',
+                        color: 'var(--text-secondary)',
+                      }}
+                    >
+                      <Check size={14} color="#6366f1" strokeWidth={2.5} style={{ flexShrink: 0 }} />
+                      <span>{f}</span>
+                    </div>
+                  ))}
+                </div>
               </motion.div>
             ))}
+          </div>
 
-            {/* Right Stacked Guarantees */}
+          {/* ══ COMPARE ALL PLANS TABLE ═════════════════════════ */}
+          <div
+            style={{
+              background: 'var(--bg-card)',
+              border: `1px solid ${border}`,
+              borderRadius: '20px',
+              overflow: 'hidden',
+              marginBottom: '48px',
+            }}
+          >
             <div
               style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '12px',
-                justifyContent: 'space-between',
+                padding: '20px 24px',
+                borderBottom: `1px solid ${border}`,
+                background: isDark ? 'rgba(255,255,255,.02)' : 'rgba(99,102,241,.03)',
               }}
             >
-              {GUARANTEES.map(({ IconComponent, title, desc }) => (
-                <div
-                  key={title}
+              <h3
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  fontSize: '1.2rem',
+                  fontWeight: 800,
+                  color: 'var(--text-primary)',
+                  margin: 0,
+                }}
+              >
+                Compare All Plans
+              </h3>
+            </div>
+
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                <thead>
+                  <tr style={{ borderBottom: `1px solid ${border}`, fontSize: '0.82rem' }}>
+                    <th style={{ padding: '16px 24px', color: 'var(--text-primary)', fontWeight: 700 }}>
+                      Features
+                    </th>
+                    <th style={{ padding: '16px 20px', color: 'var(--text-primary)', fontWeight: 700 }}>
+                      Basic
+                    </th>
+                    <th style={{ padding: '16px 20px', color: '#6366f1', fontWeight: 800 }}>
+                      Pro <span style={{ fontSize: '0.68rem', background: 'rgba(99,102,241,.12)', padding: '2px 6px', borderRadius: '4px', marginLeft: '4px' }}>Popular</span>
+                    </th>
+                    <th style={{ padding: '16px 20px', color: 'var(--text-primary)', fontWeight: 700 }}>
+                      Premium
+                    </th>
+                    <th style={{ padding: '16px 20px', color: 'var(--text-primary)', fontWeight: 700 }}>
+                      Lifetime
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {COMPARISON_ROWS.map((row, idx) => (
+                    <tr
+                      key={row.key}
+                      style={{
+                        borderBottom: idx < COMPARISON_ROWS.length - 1 ? `1px solid ${border}` : 'none',
+                        fontSize: '0.8rem',
+                        color: 'var(--text-secondary)',
+                      }}
+                    >
+                      <td style={{ padding: '14px 24px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <row.Icon size={14} color="#6366f1" /> {row.label}
+                        </div>
+                      </td>
+                      <td style={{ padding: '14px 20px' }}>
+                        {typeof row.basic === 'boolean' ? (
+                          row.basic ? (
+                            <Check size={16} color="#10b981" strokeWidth={2.5} />
+                          ) : (
+                            <X size={16} color="#ef4444" strokeWidth={2} />
+                          )
+                        ) : (
+                          row.basic
+                        )}
+                      </td>
+                      <td style={{ padding: '14px 20px', fontWeight: 700, color: 'var(--text-primary)' }}>
+                        {typeof row.pro === 'boolean' ? (
+                          row.pro ? (
+                            <Check size={16} color="#10b981" strokeWidth={2.5} />
+                          ) : (
+                            <X size={16} color="#ef4444" strokeWidth={2} />
+                          )
+                        ) : (
+                          row.pro
+                        )}
+                      </td>
+                      <td style={{ padding: '14px 20px' }}>
+                        {typeof row.premium === 'boolean' ? (
+                          row.premium ? (
+                            <Check size={16} color="#10b981" strokeWidth={2.5} />
+                          ) : (
+                            <X size={16} color="#ef4444" strokeWidth={2} />
+                          )
+                        ) : (
+                          row.premium
+                        )}
+                      </td>
+                      <td style={{ padding: '14px 20px' }}>
+                        {typeof row.lifetime === 'boolean' ? (
+                          row.lifetime ? (
+                            <Check size={16} color="#10b981" strokeWidth={2.5} />
+                          ) : (
+                            <X size={16} color="#ef4444" strokeWidth={2} />
+                          )
+                        ) : (
+                          row.lifetime
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* ══ 30-DAY MONEY BACK BANNER ════════════════════════ */}
+          <div
+            style={{
+              background: isDark
+                ? 'linear-gradient(135deg,rgba(99,102,241,.18),rgba(139,92,246,.12))'
+                : 'linear-gradient(135deg,#f3f4f6,#eef2ff)',
+              border: '1.5px solid rgba(99,102,241,.25)',
+              borderRadius: '18px',
+              padding: '24px 32px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '20px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div
+                style={{
+                  width: '46px',
+                  height: '46px',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#fff',
+                  boxShadow: '0 6px 18px rgba(99,102,241,.35)',
+                  flexShrink: 0,
+                }}
+              >
+                <Shield size={22} color="#fff" />
+              </div>
+              <div>
+                <h4
                   style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '12px',
-                    padding: '16px 18px',
-                    borderRadius: '14px',
-                    background: 'var(--bg-card)',
-                    border: `1px solid ${border}`,
-                    flex: 1,
+                    fontFamily: 'var(--font-display)',
+                    fontSize: '1rem',
+                    fontWeight: 800,
+                    color: 'var(--text-primary)',
+                    margin: '0 0 2px',
                   }}
                 >
-                  <div
-                    style={{
-                      width: '36px',
-                      height: '36px',
-                      borderRadius: '10px',
-                      flexShrink: 0,
-                      background: isDark ? 'rgba(99,102,241,.15)' : 'rgba(99,102,241,.1)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <IconComponent size={16} color="#6366f1" />
-                  </div>
-                  <div>
-                    <p
-                      style={{
-                        color: 'var(--text-primary)',
-                        fontWeight: 700,
-                        fontSize: '0.8rem',
-                        margin: '0 0 2px',
-                      }}
-                    >
-                      {title}
-                    </p>
-                    <p
-                      style={{
-                        color: 'var(--text-muted)',
-                        fontSize: '0.7rem',
-                        margin: 0,
-                        lineHeight: 1.4,
-                      }}
-                    >
-                      {desc}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                  30-Day Money Back Guarantee
+                </h4>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.78rem', margin: 0 }}>
+                  Not satisfied? Get a full refund within 30 days, no questions asked.
+                </p>
+              </div>
             </div>
+
+            <button
+              onClick={() => navigate('/courses')}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '12px 24px',
+                borderRadius: '10px',
+                background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
+                color: '#fff',
+                fontSize: '0.85rem',
+                fontWeight: 700,
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 6px 18px rgba(99,102,241,.35)',
+                transition: 'all .15s',
+              }}
+            >
+              Start Your Learning Journey <ArrowRight size={15} />
+            </button>
           </div>
         </div>
       </section>
 
-      {/* ══ TESTIMONIALS ══════════════════════════════════════ */}
+      {/* ══ 4. TESTIMONIALS ══════════════════════════════════════ */}
       <section
         style={{
           padding: '56px 32px',
@@ -1192,7 +1391,7 @@ export default function Subscription() {
         </div>
       </section>
 
-      {/* ══ FAQ + UPGRADE CTA CARD ════════════════════════════ */}
+      {/* ══ 5. FAQ + UPGRADE CTA CARD ════════════════════════════ */}
       <section style={{ padding: '64px 32px', background: 'var(--bg-primary)' }}>
         <div
           style={{
@@ -1295,7 +1494,7 @@ export default function Subscription() {
         </div>
       </section>
 
-      {/* ══ TRUST FOOTER STRIP ═══════════════════════════════ */}
+      {/* ══ 6. TRUST FOOTER STRIP ═══════════════════════════════ */}
       <section
         style={{
           padding: '28px 32px',

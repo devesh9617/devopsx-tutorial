@@ -1,441 +1,877 @@
 // ============================================================
-// Dashboard Page — DevOpsX Student Dashboard (Theme-Aware)
+// Dashboard Page — 1:1 Pixel-Perfect Reference Match (Extended Recommended Full Width)
 // ============================================================
 
-import { useRef } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
-  BookOpen, Clock, Award, TrendingUp, Calendar, Star,
-  BarChart3, Target, Flame, ArrowRight, Trophy, Lightbulb, Rocket, BookMarked,
-  ChevronLeft, ChevronRight
+  Flame,
+  Award,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Shield,
+  Star,
+  CheckCircle,
+  Play,
+  ArrowRight,
+  BookOpen,
 } from 'lucide-react';
-import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, RadialBarChart, RadialBar,
-} from 'recharts';
-import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
-import { courses } from '../../data/courses';
-import { assignments } from '../../data/assignments';
+import { useAuth } from '../../context/AuthContext';
+import { toast } from 'react-hot-toast';
 
-const activityData = [
-  { day: 'Mon', hours: 1.5 }, { day: 'Tue', hours: 2.8 }, { day: 'Wed', hours: 1.2 },
-  { day: 'Thu', hours: 3.5 }, { day: 'Fri', hours: 2.1 }, { day: 'Sat', hours: 4.2 }, { day: 'Sun', hours: 0.8 },
+const MY_COURSES = [
+  {
+    id: 1,
+    title: 'Deep Learning with TensorFlow 2.0',
+    cover: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=400&auto=format&fit=crop',
+    progress: 43,
+    status: 'in_progress',
+    buttonText: 'Resume',
+  },
+  {
+    id: 2,
+    title: 'Artificial Intelligence for Beginners',
+    cover: 'https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=400&auto=format&fit=crop',
+    progress: 100,
+    status: 'completed',
+    statusText: 'Completed',
+    buttonText: 'Review',
+  },
+  {
+    id: 3,
+    title: 'Data Science & Analytics Bootcamp',
+    cover: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&auto=format&fit=crop',
+    progress: 25,
+    status: 'in_progress',
+    buttonText: 'Resume',
+  },
+  {
+    id: 4,
+    title: 'Generative AI with ChatGPT',
+    cover: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&auto=format&fit=crop',
+    progress: 0,
+    status: 'not_started',
+    statusText: 'Not Started',
+    buttonText: 'Start',
+  },
 ];
-const progressData = [{ name: 'Completed', value: 65, fill: '#3b82f6' }];
 
-function StatCard({ icon: Icon, label, value, color, trend, delay = 0, isDark }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.35 }}
-      style={{
-        padding: '20px', borderRadius: '18px', minWidth: 0,
-        background: isDark ? 'var(--bg-card)' : '#ffffff',
-        border: isDark ? '1px solid var(--border-subtle)' : `1px solid ${color}22`,
-        boxShadow: isDark
-          ? '0 2px 12px rgba(0,0,0,.3)'
-          : `0 4px 20px ${color}18, 0 1px 4px rgba(0,0,0,.06)`,
-        flex: '1 1 0',
-        position: 'relative',
-        display: 'flex', flexDirection: 'column', gap: '8px',
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{
-          width: '38px', height: '38px', borderRadius: '12px',
-          background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>
-          <Icon size={18} color={color} />
-        </div>
-        {trend && (
-          <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#10b981', background: 'rgba(16,185,129,.12)', padding: '2px 8px', borderRadius: '999px' }}>
-            +{trend}%
-          </span>
-        )}
-      </div>
-      <div>
-        <p style={{ color: isDark ? '#ffffff' : '#0f172a', fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 800, margin: '0 0 2px', lineHeight: 1 }}>
-          {value}
-        </p>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', margin: 0, fontWeight: 500 }}>
-          {label}
-        </p>
-      </div>
-    </motion.div>
-  );
-}
+const UPCOMING_CLASSES = [
+  {
+    id: 1,
+    month: 'MAY',
+    day: '28',
+    title: 'Introduction to Deep Learning',
+    instructor: 'Neha Sharma',
+    time: 'Tomorrow, 7:00 PM',
+  },
+  {
+    id: 2,
+    month: 'MAY',
+    day: '30',
+    title: 'NLP with Transformers',
+    instructor: 'Ronak Patel',
+    time: 'Thu, 7:00 PM',
+  },
+  {
+    id: 3,
+    month: 'JUN',
+    day: '02',
+    title: 'Data Visualization with Python',
+    instructor: 'Ankit Jain',
+    time: 'Sun, 6:00 PM',
+  },
+];
 
-function Bar({ value, isDark, color = 'linear-gradient(90deg,#3b82f6,#06b6d4)' }) {
-  return (
-    <div style={{
-      flex: 1, height: '6px',
-      background: isDark ? 'rgba(255,255,255,.08)' : 'rgba(59,130,246,.1)',
-      borderRadius: '999px', overflow: 'hidden',
-    }}>
-      <motion.div
-        initial={{ width: 0 }}
-        animate={{ width: `${value}%` }}
-        transition={{ duration: 0.7, ease: 'easeOut', delay: 0.4 }}
-        style={{ height: '100%', borderRadius: '999px', background: color }}
-      />
-    </div>
-  );
-}
+const ACHIEVEMENTS = [
+  {
+    id: 1,
+    Icon: Shield,
+    iconBg: 'rgba(99,102,241,.12)',
+    iconColor: '#6366f1',
+    title: 'Course Completed',
+    desc: 'Completed Artificial Intelligence for Beginners',
+    date: 'May 24, 2024',
+    points: '+200 Points',
+  },
+  {
+    id: 2,
+    Icon: Star,
+    iconBg: 'rgba(245,158,11,.12)',
+    iconColor: '#f59e0b',
+    title: 'Streak Milestone',
+    desc: 'Maintained a 7-day learning streak',
+    date: 'May 22, 2024',
+    points: '+100 Points',
+  },
+  {
+    id: 3,
+    Icon: Award,
+    iconBg: 'rgba(16,185,129,.12)',
+    iconColor: '#10b981',
+    title: 'Certificate Earned',
+    desc: 'Earned "AI Basics" Certificate',
+    date: 'May 20, 2024',
+    points: '+150 Points',
+  },
+];
+
+const RECOMMENDED_COURSES = [
+  {
+    id: 101,
+    title: 'Machine Learning A-Z™: Hands-On',
+    cover: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&auto=format&fit=crop',
+    rating: 4.6,
+    reviewsCount: '8.2K',
+    price: 1299,
+    originalPrice: 2499,
+    discountPct: 48,
+  },
+  {
+    id: 102,
+    title: 'Natural Language Processing in Python',
+    cover: 'https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=400&auto=format&fit=crop',
+    rating: 4.5,
+    reviewsCount: '5.6K',
+    price: 999,
+    originalPrice: 1999,
+    discountPct: 50,
+  },
+  {
+    id: 103,
+    title: 'Statistics for Data Science',
+    cover: 'https://images.unsplash.com/photo-1543286386-713bdd548da4?w=400&auto=format&fit=crop',
+    rating: 4.7,
+    reviewsCount: '7.1K',
+    price: 799,
+    originalPrice: 1499,
+    discountPct: 47,
+  },
+  {
+    id: 104,
+    title: 'Deep Reinforcement Learning',
+    cover: 'https://images.unsplash.com/photo-1509228468518-180dd4864904?w=400&auto=format&fit=crop',
+    rating: 4.6,
+    reviewsCount: '3.9K',
+    price: 1199,
+    originalPrice: 2399,
+    discountPct: 50,
+  },
+];
 
 export default function Dashboard() {
-  const { user } = useAuth();
   const { isDark } = useTheme();
-  const scrollRef = useRef(null);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const recScrollRef = useRef(null);
 
-  const displayCourses = courses; // Show all 18 courses in horizontal slider
-  const pendingAssignments = assignments.filter((a) => a.status === 'pending').slice(0, 3);
-  const progressMap = {
-    1: 65, 2: 32, 3: 88, 4: 45, 5: 72, 6: 20, 7: 55, 8: 90,
-    9: 40, 10: 82, 11: 60, 12: 75, 13: 50, 14: 85, 15: 30, 16: 95, 17: 68, 18: 42
-  };
+  const border = isDark ? 'rgba(255,255,255,.08)' : '#eaecf0';
+  const cardBg = isDark ? 'var(--bg-card)' : '#ffffff';
 
-  const scrollLeft = () => scrollRef.current?.scrollBy({ left: -320, behavior: 'smooth' });
-  const scrollRight = () => scrollRef.current?.scrollBy({ left: 320, behavior: 'smooth' });
+  const userName = user?.name || 'Shailendra';
 
-  const diffColor = (d) => d === 'Hard' ? '#ef4444' : d === 'Medium' ? '#f59e0b' : '#10b981';
-
-  // Theme-aware helpers
-  const cardBg    = isDark ? 'var(--bg-card)'               : '#ffffff';
-  const cardBorder= isDark ? '1px solid var(--border-subtle)': '1px solid rgba(59,130,246,.12)';
-  const cardShadow= isDark ? '0 2px 12px rgba(0,0,0,.25)'   : '0 4px 20px rgba(59,130,246,.08), 0 1px 4px rgba(0,0,0,.05)';
-  const headingColor = isDark ? '#ffffff' : '#0f172a';
-  const subHeadColor = isDark ? '#93c5fd' : '#2563eb';
-  const itemBg    = isDark ? 'rgba(255,255,255,.03)' : 'rgba(59,130,246,.04)';
-  const itemBorder= isDark ? '1px solid rgba(255,255,255,.05)' : '1px solid rgba(59,130,246,.1)';
-  const chartGrid = isDark ? 'rgba(255,255,255,.05)' : 'rgba(59,130,246,.08)';
-  const chartTick = isDark ? '#64748b' : '#94a3b8';
-  const tooltipBg = isDark ? '#0f1929' : '#ffffff';
-  const tooltipBorder = isDark ? '1px solid rgba(255,255,255,.1)' : '1px solid rgba(59,130,246,.2)';
-  const tooltipColor  = isDark ? '#fff' : '#0f172a';
-  const radialBg  = isDark ? 'rgba(255,255,255,.06)' : 'rgba(59,130,246,.08)';
+  const scrollRecLeft = () => recScrollRef.current?.scrollBy({ left: -300, behavior: 'smooth' });
+  const scrollRecRight = () => recScrollRef.current?.scrollBy({ left: 300, behavior: 'smooth' });
 
   return (
-    <div style={{
-      minHeight: '100vh', width: '100%', boxSizing: 'border-box',
-      padding: '28px 20px 60px',
-      background: 'var(--bg-primary)',
-      overflowX: 'hidden',
-      transition: 'background 0.25s ease',
-    }}>
+    <div style={{ background: 'var(--bg-primary)', minHeight: '100vh', padding: '24px 28px 64px' }}>
+      <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
 
-      {/* Welcome Header */}
-      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: '24px' }}>
-        <h1 style={{
-          color: headingColor,
-          fontFamily: 'var(--font-display)',
-          fontSize: 'clamp(1.4rem, 3vw, 1.9rem)',
-          fontWeight: 800, margin: '0 0 4px', letterSpacing: '-0.02em',
-        }}>
-          Welcome back, {user?.name?.split(' ')[0] || 'Learner'} 👋
-        </h1>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', margin: 0 }}>
-          Here's your learning overview for today.
-        </p>
-      </motion.div>
+        {/* ── HEADER GREETING & STREAK / POINTS BADGES ── */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: '28px',
+            flexWrap: 'wrap',
+            gap: '16px',
+          }}
+        >
+          <div>
+            <h1
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: '1.75rem',
+                fontWeight: 800,
+                color: 'var(--text-primary)',
+                margin: '0 0 4px',
+                letterSpacing: '-0.02em',
+              }}
+            >
+              Welcome back, {userName}! 👋
+            </h1>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.86rem', margin: 0 }}>
+              Continue your learning journey and achieve your goals.
+            </p>
+          </div>
 
-      {/* Stats row */}
-      <div style={{ display: 'flex', gap: '14px', marginBottom: '20px', flexWrap: 'wrap' }}>
-        <StatCard isDark={isDark} icon={BookOpen} label="Enrolled Courses" value={user?.enrolledCourses?.length || 3} color="#3b82f6" trend={12} delay={0.05} />
-        <StatCard isDark={isDark} icon={Clock}    label="Learning Hours"   value="24.5h"                               color="#06b6d4" trend={8}  delay={0.1}  />
-        <StatCard isDark={isDark} icon={Award}    label="Certificates"     value={user?.certificates?.length || 1}     color="#8b5cf6"            delay={0.15} />
-        <StatCard isDark={isDark} icon={Flame}    label="Day Streak"       value="7 days"                              color="#f59e0b"            delay={0.2}  />
-      </div>
-
-      {/* Main Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 260px', gap: '16px', alignItems: 'start', width: '100%' }}>
-
-        {/* ── Left Column ── */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', minWidth: 0 }}>
-
-          {/* Activity Chart */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }}
-            style={{ background: cardBg, border: cardBorder, borderRadius: '18px', padding: '20px', overflow: 'hidden', boxShadow: cardShadow }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h2 style={{ color: headingColor, fontWeight: 700, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
-                <BarChart3 size={16} color="#3b82f6" /> Weekly Activity
-              </h2>
-              <span style={{
-                fontSize: '0.7rem', color: subHeadColor, fontWeight: 600,
-                background: isDark ? 'rgba(59,130,246,.12)' : 'rgba(59,130,246,.08)',
-                padding: '3px 10px', borderRadius: '999px',
-                border: '1px solid rgba(59,130,246,.2)',
-              }}>This week</span>
+          {/* Top-Right Stats Cards */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            {/* Day Streak */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '10px 18px',
+                borderRadius: '14px',
+                background: cardBg,
+                border: `1px solid ${border}`,
+                boxShadow: isDark ? '0 2px 8px rgba(0,0,0,.2)' : '0 2px 8px rgba(0,0,0,.03)',
+              }}
+            >
+              <div
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '10px',
+                  background: 'rgba(99,102,241,.12)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Flame size={20} color="#6366f1" />
+              </div>
+              <div>
+                <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.1 }}>
+                  12
+                </div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                  Day Streak
+                </div>
+              </div>
             </div>
-            <div style={{ width: '100%', height: '180px' }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={activityData} margin={{ top: 4, right: 0, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%"  stopColor="#3b82f6" stopOpacity={isDark ? 0.25 : 0.18} />
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke={chartGrid} vertical={false} />
-                  <XAxis dataKey="day" tick={{ fill: chartTick, fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fill: chartTick, fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <Tooltip
-                    contentStyle={{ background: tooltipBg, border: tooltipBorder, borderRadius: '10px', color: tooltipColor, fontSize: '12px', boxShadow: '0 8px 24px rgba(0,0,0,.15)' }}
-                    formatter={(v) => [`${v}h`, 'Study time']}
+
+            {/* Total Points */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '10px 18px',
+                borderRadius: '14px',
+                background: cardBg,
+                border: `1px solid ${border}`,
+                boxShadow: isDark ? '0 2px 8px rgba(0,0,0,.2)' : '0 2px 8px rgba(0,0,0,.03)',
+              }}
+            >
+              <div
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '10px',
+                  background: 'rgba(16,185,129,.12)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Award size={20} color="#10b981" />
+              </div>
+              <div>
+                <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.1 }}>
+                  1250
+                </div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                  Total Points
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── MAIN DASHBOARD GRID (LEFT: 65% | RIGHT: 35%) ── */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'minmax(0, 1.8fr) minmax(320px, 1fr)',
+            gap: '24px',
+            alignItems: 'start',
+            marginBottom: '24px',
+          }}
+        >
+
+          {/* LEFT MAIN COLUMN */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+
+            {/* 1. CONTINUE LEARNING HERO CARD */}
+            <div
+              style={{
+                background: cardBg,
+                border: `1px solid ${border}`,
+                borderRadius: '18px',
+                padding: '24px',
+                boxShadow: isDark ? '0 2px 10px rgba(0,0,0,.25)' : '0 2px 12px rgba(99,102,241,.05)',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
+                <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
+                  Continue Learning
+                </h2>
+                <Link
+                  to="/my-learning"
+                  style={{ color: '#6366f1', fontSize: '0.8rem', fontWeight: 700, textDecoration: 'none' }}
+                >
+                  View All
+                </Link>
+              </div>
+
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '20px',
+                  flexWrap: 'wrap',
+                }}
+              >
+                {/* Hero Thumbnail with dark overlay percentage */}
+                <div
+                  style={{
+                    position: 'relative',
+                    width: '130px',
+                    height: '130px',
+                    borderRadius: '14px',
+                    overflow: 'hidden',
+                    flexShrink: 0,
+                  }}
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=400&auto=format&fit=crop"
+                    alt="Python Course"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />
-                  <Area type="monotone" dataKey="hours" stroke="#3b82f6" strokeWidth={2.5} fill="url(#areaGrad)" dot={{ fill: '#3b82f6', r: 3.5, strokeWidth: 0 }} />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </motion.div>
+                  <div
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      background: 'rgba(15,23,42,.4)',
+                      display: 'flex',
+                      alignItems: 'flex-end',
+                      padding: '8px',
+                    }}
+                  >
+                    <span
+                      style={{
+                        background: 'rgba(0,0,0,.75)',
+                        color: '#fff',
+                        fontSize: '0.68rem',
+                        fontWeight: 800,
+                        padding: '2px 8px',
+                        borderRadius: '4px',
+                      }}
+                    >
+                      65%
+                    </span>
+                  </div>
+                </div>
 
-          {/* Continue Learning */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-            style={{ background: cardBg, border: cardBorder, borderRadius: '18px', padding: '20px', boxShadow: cardShadow }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <h2 style={{ color: headingColor, fontWeight: 700, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
-                <TrendingUp size={16} color="#3b82f6" /> Continue Learning
-              </h2>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600 }}>{displayCourses.length} Courses</span>
-                {/* Scroll Arrow Buttons */}
-                <div style={{ display: 'flex', gap: '6px' }}>
-                  <button
-                    onClick={scrollLeft}
-                    title="Slide Left"
+                {/* Info & Progress */}
+                <div style={{ flex: 1, minWidth: '220px' }}>
+                  <h3
                     style={{
-                      width: '28px', height: '28px', borderRadius: '8px',
-                      background: isDark ? 'rgba(255,255,255,.07)' : 'rgba(59,130,246,.1)',
-                      border: '1px solid var(--border-subtle)',
-                      color: 'var(--text-primary)', cursor: 'pointer',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      transition: 'all 0.15s',
+                      fontFamily: 'var(--font-display)',
+                      fontSize: '1.05rem',
+                      fontWeight: 800,
+                      color: 'var(--text-primary)',
+                      margin: '0 0 4px',
+                      lineHeight: 1.3,
                     }}
-                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--brand-blue-hover)'}
-                    onMouseLeave={(e) => e.currentTarget.style.background = isDark ? 'rgba(255,255,255,.07)' : 'rgba(59,130,246,.1)'}
                   >
-                    <ChevronLeft size={16} />
-                  </button>
+                    Complete Python for AI &amp; Data Science
+                  </h3>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.78rem', margin: '0 0 16px' }}>
+                    Section 7: Machine Learning with Python
+                  </p>
+
+                  {/* Progress Bar Row */}
+                  <div style={{ marginBottom: '16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', marginBottom: '6px', fontWeight: 700 }}>
+                      <span style={{ color: '#6366f1' }}>65% Complete</span>
+                      <span style={{ color: 'var(--text-muted)' }}>8h 15m left</span>
+                    </div>
+                    <div
+                      style={{
+                        height: '6px',
+                        width: '100%',
+                        borderRadius: '999px',
+                        background: isDark ? 'rgba(255,255,255,.08)' : '#e2e8f0',
+                        overflow: 'hidden',
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: '65%',
+                          height: '100%',
+                          borderRadius: '999px',
+                          background: 'linear-gradient(90deg,#6366f1,#8b5cf6)',
+                        }}
+                      />
+                    </div>
+                  </div>
+
                   <button
-                    onClick={scrollRight}
-                    title="Slide Right"
+                    onClick={() => navigate('/courses/complete-python-ai')}
                     style={{
-                      width: '28px', height: '28px', borderRadius: '8px',
-                      background: isDark ? 'rgba(255,255,255,.07)' : 'rgba(59,130,246,.1)',
-                      border: '1px solid var(--border-subtle)',
-                      color: 'var(--text-primary)', cursor: 'pointer',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      transition: 'all 0.15s',
+                      padding: '10px 22px',
+                      borderRadius: '8px',
+                      background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
+                      color: '#fff',
+                      fontSize: '0.84rem',
+                      fontWeight: 700,
+                      border: 'none',
+                      cursor: 'pointer',
+                      boxShadow: '0 4px 14px rgba(99,102,241,.3)',
+                      transition: 'all .15s',
                     }}
-                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--brand-blue-hover)'}
-                    onMouseLeave={(e) => e.currentTarget.style.background = isDark ? 'rgba(255,255,255,.07)' : 'rgba(59,130,246,.1)'}
                   >
-                    <ChevronRight size={16} />
+                    Continue Learning
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* Horizontal scroll */}
+            {/* 2. MY COURSES SECTION */}
             <div
-              ref={scrollRef}
               style={{
-                display: 'flex', gap: '14px', overflowX: 'auto', paddingBottom: '10px',
-                scrollSnapType: 'x mandatory', scrollbarWidth: 'none', msOverflowStyle: 'none',
-                scrollBehavior: 'smooth',
+                background: cardBg,
+                border: `1px solid ${border}`,
+                borderRadius: '18px',
+                padding: '24px',
+                boxShadow: isDark ? '0 2px 10px rgba(0,0,0,.25)' : '0 2px 12px rgba(99,102,241,.05)',
               }}
             >
-              {displayCourses.map((course, i) => {
-                const prog = progressMap[course.id] ?? 50;
-                const progColor = prog >= 70
-                  ? 'linear-gradient(90deg,#10b981,#059669)'
-                  : 'linear-gradient(90deg,#3b82f6,#06b6d4)';
-                const progText  = prog >= 70 ? (isDark ? '#34d399' : '#059669') : (isDark ? '#60a5fa' : '#2563eb');
-                return (
-                  <Link
-                    to={`/courses/${course.slug}`}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
+                <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
+                  My Courses
+                </h2>
+                <Link
+                  to="/my-learning"
+                  style={{ color: '#6366f1', fontSize: '0.8rem', fontWeight: 700, textDecoration: 'none' }}
+                >
+                  View All
+                </Link>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {MY_COURSES.map((course) => (
+                  <div
                     key={course.id}
                     style={{
-                      display: 'flex', flexDirection: 'column', gap: '10px',
-                      minWidth: '200px', maxWidth: '220px', flexShrink: 0,
-                      scrollSnapAlign: 'start',
-                      padding: '12px', borderRadius: '14px', textDecoration: 'none',
-                      background: itemBg, border: itemBorder,
-                      boxShadow: isDark ? 'none' : '0 2px 8px rgba(15,23,42,.04)',
-                      transition: 'all 0.2s ease',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = isDark ? 'rgba(255,255,255,.07)' : 'rgba(59,130,246,.08)';
-                      e.currentTarget.style.transform = 'translateY(-4px)';
-                      e.currentTarget.style.borderColor = 'var(--brand-blue)';
-                      e.currentTarget.style.boxShadow = isDark
-                        ? '0 12px 30px rgba(0,0,0,.35)'
-                        : '0 8px 24px rgba(59,130,246,.18)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = itemBg;
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.borderColor = isDark ? 'rgba(255,255,255,.05)' : 'rgba(59,130,246,.1)';
-                      e.currentTarget.style.boxShadow = isDark ? 'none' : '0 2px 8px rgba(15,23,42,.04)';
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '16px',
+                      padding: '12px 14px',
+                      borderRadius: '12px',
+                      background: isDark ? 'rgba(255,255,255,.02)' : '#f8fafc',
+                      border: `1px solid ${border}`,
                     }}
                   >
-                    <div style={{ width: '100%', height: '110px', borderRadius: '10px', overflow: 'hidden', flexShrink: 0 }}>
-                      <img src={course.thumbnail} alt={course.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{
-                        color: isDark ? '#f1f5f9' : '#0f172a',
-                        fontSize: '0.8rem', fontWeight: 700, margin: '0 0 4px',
-                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                      }}>
-                        {course.title}
-                      </p>
-                      <p style={{ color: 'var(--text-muted)', fontSize: '0.7rem', margin: '0 0 8px' }}>
-                        {course.category} • {course.lessons} lessons
-                      </p>
+                    <img
+                      src={course.cover}
+                      alt={course.title}
+                      style={{
+                        width: '52px',
+                        height: '52px',
+                        borderRadius: '8px',
+                        objectFit: 'cover',
+                        flexShrink: 0,
+                      }}
+                    />
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Bar value={prog} isDark={isDark} color={progColor} />
-                        <span style={{ fontSize: '0.68rem', fontWeight: 800, color: progText, flexShrink: 0 }}>
-                          {prog}%
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <h4
+                        style={{
+                          fontSize: '0.86rem',
+                          fontWeight: 700,
+                          color: 'var(--text-primary)',
+                          margin: '0 0 6px',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
+                        {course.title}
+                      </h4>
+
+                      {/* Status / Progress bar */}
+                      {course.status === 'completed' ? (
+                        <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#10b981' }}>
+                          Completed
+                        </span>
+                      ) : course.status === 'not_started' ? (
+                        <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                          Not Started
+                        </span>
+                      ) : (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <div
+                            style={{
+                              height: '5px',
+                              flex: 1,
+                              maxWidth: '180px',
+                              borderRadius: '999px',
+                              background: isDark ? 'rgba(255,255,255,.08)' : '#e2e8f0',
+                              overflow: 'hidden',
+                            }}
+                          >
+                            <div
+                              style={{
+                                width: `${course.progress}%`,
+                                height: '100%',
+                                borderRadius: '999px',
+                                background: '#6366f1',
+                              }}
+                            />
+                          </div>
+                          <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#6366f1' }}>
+                            {course.progress}% Complete
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    <button
+                      onClick={() => navigate('/courses/deep-learning-tensorflow')}
+                      style={{
+                        padding: '7px 18px',
+                        borderRadius: '6px',
+                        background: 'transparent',
+                        border: '1.5px solid #6366f1',
+                        color: '#6366f1',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        flexShrink: 0,
+                        transition: 'all .15s',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(99,102,241,.1)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'transparent';
+                      }}
+                    >
+                      {course.buttonText}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+
+          {/* RIGHT SIDEBAR COLUMN */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+
+            {/* WIDGET 1: UPCOMING LIVE CLASSES */}
+            <div
+              style={{
+                background: cardBg,
+                border: `1px solid ${border}`,
+                borderRadius: '18px',
+                padding: '22px',
+                boxShadow: isDark ? '0 2px 10px rgba(0,0,0,.25)' : '0 2px 12px rgba(99,102,241,.05)',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
+                <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
+                  Upcoming Live Classes
+                </h3>
+                <Link
+                  to="/practice"
+                  style={{ color: '#6366f1', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none' }}
+                >
+                  View All
+                </Link>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                {UPCOMING_CLASSES.map((cls) => (
+                  <div
+                    key={cls.id}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: '12px',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+                      {/* Date Badge Box */}
+                      <div
+                        style={{
+                          width: '42px',
+                          height: '46px',
+                          borderRadius: '8px',
+                          background: isDark ? 'rgba(99,102,241,.18)' : '#eef2ff',
+                          border: '1px solid rgba(99,102,241,.25)',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                        }}
+                      >
+                        <span style={{ fontSize: '0.58rem', fontWeight: 800, color: '#6366f1', textTransform: 'uppercase', lineHeight: 1 }}>
+                          {cls.month}
+                        </span>
+                        <span style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.1 }}>
+                          {cls.day}
+                        </span>
+                      </div>
+
+                      <div style={{ minWidth: 0 }}>
+                        <h4
+                          style={{
+                            fontSize: '0.8rem',
+                            fontWeight: 700,
+                            color: 'var(--text-primary)',
+                            margin: '0 0 2px',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                          }}
+                        >
+                          {cls.title}
+                        </h4>
+                        <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', display: 'block' }}>
+                          with {cls.instructor}
+                        </span>
+                        <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <Clock size={10} color="#6366f1" /> {cls.time}
                         </span>
                       </div>
                     </div>
-                  </Link>
-                );
-              })}
+
+                    <button
+                      onClick={() => toast.success(`Joining live class: ${cls.title}`)}
+                      style={{
+                        padding: '6px 14px',
+                        borderRadius: '6px',
+                        background: 'transparent',
+                        border: '1.5px solid #6366f1',
+                        color: '#6366f1',
+                        fontSize: '0.74rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        flexShrink: 0,
+                      }}
+                    >
+                      Join
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <Link
-              to="/my-learning"
+            {/* WIDGET 2: RECENT ACHIEVEMENTS */}
+            <div
               style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-                marginTop: '14px', padding: '10px', borderRadius: '12px',
-                border: cardBorder,
-                color: subHeadColor, fontSize: '0.78rem', fontWeight: 600,
-                textDecoration: 'none', transition: 'background 0.15s',
+                background: cardBg,
+                border: `1px solid ${border}`,
+                borderRadius: '18px',
+                padding: '22px',
+                boxShadow: isDark ? '0 2px 10px rgba(0,0,0,.25)' : '0 2px 12px rgba(99,102,241,.05)',
               }}
-              onMouseEnter={(e) => e.currentTarget.style.background = viewAllHover}
-              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
             >
-              View all courses <ArrowRight size={13} />
-            </Link>
-          </motion.div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
+                <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
+                  Recent Achievements
+                </h3>
+                <Link
+                  to="/certificates"
+                  style={{ color: '#6366f1', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none' }}
+                >
+                  View All
+                </Link>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                {ACHIEVEMENTS.map(({ id, Icon, iconBg, iconColor, title, desc, date, points }) => (
+                  <div key={id} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                    <div
+                      style={{
+                        width: '38px',
+                        height: '38px',
+                        borderRadius: '10px',
+                        background: iconBg,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                      }}
+                    >
+                      <Icon size={18} color={iconColor} />
+                    </div>
+
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 2px' }}>
+                        {title}
+                      </h4>
+                      <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', margin: '0 0 4px', lineHeight: 1.3 }}>
+                        {desc}
+                      </p>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.68rem' }}>
+                        <span style={{ color: 'var(--text-muted)' }}>{date}</span>
+                        <span style={{ color: '#10b981', fontWeight: 700 }}>{points}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+
         </div>
 
-        {/* ── Right Column ── */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', width: '260px', flexShrink: 0 }}>
-
-          {/* Progress Radial */}
-          <motion.div
-            initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.25 }}
-            style={{ background: cardBg, border: cardBorder, borderRadius: '18px', padding: '18px', boxShadow: cardShadow }}
-          >
-            <h3 style={{ color: headingColor, fontWeight: 700, fontSize: '0.825rem', display: 'flex', alignItems: 'center', gap: '7px', margin: '0 0 4px' }}>
-              <Target size={14} color="#3b82f6" /> Overall Progress
-            </h3>
-            <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <div style={{ width: '100%', height: '140px' }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <RadialBarChart innerRadius="62%" outerRadius="88%" data={progressData} startAngle={90} endAngle={-270}>
-                    <RadialBar background={{ fill: radialBg }} dataKey="value" cornerRadius={6} />
-                  </RadialBarChart>
-                </ResponsiveContainer>
-              </div>
-              <div style={{ position: 'absolute', top: '50%', transform: 'translateY(-50%)', textAlign: 'center' }}>
-                <p style={{ color: isDark ? '#fff' : '#1e3a8a', fontFamily: 'var(--font-display)', fontSize: '1.6rem', fontWeight: 800, margin: 0, lineHeight: 1 }}>65%</p>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.65rem', margin: '4px 0 0' }}>Completion</p>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Upcoming Assignments */}
-          <motion.div
-            initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.32 }}
-            style={{ background: cardBg, border: cardBorder, borderRadius: '18px', padding: '18px', boxShadow: cardShadow }}
-          >
-            <h3 style={{ color: headingColor, fontWeight: 700, fontSize: '0.825rem', display: 'flex', alignItems: 'center', gap: '7px', margin: '0 0 14px' }}>
-              <Calendar size={14} color="#3b82f6" /> Upcoming
-            </h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {pendingAssignments.map((a) => (
-                <div
-                  key={a.id}
+        {/* ── 3. RECOMMENDED FOR YOU (FULL-WIDTH 100% EXTENDED BOTTOM SECTION) ── */}
+        <div
+          style={{
+            background: cardBg,
+            border: `1px solid ${border}`,
+            borderRadius: '18px',
+            padding: '24px',
+            boxShadow: isDark ? '0 2px 10px rgba(0,0,0,.25)' : '0 2px 12px rgba(99,102,241,.05)',
+            width: '100%',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
+              Recommended for You
+            </h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <Link
+                to="/courses"
+                style={{ color: '#6366f1', fontSize: '0.8rem', fontWeight: 700, textDecoration: 'none' }}
+              >
+                View All
+              </Link>
+              <div style={{ display: 'flex', gap: '6px' }}>
+                <button
+                  onClick={scrollRecLeft}
                   style={{
-                    display: 'flex', alignItems: 'flex-start', gap: '10px',
-                    padding: '10px', borderRadius: '12px',
-                    background: itemBg, border: itemBorder,
+                    width: '28px',
+                    height: '28px',
+                    borderRadius: '50%',
+                    border: `1px solid ${border}`,
+                    background: 'var(--bg-primary)',
+                    color: 'var(--text-primary)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
                   }}
                 >
-                  <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: diffColor(a.difficulty), flexShrink: 0, marginTop: '4px' }} />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{
-                      color: isDark ? '#f1f5f9' : '#0f172a',
-                      fontSize: '0.75rem', fontWeight: 600, margin: '0 0 3px',
-                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                    }}>
-                      {a.title}
-                    </p>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.68rem', margin: 0 }}>Due {a.dueDate}</p>
-                  </div>
-                  <span style={{ color: subHeadColor, fontSize: '0.68rem', fontWeight: 700, flexShrink: 0 }}>{a.points}pts</span>
-                </div>
-              ))}
-            </div>
-            <Link
-              to="/assignments"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', marginTop: '12px', fontSize: '0.75rem', color: subHeadColor, fontWeight: 600, textDecoration: 'none' }}
-            >
-              View all <ArrowRight size={11} />
-            </Link>
-          </motion.div>
-
-          {/* Achievements */}
-          <motion.div
-            initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.38 }}
-            style={{ background: cardBg, border: cardBorder, borderRadius: '18px', padding: '18px', boxShadow: cardShadow }}
-          >
-            <h3 style={{ color: headingColor, fontWeight: 700, fontSize: '0.825rem', display: 'flex', alignItems: 'center', gap: '7px', margin: '0 0 14px' }}>
-              <Star size={14} color="#f59e0b" fill="#f59e0b" /> Achievements
-            </h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
-              {[
-                { icon: Target,     label: 'First Course',  color: '#3b82f6' },
-                { icon: Flame,      label: '7-Day Streak',  color: '#ef4444' },
-                { icon: Trophy,     label: 'Top Learner',   color: '#f59e0b' },
-                { icon: BookMarked, label: 'Bookworm',      color: '#10b981' },
-                { icon: Lightbulb,  label: 'Problem Solver',color: '#8b5cf6' },
-                { icon: Rocket,     label: 'Fast Starter',  color: '#06b6d4' },
-              ].map(({ icon: BIcon, label, color }) => (
-                <div
-                  key={label}
+                  <ChevronLeft size={15} />
+                </button>
+                <button
+                  onClick={scrollRecRight}
                   style={{
-                    display: 'flex', flexDirection: 'column', alignItems: 'center',
-                    gap: '6px', padding: '10px 4px', borderRadius: '12px', textAlign: 'center',
-                    background: isDark ? 'rgba(255,255,255,.04)' : `${color}08`,
-                    border: isDark ? '1px solid rgba(255,255,255,.06)' : `1px solid ${color}20`,
+                    width: '28px',
+                    height: '28px',
+                    borderRadius: '50%',
+                    border: `1px solid ${border}`,
+                    background: 'var(--bg-primary)',
+                    color: 'var(--text-primary)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
                   }}
                 >
-                  <div style={{
-                    width: '30px', height: '30px', borderRadius: '9px',
-                    background: `${color}20`,
-                    border: `1.5px solid ${color}30`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}>
-                    <BIcon size={14} style={{ color }} />
-                  </div>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '0.6rem', lineHeight: 1.3, fontWeight: 500 }}>{label}</span>
-                </div>
-              ))}
+                  <ChevronRight size={15} />
+                </button>
+              </div>
             </div>
-          </motion.div>
+          </div>
+
+          {/* Full-width 4-card Grid */}
+          <div
+            ref={recScrollRef}
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: '16px',
+              width: '100%',
+            }}
+          >
+            {RECOMMENDED_COURSES.map((course) => (
+              <div
+                key={course.id}
+                style={{
+                  background: isDark ? 'rgba(255,255,255,.02)' : '#f8fafc',
+                  border: `1px solid ${border}`,
+                  borderRadius: '14px',
+                  overflow: 'hidden',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  minWidth: 0,
+                  transition: 'transform .15s, border-color .15s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.borderColor = '#6366f1';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'none';
+                  e.currentTarget.style.borderColor = border;
+                }}
+              >
+                <img
+                  src={course.cover}
+                  alt={course.title}
+                  style={{ width: '100%', height: '120px', objectFit: 'cover' }}
+                />
+                <div style={{ padding: '14px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                  <h4
+                    style={{
+                      fontSize: '0.82rem',
+                      fontWeight: 700,
+                      color: 'var(--text-primary)',
+                      margin: '0 0 8px',
+                      lineHeight: 1.3,
+                      height: '34px',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {course.title}
+                  </h4>
+
+                  {/* Rating */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', margin: '0 0 10px' }}>
+                    <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{course.rating}</span>
+                    <div style={{ display: 'flex', gap: '1px' }}>
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star key={star} size={11} fill="#fbbf24" color="#fbbf24" />
+                      ))}
+                    </div>
+                    <span style={{ color: 'var(--text-muted)' }}>({course.reviewsCount})</span>
+                  </div>
+
+                  {/* Price */}
+                  <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                      ₹{course.price.toLocaleString()}
+                    </span>
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>
+                      ₹{course.originalPrice.toLocaleString()}
+                    </span>
+                    <span style={{ fontSize: '0.65rem', fontWeight: 700, color: '#10b981', background: 'rgba(16,185,129,.12)', padding: '2px 6px', borderRadius: '4px' }}>
+                      {course.discountPct}% OFF
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
+
       </div>
     </div>
   );
