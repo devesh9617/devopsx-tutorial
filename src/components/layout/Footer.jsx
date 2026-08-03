@@ -51,8 +51,40 @@ export default function Footer() {
       boxSizing: 'border-box',
       overflowX: 'hidden',
     }}>
+      {/* Trust Feature Strip — Matching Reference Image */}
+      <div style={{
+        borderBottom: '1px solid var(--border-subtle)',
+        background: 'var(--bg-card)',
+        padding: '16px 24px',
+      }}>
+        <div style={{
+          maxWidth: '1280px', margin: '0 auto',
+          display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '16px', textAlign: 'center',
+        }}>
+          <div>
+            <strong style={{ color: 'var(--text-primary)', fontSize: '0.82rem', display: 'block', fontWeight: 700 }}>📦 100% Original Books</strong>
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Sourced from trusted publishers</span>
+          </div>
+          <div>
+            <strong style={{ color: 'var(--text-primary)', fontSize: '0.82rem', display: 'block', fontWeight: 700 }}>🚚 Free Shipping</strong>
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Quick & safe delivery on all orders</span>
+          </div>
+          <div>
+            <strong style={{ color: 'var(--text-primary)', fontSize: '0.82rem', display: 'block', fontWeight: 700 }}>🔄 7 Days Return</strong>
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Hassle-free return policy</span>
+          </div>
+          <div>
+            <strong style={{ color: 'var(--text-primary)', fontSize: '0.82rem', display: 'block', fontWeight: 700 }}>🛡️ Secure Payment</strong>
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>100% protected checkout</span>
+          </div>
+        </div>
+      </div>
+
       <div style={{
         width: '100%',
+        maxWidth: '1280px',
+        margin: '0 auto',
         boxSizing: 'border-box',
         padding: '40px 24px 32px',
       }}>

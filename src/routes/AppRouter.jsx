@@ -34,6 +34,9 @@ const OrderSuccess = lazy(() => import('../pages/OrderSuccess/index'));
 const NotFound = lazy(() => import('../pages/NotFound/index'));
 const Subscription = lazy(() => import('../pages/Subscription/index'));
 const Curriculum = lazy(() => import('../pages/Curriculum/index'));
+const Downloads = lazy(() => import('../pages/Downloads/index'));
+const Achievements = lazy(() => import('../pages/Achievements/index'));
+const Resources = lazy(() => import('../pages/Resources/index'));
 
 // Wrapper that renders MainLayout with Outlet for nested routes
 function LayoutWrapper() {
@@ -82,6 +85,12 @@ export default function AppRouter() {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/subscription" element={<Subscription />} />
+          <Route path="/downloads" element={<Downloads />} />
+          <Route path="/download" element={<Downloads />} />
+          <Route path="/achievements" element={<Achievements />} />
+          <Route path="/achievement" element={<Achievements />} />
+          <Route path="/resources" element={<Resources />} />
+          <Route path="/resource" element={<Resources />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

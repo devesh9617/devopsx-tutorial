@@ -18,12 +18,13 @@ export default function MainLayout({ children }) {
   const isCheckoutFlow = /^\/(checkout|payment|order-success)/.test(location.pathname);
   const hideSidebar = isBookDetailsPage || isCheckoutFlow;
 
-  const sidebarWidth = hideSidebar || isMobile ? 0 : collapsed ? 72 : 260;
+  // Sidebar commented out to match full-width top navigation layout reference
+  const sidebarWidth = 0;
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
       <Navbar />
-      {!hideSidebar && <Sidebar />}
+      {/* <Sidebar /> */}
 
       {/* Main content — shifts right for sidebar or takes full width when sidebar is hidden */}
       <motion.div

@@ -7,7 +7,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Menu, Search, Bell, Sun, Moon, LogIn, UserPlus, ChevronDown,
-  LogOut, User, BookOpen, Award, Heart, Settings, X, Sparkles, CheckCircle2
+  LogOut, User, BookOpen, Award, Heart, Settings, X, Sparkles, CheckCircle2, Download, Folder
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -88,38 +88,51 @@ export default function Navbar() {
           boxSizing: 'border-box',
         }}
       >
-        {/* Left: Sidebar Toggle + Brand Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <button
-            onClick={toggle}
-            aria-label="Toggle sidebar"
-            style={{
-              padding: '8px', borderRadius: '10px',
-              background: isDark ? 'rgba(255,255,255,.05)' : 'rgba(59,130,246,.07)',
-              border: isDark ? '1px solid rgba(255,255,255,.08)' : '1px solid rgba(59,130,246,.15)',
-              color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center',
-              transition: 'all 0.15s',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = isDark ? 'rgba(255,255,255,.1)' : 'rgba(59,130,246,.14)';
-              e.currentTarget.style.color = isDark ? '#fff' : '#1d4ed8';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = isDark ? 'rgba(255,255,255,.05)' : 'rgba(59,130,246,.07)';
-              e.currentTarget.style.color = 'var(--text-secondary)';
-            }}
-          >
-            <Menu size={18} />
-          </button>
+        {/* Left: Brand Logo + Browse Category Dropdown */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          {/* <button onClick={toggle} aria-label="Toggle sidebar"> ... </button> */}
 
           <Link to="/" style={{ textDecoration: 'none' }}>
             <BrandLogo size="md" />
           </Link>
+
+          {/* Browse Categories Dropdown */}
+          <Link
+            to="/categories"
+            style={{
+              display: 'flex', alignItems: 'center', gap: '4px',
+              padding: '6px 12px', borderRadius: '8px',
+              color: 'var(--text-secondary)', fontSize: '0.84rem', fontWeight: 600,
+              textDecoration: 'none', background: 'rgba(59,130,246,0.06)',
+              border: '1px solid var(--border-subtle)',
+            }}
+          >
+            Browse <ChevronDown size={14} />
+          </Link>
         </div>
 
         {/* Center: Desktop Global Search Bar */}
-        <div className="hidden lg:flex" style={{ flex: 1, maxWidth: '440px', margin: '0 24px' }}>
-          <SearchBar size="md" className="w-full" placeholder="Search courses, books, topics..." />
+        <div className="hidden lg:flex" style={{ flex: 1, maxWidth: '380px', margin: '0 16px' }}>
+          <SearchBar size="md" className="w-full" placeholder="Search for books, courses and more..." />
+        </div>
+
+        {/* Top Header Navigation Links (Matching Reference UI) */}
+        <div className="hidden md:flex" style={{ alignItems: 'center', gap: '20px', margin: '0 12px' }}>
+          <Link to="/textbooks" style={{ color: 'var(--text-primary)', fontSize: '0.86rem', fontWeight: 600, textDecoration: 'none' }}>
+            Books
+          </Link>
+          <Link to="/courses" style={{ color: 'var(--text-primary)', fontSize: '0.86rem', fontWeight: 600, textDecoration: 'none' }}>
+            Courses
+          </Link>
+          <Link to="/curriculum" style={{ color: 'var(--text-primary)', fontSize: '0.86rem', fontWeight: 600, textDecoration: 'none' }}>
+            Curriculum
+          </Link>
+          <Link to="/resources" style={{ color: 'var(--text-primary)', fontSize: '0.86rem', fontWeight: 600, textDecoration: 'none' }}>
+            Resources
+          </Link>
+          <Link to="/dashboard" style={{ color: 'var(--text-primary)', fontSize: '0.86rem', fontWeight: 600, textDecoration: 'none' }}>
+            Dashboard
+          </Link>
         </div>
 
         {/* Right: Actions & User Menu */}
@@ -269,11 +282,14 @@ export default function Navbar() {
                       {/* Menu Links */}
                       <div style={{ padding: '6px' }}>
                         {[
-                          { icon: User,     label: 'Profile',     to: '/profile' },
-                          { icon: BookOpen, label: 'My Learning', to: '/my-learning' },
-                          { icon: Award,    label: 'Certificates',to: '/certificates' },
-                          { icon: Heart,    label: 'Wishlist',    to: '/wishlist' },
-                          { icon: Settings, label: 'Settings',    to: '/profile' },
+                          { icon: User,     label: 'Profile',      to: '/profile' },
+                          { icon: BookOpen, label: 'My Learning',  to: '/my-learning' },
+                          { icon: Folder,   label: 'Resources',    to: '/resources' },
+                          { icon: Download, label: 'Downloads',    to: '/downloads' },
+                          { icon: Award,    label: 'Achievements', to: '/achievements' },
+                          { icon: Award,    label: 'Certificates', to: '/certificates' },
+                          { icon: Heart,    label: 'Wishlist',     to: '/wishlist' },
+                          { icon: Settings, label: 'Settings',     to: '/profile' },
                         ].map(({ icon: Icon, label, to }) => (
                           <Link
                             key={label}
