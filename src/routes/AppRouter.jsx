@@ -37,6 +37,7 @@ const Curriculum = lazy(() => import('../pages/Curriculum/index'));
 const Downloads = lazy(() => import('../pages/Downloads/index'));
 const Achievements = lazy(() => import('../pages/Achievements/index'));
 const Resources = lazy(() => import('../pages/Resources/index'));
+const LiveClasses = lazy(() => import('../pages/LiveClasses/index'));
 const Orders = lazy(() => import('../pages/Orders/index'));
 const OrderDetails = lazy(() => import('../pages/OrderDetails/index'));
 const OrderTracking = lazy(() => import('../pages/OrderTracking/index'));
@@ -99,6 +100,8 @@ export default function AppRouter() {
           <Route path="/achievement" element={<Achievements />} />
           <Route path="/resources" element={<Resources />} />
           <Route path="/resource" element={<Resources />} />
+          <Route path="/live-classes" element={<LiveClasses />} />
+          <Route path="/live-class" element={<LiveClasses />} />
           <Route path="/orders" element={<Orders />} />
           <Route path="/orders/invoices" element={<Invoices />} />
           <Route path="/orders/invoices/:id" element={<InvoiceDetails />} />

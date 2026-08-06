@@ -7,7 +7,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Menu, Search, Bell, Sun, Moon, LogIn, UserPlus, ChevronDown,
-  LogOut, User, BookOpen, Award, Heart, Settings, X, Sparkles, CheckCircle2, Download, Folder
+  LogOut, User, BookOpen, Award, Heart, Settings, X, Sparkles, CheckCircle2, Download, Folder, Video
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -126,6 +126,9 @@ export default function Navbar() {
           </Link>
           <Link to="/curriculum" style={{ color: 'var(--text-primary)', fontSize: '0.86rem', fontWeight: 600, textDecoration: 'none' }}>
             Curriculum
+          </Link>
+          <Link to="/live-classes" style={{ color: 'var(--text-primary)', fontSize: '0.86rem', fontWeight: 600, textDecoration: 'none' }}>
+            Live Classes
           </Link>
           <Link to="/resources" style={{ color: 'var(--text-primary)', fontSize: '0.86rem', fontWeight: 600, textDecoration: 'none' }}>
             Resources
@@ -284,6 +287,7 @@ export default function Navbar() {
                         {[
                           { icon: User,     label: 'Profile',      to: '/profile' },
                           { icon: BookOpen, label: 'My Learning',  to: '/my-learning' },
+                          { icon: Video,    label: 'Live Classes', to: '/live-classes' },
                           { icon: Folder,   label: 'Resources',    to: '/resources' },
                           { icon: Download, label: 'Downloads',    to: '/downloads' },
                           { icon: Award,    label: 'Achievements', to: '/achievements' },
