@@ -8,7 +8,7 @@
 /* ─────────────────── CSS Variables ─────────────────── */
 :root {
   /* Layout */
-  --navbar-height: 64px;
+  --navbar-height: 72px;
   --sidebar-width: 260px;
   --sidebar-collapsed-width: 72px;
 

@@ -8,6 +8,7 @@ import { useSidebar } from '../context/SidebarContext';
 import Navbar from '../components/layout/Navbar';
 import Sidebar from '../components/layout/Sidebar';
 import Footer from '../components/layout/Footer';
+import ChatWidget from '../components/ui/ChatWidget';
 
 export default function MainLayout({ children }) {
   const { collapsed, isMobile } = useSidebar();
@@ -38,6 +39,8 @@ export default function MainLayout({ children }) {
         </main>
         <Footer />
       </motion.div>
+
+      <ChatWidget />
     </div>
   );
 }

@@ -779,7 +779,7 @@ export default function BookDetails() {
         <footer style={{ borderTop: '1px solid #eaecf0', paddingTop: '32px', paddingBottom: '32px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr 1.5fr', gap: '32px', marginBottom: '32px' }}>
             <div>
-              <h3 style={{ color: '#101828', fontSize: '1.1rem', fontWeight: 900, margin: '0 0 4px' }}>AI Learning</h3>
+              <h3 style={{ color: '#101828', fontSize: '1.1rem', fontWeight: 900, margin: '0 0 4px' }}>DevOpsX Learning</h3>
               <span style={{ fontSize: '0.72rem', color: '#667085', display: 'block', marginBottom: '8px' }}>Learn Skills. Build Future.</span>
               <p style={{ fontSize: '0.78rem', color: '#475467', lineHeight: 1.5, margin: '0 0 14px' }}>
                 Empowering learners with quality AI education and resources.
@@ -850,7 +850,7 @@ export default function BookDetails() {
           </div>
 
           <div style={{ textAlign: 'center', fontSize: '0.75rem', color: '#98a2b3', borderTop: '1px solid #eaecf0', paddingTop: '16px' }}>
-            © 2024 AI Learning. All rights reserved.
+            © 2024 DevOpsX Learning. All rights reserved.
           </div>
         </footer>
 

@@ -1,81 +1,112 @@
 // ============================================================
-// Home Page Sections — AI Learning Platform (Reference Design)
+// Home Page Sections — DevOpsX Learning (matches reference design)
+//   1. Trusted-By strip        5. Testimonials
+//   2. Explore Top Categories  6. FAQ
+//   3. Featured Books/Courses  7. Newsletter
+//   4. Subscription banner
 // ============================================================
 
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
-  ArrowRight, Star, ShoppingCart, CheckCircle2, ChevronRight,
-  ChevronLeft, Mail, Send, Plus, Minus,
+  ArrowRight, Star, ShoppingCart, CheckCircle2, ChevronRight, ChevronLeft,
+  Mail, ChevronDown, Network, BrainCircuit, MessageSquare, Camera,
+  Sparkles, Users,
 } from 'lucide-react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import CourseCard from '../cards/CourseCard';
 import { getFeaturedCourses } from '../../data/courses';
 import { books } from '../../data/books';
-import { reviews } from '../../data/reviews';
-import { faqs } from '../../data/assignments';
-import { useState, useRef } from 'react';
+import { homeTestimonials } from '../../data/reviews';
+import { homeFaqs } from '../../data/assignments';
 import { useTheme } from '../../context/ThemeContext';
+import { trustedLogos } from '../ui/BrandMarks';
 
-// ─── Helpers ────────────────────────────────────────────────
+const CONTAINER = 1120;
+const ACCENT = '#4f46e5';
+
+// ─── Shared bits ─────────────────────────────────────────────
 
 function fadeInUp(delay = 0) {
   return {
-    initial: { opacity: 0, y: 24 },
+    initial: { opacity: 0, y: 22 },
     whileInView: { opacity: 1, y: 0 },
-    viewport: { once: true },
+    viewport: { once: true, amount: 0.2 },
     transition: { duration: 0.45, ease: 'easeOut', delay },
   };
 }
 
-function SectionHeader({ badge, title, subtitle, link, linkLabel, center }) {
+function HomeSection({ children, bg = 'transparent', style = {} }) {
+  return (
+    <section
+      style={{
+        width: '100%',
+        boxSizing: 'border-box',
+        padding: '30px 32px',
+        background: bg,
+        overflowX: 'clip',
+        ...style,
+      }}
+    >
+      <div style={{ maxWidth: `${CONTAINER}px`, margin: '0 auto' }}>{children}</div>
+    </section>
+  );
+}
+
+/** Section heading: title on the left, "View All" link on the right. */
+function SectionHeading({ title, subtitle, center, link, linkLabel, extra }) {
   const { isDark } = useTheme();
   return (
     <div
       style={{
         display: 'flex',
         flexWrap: 'wrap',
-        alignItems: center ? undefined : 'flex-end',
-        flexDirection: center ? 'column' : undefined,
-        alignItems: center ? 'center' : 'flex-end',
-        justifyContent: 'space-between',
-        gap: '12px',
-        marginBottom: '32px',
+        alignItems: center ? 'center' : 'baseline',
+        flexDirection: center ? 'column' : 'row',
+        justifyContent: center ? 'center' : 'space-between',
+        gap: center ? '6px' : '18px',
+        marginBottom: center ? '26px' : '20px',
         textAlign: center ? 'center' : undefined,
       }}
     >
-      <div>
-        {badge && (
-          <p style={{ fontSize: '0.75rem', fontWeight: 700, color: isDark ? '#60a5fa' : '#2563eb', marginBottom: '6px', letterSpacing: '0.04em' }}>
-            {badge}
-          </p>
-        )}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'baseline',
+          gap: '38px',
+          flexWrap: 'wrap',
+          flexDirection: center ? 'column' : 'row',
+        }}
+      >
         <h2
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(1.4rem, 2.8vw, 1.9rem)',
+            fontSize: 'clamp(1.3rem, 2.4vw, 1.6rem)',
             fontWeight: 800,
             color: 'var(--text-primary)',
-            letterSpacing: '-0.02em',
+            letterSpacing: '-0.025em',
             margin: 0,
           }}
         >
           {title}
         </h2>
-        {subtitle && (
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginTop: '6px', margin: '6px 0 0' }}>
-            {subtitle}
-          </p>
-        )}
+        {extra}
       </div>
+
+      {subtitle && (
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.855rem', margin: 0 }}>
+          {subtitle}
+        </p>
+      )}
+
       {link && (
         <Link
           to={link}
           style={{
-            display: 'inline-flex', alignItems: 'center', gap: '5px',
-            fontSize: '0.82rem', fontWeight: 700,
-            color: isDark ? '#60a5fa' : '#2563eb',
-            textDecoration: 'none', transition: 'gap 0.15s',
-            flexShrink: 0,
+            display: 'inline-flex', alignItems: 'center', gap: '6px',
+            fontSize: '0.815rem', fontWeight: 600,
+            color: isDark ? '#818cf8' : ACCENT,
+            textDecoration: 'none', flexShrink: 0,
           }}
         >
           {linkLabel || 'View All'} <ArrowRight size={14} />
@@ -85,36 +116,91 @@ function SectionHeader({ badge, title, subtitle, link, linkLabel, center }) {
   );
 }
 
-function HomeSection({ children, bg = 'transparent', style = {} }) {
+/**
+ * Horizontal scroll row with the circular chevron controls used across the
+ * page. The right control is always rendered (as in the reference); the left
+ * one appears once the row has been scrolled.
+ */
+function ScrollRow({ children, step = 360, gap = 16 }) {
+  const { isDark } = useTheme();
+  const ref = useRef(null);
+  const [canLeft, setCanLeft] = useState(false);
+  const [canRight, setCanRight] = useState(true);
+
+  const sync = useCallback(() => {
+    const el = ref.current;
+    if (!el) return;
+    setCanLeft(el.scrollLeft > 4);
+    setCanRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+  }, []);
+
+  useEffect(() => {
+    sync();
+    const el = ref.current;
+    if (!el) return undefined;
+    el.addEventListener('scroll', sync, { passive: true });
+    window.addEventListener('resize', sync);
+    return () => {
+      el.removeEventListener('scroll', sync);
+      window.removeEventListener('resize', sync);
+    };
+  }, [sync]);
+
+  const scroll = (dir) => ref.current?.scrollBy({ left: dir * step, behavior: 'smooth' });
+
+  const btn = (side, enabled) => ({
+    position: 'absolute',
+    [side]: '-19px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    zIndex: 5,
+    width: '38px', height: '38px', borderRadius: '50%',
+    background: isDark ? 'rgba(15,25,41,.96)' : '#ffffff',
+    border: isDark ? '1px solid rgba(255,255,255,.12)' : '1px solid rgba(15,23,42,.1)',
+    boxShadow: isDark ? '0 4px 14px rgba(0,0,0,.4)' : '0 3px 12px rgba(15,23,42,.12)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    cursor: enabled ? 'pointer' : 'default',
+    color: enabled ? 'var(--text-secondary)' : 'var(--text-muted)',
+    opacity: enabled ? 1 : 0.45,
+    transition: 'opacity .2s, box-shadow .2s',
+  });
+
   return (
-    <section
-      style={{
-        width: '100%',
-        boxSizing: 'border-box',
-        padding: '56px 32px',
-        background: bg,
-        overflowX: 'hidden',
-        ...style,
-      }}
-    >
-      <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+    <div style={{ position: 'relative' }}>
+      {canLeft && (
+        <button aria-label="Scroll left" onClick={() => scroll(-1)} style={btn('left', true)}>
+          <ChevronLeft size={17} />
+        </button>
+      )}
+
+      <div
+        ref={ref}
+        className="scrollbar-hide"
+        style={{
+          display: 'flex',
+          gap: `${gap}px`,
+          overflowX: 'auto',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          padding: '4px 2px 8px',
+          margin: '-4px -2px -8px',
+        }}
+      >
         {children}
       </div>
-    </section>
+
+      <button
+        aria-label="Scroll right"
+        onClick={() => canRight && scroll(1)}
+        style={btn('right', canRight)}
+      >
+        <ChevronRight size={17} />
+      </button>
+    </div>
   );
 }
 
-// ── 1. Trusted-By Strip ──────────────────────────────────────
-
-const trustedLogos = [
-  { name: 'Google',    color: '#4285F4', weight: 800 },
-  { name: 'Microsoft', color: '#00a4ef', weight: 800 },
-  { name: 'amazon',    color: '#FF9900', weight: 800 },
-  { name: 'IBM',       color: '#1F70C1', weight: 900 },
-  { name: 'Deloitte.', color: '#86BC25', weight: 800 },
-  { name: 'Infosys',   color: '#007CC3', weight: 800 },
-  { name: 'TCS',       color: '#c00', weight: 900 },
-];
+// ── 1. Trusted-By strip ──────────────────────────────────────
 
 export function TrustedBy() {
   const { isDark } = useTheme();
@@ -122,22 +208,21 @@ export function TrustedBy() {
     <section
       style={{
         width: '100%',
-        padding: '28px 32px',
-        borderTop: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(59,130,246,0.1)',
-        borderBottom: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(59,130,246,0.1)',
-        background: isDark ? 'rgba(255,255,255,0.01)' : 'rgba(59,130,246,0.02)',
+        padding: '24px 32px 26px',
+        borderTop: isDark ? '1px solid rgba(255,255,255,.06)' : '1px solid rgba(15,23,42,.06)',
+        borderBottom: isDark ? '1px solid rgba(255,255,255,.06)' : '1px solid rgba(15,23,42,.06)',
+        background: isDark ? 'rgba(255,255,255,.015)' : '#fcfcfe',
         boxSizing: 'border-box',
       }}
     >
-      <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+      <div style={{ maxWidth: `${CONTAINER}px`, margin: '0 auto' }}>
         <p
           style={{
             textAlign: 'center',
-            color: 'var(--text-muted)',
-            fontSize: '0.8rem',
+            color: 'var(--text-secondary)',
+            fontSize: '0.845rem',
             fontWeight: 600,
-            letterSpacing: '0.04em',
-            marginBottom: '20px',
+            margin: '0 0 20px',
           }}
         >
           Trusted by Learners from Top Companies &amp; Universities
@@ -148,26 +233,23 @@ export function TrustedBy() {
             flexWrap: 'wrap',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '36px',
+            gap: '20px 48px',
           }}
         >
-          {trustedLogos.map((logo) => (
+          {trustedLogos.map(({ name, Mark }, i) => (
             <motion.span
-              key={logo.name}
-              {...fadeInUp(0.05)}
+              key={name}
+              {...fadeInUp(i * 0.03)}
               style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(1.1rem, 2vw, 1.5rem)',
-                fontWeight: logo.weight,
-                color: isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.4)',
-                letterSpacing: '-0.02em',
-                transition: 'color 0.2s',
+                display: 'inline-flex',
+                alignItems: 'center',
+                filter: isDark ? 'brightness(1.35) saturate(.9)' : 'none',
+                transition: 'transform .2s, opacity .2s',
                 cursor: 'default',
-                userSelect: 'none',
               }}
-              whileHover={{ color: logo.color }}
+              whileHover={{ scale: 1.05 }}
             >
-              {logo.name}
+              <Mark />
             </motion.span>
           ))}
         </div>
@@ -179,144 +261,93 @@ export function TrustedBy() {
 // ── 2. Explore Top Categories ────────────────────────────────
 
 const topCategories = [
-  { id: 1, icon: '🧠', name: 'Machine Learning',           courses: 25, color: '#8b5cf6' },
-  { id: 2, icon: '🤖', name: 'Deep Learning',               courses: 15, color: '#6366f1' },
-  { id: 3, icon: '💬', name: 'Natural Language Processing', courses: 15, color: '#f59e0b' },
-  { id: 4, icon: '📷', name: 'Computer Vision',             courses: 12, color: '#ef4444' },
-  { id: 5, icon: '✨', name: 'Generative AI',               courses: 14, color: '#06b6d4' },
-  { id: 6, icon: '👥', name: 'AI for Everyone',             courses: 20, color: '#10b981' },
+  { id: 1, icon: Network,      name: 'Machine Learning',           courses: 25, color: '#8b5cf6' },
+  { id: 2, icon: BrainCircuit, name: 'Deep Learning',              courses: 18, color: '#10b981' },
+  { id: 3, icon: MessageSquare,name: 'Natural Language Processing', courses: 15, color: '#f59e0b' },
+  { id: 4, icon: Camera,       name: 'Computer Vision',            courses: 12, color: '#ef4444' },
+  { id: 5, icon: Sparkles,     name: 'Generative AI',              courses: 14, color: '#8b5cf6' },
+  { id: 6, icon: Users,        name: 'AI for Everyone',            courses: 20, color: '#3b82f6' },
 ];
 
 export function ExploreCategories() {
   const { isDark } = useTheme();
-  const scrollRef = useRef(null);
-
-  const scroll = (dir) => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: dir * 220, behavior: 'smooth' });
-    }
-  };
+  const border = isDark ? 'rgba(255,255,255,.08)' : 'rgba(15,23,42,.09)';
 
   return (
     <HomeSection>
-      <SectionHeader
+      <SectionHeading
         title="Explore Top Categories"
         subtitle="Choose a path and start your AI journey today"
         center
       />
 
-      <div style={{ position: 'relative' }}>
-        {/* Scroll buttons */}
-        <button
-          onClick={() => scroll(-1)}
-          style={{
-            position: 'absolute', left: '-16px', top: '50%', transform: 'translateY(-50%)',
-            zIndex: 5, width: '36px', height: '36px', borderRadius: '50%',
-            background: isDark ? 'rgba(15,25,41,.95)' : '#fff',
-            border: isDark ? '1px solid rgba(255,255,255,.1)' : '1px solid rgba(59,130,246,.2)',
-            boxShadow: '0 4px 14px rgba(0,0,0,.15)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'pointer', color: 'var(--text-primary)',
-          }}
-        >
-          <ChevronLeft size={16} />
-        </button>
-
-        <div
-          ref={scrollRef}
-          style={{
-            display: 'flex',
-            gap: '16px',
-            overflowX: 'auto',
-            paddingBottom: '8px',
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-          }}
-          className="scrollbar-hide"
-        >
-          {topCategories.map((cat, i) => (
-            <motion.div key={cat.id} {...fadeInUp(i * 0.05)}>
-              <Link
-                to={`/courses?category=${cat.name.toLowerCase().replace(/\s+/g, '-')}`}
-                style={{
-                  display: 'flex', flexDirection: 'column', alignItems: 'center',
-                  gap: '10px', textAlign: 'center',
-                  padding: '22px 20px', borderRadius: '16px',
-                  background: 'var(--bg-card)',
-                  border: isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(59,130,246,0.15)',
-                  boxShadow: isDark ? 'none' : '0 2px 10px rgba(59,130,246,.07)',
-                  textDecoration: 'none', transition: 'all 0.2s ease',
-                  minWidth: '150px', flexShrink: 0,
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = cat.color;
-                  e.currentTarget.style.transform = 'translateY(-4px)';
-                  e.currentTarget.style.boxShadow = `0 8px 24px ${cat.color}22`;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(59,130,246,0.15)';
-                  e.currentTarget.style.transform = 'none';
-                  e.currentTarget.style.boxShadow = isDark ? 'none' : '0 2px 10px rgba(59,130,246,.07)';
-                }}
-              >
-                <div
+      <ScrollRow step={340}>
+        {topCategories.map(({ id, icon: Icon, name, courses, color }, i) => (
+          <motion.div key={id} {...fadeInUp(i * 0.04)} style={{ flex: '0 0 172px' }}>
+            <Link
+              to={`/courses?category=${encodeURIComponent(name)}`}
+              style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center',
+                justifyContent: 'center', gap: '13px', textAlign: 'center',
+                height: '100%', minHeight: '124px',
+                padding: '24px 14px', borderRadius: '13px',
+                background: 'var(--bg-card)',
+                border: `1px solid ${border}`,
+                boxShadow: isDark ? 'none' : '0 1px 4px rgba(15,23,42,.04)',
+                textDecoration: 'none', transition: 'all .2s ease',
+                boxSizing: 'border-box',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = color;
+                e.currentTarget.style.transform = 'translateY(-4px)';
+                e.currentTarget.style.boxShadow = `0 10px 24px ${color}26`;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = border;
+                e.currentTarget.style.transform = 'none';
+                e.currentTarget.style.boxShadow = isDark ? 'none' : '0 1px 4px rgba(15,23,42,.04)';
+              }}
+            >
+              <Icon size={27} color={color} strokeWidth={1.7} />
+              <div>
+                <p
                   style={{
-                    width: '52px', height: '52px', borderRadius: '14px',
-                    background: `${cat.color}18`,
-                    border: `1px solid ${cat.color}30`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '1.5rem',
+                    color: 'var(--text-primary)', fontSize: '0.785rem',
+                    fontWeight: 700, margin: 0, lineHeight: 1.32,
                   }}
                 >
-                  {cat.icon}
-                </div>
-                <div>
-                  <p style={{ color: 'var(--text-primary)', fontSize: '0.8rem', fontWeight: 700, margin: 0, lineHeight: 1.3 }}>
-                    {cat.name}
-                  </p>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.7rem', margin: '3px 0 0' }}>
-                    {cat.courses} Courses
-                  </p>
-                </div>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
-
-        <button
-          onClick={() => scroll(1)}
-          style={{
-            position: 'absolute', right: '-16px', top: '50%', transform: 'translateY(-50%)',
-            zIndex: 5, width: '36px', height: '36px', borderRadius: '50%',
-            background: isDark ? 'rgba(15,25,41,.95)' : '#fff',
-            border: isDark ? '1px solid rgba(255,255,255,.1)' : '1px solid rgba(59,130,246,.2)',
-            boxShadow: '0 4px 14px rgba(0,0,0,.15)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'pointer', color: 'var(--text-primary)',
-          }}
-        >
-          <ChevronRight size={16} />
-        </button>
-      </div>
+                  {name}
+                </p>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.685rem', margin: '4px 0 0' }}>
+                  {courses} Courses
+                </p>
+              </div>
+            </Link>
+          </motion.div>
+        ))}
+      </ScrollRow>
     </HomeSection>
   );
 }
 
 // ── 3. Featured Books & Courses ──────────────────────────────
 
-function StarRating({ rating, count }) {
+function Stars({ rating, count }) {
   const { isDark } = useTheme();
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+      <span style={{ fontSize: '0.68rem', fontWeight: 700, color: 'var(--text-secondary)', marginRight: '3px' }}>
+        {rating}
+      </span>
       {[1, 2, 3, 4, 5].map((s) => (
         <Star
           key={s}
-          size={11}
-          fill={s <= Math.floor(rating) ? '#fbbf24' : 'none'}
-          color={s <= Math.floor(rating) ? '#fbbf24' : (isDark ? '#374151' : '#cbd5e1')}
+          size={10}
+          fill={s <= Math.round(rating) ? '#fbbf24' : 'none'}
+          color={s <= Math.round(rating) ? '#fbbf24' : (isDark ? '#374151' : '#cbd5e1')}
         />
       ))}
-      <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginLeft: '2px' }}>
+      <span style={{ fontSize: '0.645rem', color: 'var(--text-muted)', marginLeft: '3px' }}>
         ({count?.toLocaleString()})
       </span>
     </div>
@@ -325,88 +356,96 @@ function StarRating({ rating, count }) {
 
 function BookFeaturedCard({ book, index = 0 }) {
   const { isDark } = useTheme();
-  const discount = book.originalPrice > book.price
-    ? Math.round((1 - book.price / book.originalPrice) * 100) : 0;
+  const border = isDark ? 'rgba(255,255,255,.08)' : 'rgba(15,23,42,.09)';
+  const discounted = book.originalPrice > book.price;
+  const badge = book.isNew ? 'New' : book.isFeatured ? 'Bestseller' : null;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 14 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.06, duration: 0.3 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ delay: index * 0.05, duration: 0.32 }}
       style={{
+        flex: '0 0 168px',
         background: 'var(--bg-card)',
-        border: isDark ? '1.5px solid rgba(255,255,255,0.08)' : '1.5px solid rgba(59,130,246,0.18)',
-        borderRadius: '14px',
+        border: `1px solid ${border}`,
+        borderRadius: '12px',
         overflow: 'hidden',
-        minWidth: '190px',
-        maxWidth: '210px',
-        flexShrink: 0,
-        transition: 'all 0.2s ease',
-        boxShadow: isDark ? '0 2px 10px rgba(0,0,0,.25)' : '0 2px 10px rgba(30,64,175,.08)',
+        transition: 'all .2s ease',
+        boxShadow: isDark ? '0 2px 10px rgba(0,0,0,.25)' : '0 1px 4px rgba(15,23,42,.05)',
         cursor: 'pointer',
       }}
-      whileHover={{ y: -5, boxShadow: isDark ? '0 10px 28px rgba(0,0,0,.45)' : '0 10px 28px rgba(30,64,175,.18)' }}
+      whileHover={{
+        y: -5,
+        boxShadow: isDark ? '0 12px 28px rgba(0,0,0,.45)' : '0 10px 26px rgba(15,23,42,.13)',
+      }}
     >
-      {/* Cover */}
-      <div style={{ position: 'relative', background: isDark ? '#111827' : '#f3f4f6' }}>
-        <img
-          src={book.cover}
-          alt={book.title}
-          style={{ width: '100%', height: '150px', objectFit: 'cover', display: 'block' }}
-        />
-        {(book.isFeatured || book.isNew) && (
-          <span
-            style={{
-              position: 'absolute', top: '8px', left: '8px',
-              padding: '2px 8px', borderRadius: '4px',
-              fontSize: '0.62rem', fontWeight: 700,
-              color: '#111', background: '#fbbf24',
-            }}
-          >
-            {book.isNew ? 'NEW' : 'BESTSELLER'}
-          </span>
-        )}
-      </div>
-
-      {/* Info */}
-      <div style={{ padding: '12px' }}>
-        <h4
-          style={{
-            color: 'var(--text-primary)', fontSize: '0.8rem', fontWeight: 700,
-            lineHeight: 1.35, margin: '0 0 3px',
-            display: '-webkit-box', WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical', overflow: 'hidden',
-          }}
-        >
-          {book.title}
-        </h4>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.68rem', margin: '0 0 6px' }}>
-          {book.author}
-        </p>
-        <StarRating rating={book.rating} count={book.ratingsCount} />
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '10px' }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '5px' }}>
-            <span style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-              ₹{book.price.toLocaleString()}
+      <Link to={`/textbooks/${book.id}`} style={{ textDecoration: 'none', display: 'block' }}>
+        {/* Cover */}
+        <div style={{ position: 'relative', background: isDark ? '#111827' : '#f1f5f9' }}>
+          <img
+            src={book.cover}
+            alt={book.title}
+            loading="lazy"
+            style={{ width: '100%', height: '104px', objectFit: 'cover', display: 'block' }}
+          />
+          {badge && (
+            <span
+              style={{
+                position: 'absolute', top: '7px', left: '7px',
+                padding: '2px 7px', borderRadius: '4px',
+                fontSize: '0.6rem', fontWeight: 700,
+                color: '#422006', background: '#fbbf24',
+              }}
+            >
+              {badge}
             </span>
-            {discount > 0 && (
-              <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>
-                ₹{book.originalPrice.toLocaleString()}
-              </span>
-            )}
-          </div>
-          <button
+          )}
+        </div>
+
+        {/* Info */}
+        <div style={{ padding: '11px 11px 12px' }}>
+          <h4
             style={{
-              width: '28px', height: '28px', borderRadius: '8px',
-              background: isDark ? 'rgba(59,130,246,.2)' : 'rgba(59,130,246,.12)',
-              border: 'none', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: 'var(--text-primary)', fontSize: '0.755rem', fontWeight: 700,
+              lineHeight: 1.34, margin: '0 0 3px', minHeight: '2.02em',
+              display: '-webkit-box', WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical', overflow: 'hidden',
             }}
           >
-            <ShoppingCart size={13} color="#3b82f6" />
-          </button>
+            {book.title}
+          </h4>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.655rem', margin: '0 0 7px' }}>
+            {book.author}
+          </p>
+          <Stars rating={book.rating} count={book.ratingsCount} />
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '10px' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '5px' }}>
+              <span style={{ fontSize: '0.925rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                ₹{book.price.toLocaleString()}
+              </span>
+              {discounted && (
+                <span style={{ fontSize: '0.655rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>
+                  ₹{book.originalPrice.toLocaleString()}
+                </span>
+              )}
+            </div>
+            <span
+              aria-hidden="true"
+              style={{
+                width: '26px', height: '26px', borderRadius: '7px',
+                background: isDark ? 'rgba(99,102,241,.2)' : '#eeecfd',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
+              <ShoppingCart size={13} color={ACCENT} />
+            </span>
+          </div>
         </div>
-      </div>
+      </Link>
     </motion.div>
   );
 }
@@ -414,128 +453,43 @@ function BookFeaturedCard({ book, index = 0 }) {
 export function FeaturedBooksAndCourses() {
   const { isDark } = useTheme();
   const [activeTab, setActiveTab] = useState('books');
-  const scrollRef = useRef(null);
-
-  const scroll = (dir) => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: dir * 220, behavior: 'smooth' });
-    }
-  };
-
   const courses = getFeaturedCourses();
 
+  const tab = (name) => ({
+    background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+    fontFamily: 'inherit', fontSize: '0.855rem',
+    fontWeight: activeTab === name ? 700 : 500,
+    color: activeTab === name ? (isDark ? '#818cf8' : ACCENT) : 'var(--text-muted)',
+    transition: 'color .15s',
+  });
+
   return (
-    <HomeSection bg={isDark ? 'var(--bg-secondary)' : 'rgba(59,130,246,.025)'}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '24px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-          <h2
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(1.3rem, 2.5vw, 1.8rem)',
-              fontWeight: 800, color: 'var(--text-primary)',
-              letterSpacing: '-0.02em', margin: 0,
-            }}
-          >
-            Featured Books &amp; Courses
-          </h2>
-          {/* Tabs */}
-          <div
-            style={{
-              display: 'flex', gap: '4px', padding: '4px',
-              borderRadius: '10px',
-              background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(59,130,246,0.07)',
-              border: isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(59,130,246,0.12)',
-            }}
-          >
-            {['books', 'courses'].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                style={{
-                  padding: '5px 14px', borderRadius: '7px', border: 'none', cursor: 'pointer',
-                  fontSize: '0.78rem', fontWeight: 700,
-                  background: activeTab === tab
-                    ? (isDark ? '#3b82f6' : '#2563eb')
-                    : 'transparent',
-                  color: activeTab === tab ? '#fff' : 'var(--text-muted)',
-                  transition: 'all 0.15s',
-                  textTransform: 'capitalize',
-                }}
-              >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </button>
-            ))}
+    <HomeSection bg={isDark ? 'var(--bg-secondary)' : '#fafaff'}>
+      <SectionHeading
+        title="Featured Books & Courses"
+        link={activeTab === 'books' ? '/textbooks' : '/courses'}
+        extra={
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '24px' }}>
+            <button onClick={() => setActiveTab('books')} style={tab('books')}>Books</button>
+            <button onClick={() => setActiveTab('courses')} style={tab('courses')}>Courses</button>
           </div>
-        </div>
-        <Link
-          to={activeTab === 'books' ? '/textbooks' : '/courses'}
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: '5px',
-            fontSize: '0.82rem', fontWeight: 700,
-            color: isDark ? '#60a5fa' : '#2563eb',
-            textDecoration: 'none',
-          }}
-        >
-          View All <ArrowRight size={14} />
-        </Link>
-      </div>
+        }
+      />
 
-      {/* Scroll container */}
-      <div style={{ position: 'relative' }}>
-        <button
-          onClick={() => scroll(-1)}
-          style={{
-            position: 'absolute', left: '-16px', top: '50%', transform: 'translateY(-50%)',
-            zIndex: 5, width: '36px', height: '36px', borderRadius: '50%',
-            background: isDark ? 'rgba(15,25,41,.95)' : '#fff',
-            border: isDark ? '1px solid rgba(255,255,255,.1)' : '1px solid rgba(59,130,246,.2)',
-            boxShadow: '0 4px 14px rgba(0,0,0,.15)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'pointer', color: 'var(--text-primary)',
-          }}
-        >
-          <ChevronLeft size={16} />
-        </button>
-
-        <div
-          ref={scrollRef}
-          style={{
-            display: 'flex', gap: '16px',
-            overflowX: 'auto', paddingBottom: '8px',
-            scrollbarWidth: 'none', msOverflowStyle: 'none',
-          }}
-          className="scrollbar-hide"
-        >
-          {activeTab === 'books'
-            ? books.map((book, i) => <BookFeaturedCard key={book.id} book={book} index={i} />)
-            : courses.map((course, i) => (
-              <div key={course.id} style={{ minWidth: '260px', maxWidth: '280px', flexShrink: 0 }}>
-                <CourseCard course={course} index={i} />
-              </div>
-            ))
-          }
-        </div>
-
-        <button
-          onClick={() => scroll(1)}
-          style={{
-            position: 'absolute', right: '-16px', top: '50%', transform: 'translateY(-50%)',
-            zIndex: 5, width: '36px', height: '36px', borderRadius: '50%',
-            background: isDark ? 'rgba(15,25,41,.95)' : '#fff',
-            border: isDark ? '1px solid rgba(255,255,255,.1)' : '1px solid rgba(59,130,246,.2)',
-            boxShadow: '0 4px 14px rgba(0,0,0,.15)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'pointer', color: 'var(--text-primary)',
-          }}
-        >
-          <ChevronRight size={16} />
-        </button>
-      </div>
+      <ScrollRow step={368}>
+        {activeTab === 'books'
+          ? books.map((book, i) => <BookFeaturedCard key={book.id} book={book} index={i} />)
+          : courses.map((course, i) => (
+            <div key={course.id} style={{ flex: '0 0 262px' }}>
+              <CourseCard course={course} index={i} />
+            </div>
+          ))}
+      </ScrollRow>
     </HomeSection>
   );
 }
 
-// ── 4. Subscription Banner ───────────────────────────────────
+// ── 4. Subscription banner ───────────────────────────────────
 
 const subscriptionFeatures = [
   'Access to 500+ Premium Courses',
@@ -545,95 +499,189 @@ const subscriptionFeatures = [
   'Learn at Your Own Pace',
 ];
 
+/** Graduation cap resting on a book — the banner illustration. */
+function CapOnBookArt() {
+  return (
+    <svg viewBox="0 0 170 116" fill="none" style={{ width: '160px', display: 'block' }} aria-hidden="true">
+      <defs>
+        <linearGradient id="sub-cap" x1="20" y1="18" x2="150" y2="66" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#7c6cf5" />
+          <stop offset="1" stopColor="#5b4fe0" />
+        </linearGradient>
+        <linearGradient id="sub-cap-top" x1="30" y1="10" x2="140" y2="52" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#a99cff" />
+          <stop offset="1" stopColor="#7c6cf5" />
+        </linearGradient>
+        <linearGradient id="sub-book-side" x1="18" y1="80" x2="152" y2="108" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#6d5fe8" />
+          <stop offset="1" stopColor="#4f46e5" />
+        </linearGradient>
+      </defs>
+
+      {/* Soft shadow */}
+      <ellipse cx="86" cy="108" rx="66" ry="8" fill="#4f46e5" opacity="0.14" />
+
+      {/* Book — side then top face */}
+      <path d="M20 82v12c0 3 2 5 5 6l58 12c3 1 6 0 6-3V90L20 82Z" fill="url(#sub-book-side)" />
+      <path d="M152 76v12c0 3-2 5-5 6l-58 13V90l63-14Z" fill="#3f37c9" />
+      <path d="M20 82 86 66l66 10-63 14L20 82Z" fill="#f5f4ff" />
+      <path d="M86 66 152 76 89 90 20 82 86 66Z" stroke="#ddd9ff" strokeWidth="1" fill="none" />
+      {/* Pages hint */}
+      <path d="M40 84l46-10M52 88l46-10" stroke="#d9d5fb" strokeWidth="1.4" strokeLinecap="round" />
+
+      {/* Mortarboard base */}
+      <path d="M50 52h72v10c0 6-16 11-36 11S50 68 50 62V52Z" fill="url(#sub-cap)" />
+      {/* Mortarboard flat top */}
+      <path d="M86 30 162 52 86 74 10 52 86 30Z" fill="url(#sub-cap-top)" />
+      <path d="M86 34 148 52 86 70 24 52 86 34Z" fill="#8b7cf8" opacity="0.55" />
+
+      {/* Tassel */}
+      <path d="M150 54v18" stroke="#fbbf24" strokeWidth="2.6" strokeLinecap="round" />
+      <path d="M150 70c-3 4-3 9 0 13 3-4 3-9 0-13Z" fill="#fbbf24" />
+      <circle cx="150" cy="53" r="3.4" fill="#f59e0b" />
+    </svg>
+  );
+}
+
 export function SubscriptionBanner() {
   const { isDark } = useTheme();
+
   return (
     <HomeSection>
       <motion.div
         {...fadeInUp()}
+        className="sub-banner"
         style={{
           background: isDark
-            ? 'linear-gradient(135deg, rgba(79,70,229,.15) 0%, rgba(124,58,237,.1) 100%)'
-            : 'linear-gradient(135deg, rgba(238,242,255,1) 0%, rgba(237,233,254,1) 100%)',
-          border: isDark ? '1px solid rgba(99,102,241,.25)' : '1px solid rgba(99,102,241,.25)',
-          borderRadius: '24px',
-          padding: '36px 40px',
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '28px',
+            ? 'linear-gradient(135deg, rgba(79,70,229,.16) 0%, rgba(124,58,237,.11) 100%)'
+            : 'linear-gradient(135deg, #f0eefe 0%, #ecebfd 55%, #efedfe 100%)',
+          border: isDark ? '1px solid rgba(99,102,241,.25)' : '1px solid rgba(99,102,241,.16)',
+          borderRadius: '18px',
+          padding: '26px 34px',
           position: 'relative',
           overflow: 'hidden',
         }}
       >
-        {/* Background decoration */}
+        {/* Decorative circle */}
         <div
+          aria-hidden="true"
           style={{
-            position: 'absolute', right: '-30px', bottom: '-30px',
-            width: '200px', height: '200px', borderRadius: '50%',
-            background: isDark ? 'rgba(99,102,241,.08)' : 'rgba(99,102,241,.12)',
+            position: 'absolute', right: '-46px', bottom: '-72px',
+            width: '210px', height: '210px', borderRadius: '50%',
+            background: isDark ? 'rgba(99,102,241,.08)' : 'rgba(99,102,241,.07)',
             pointerEvents: 'none',
           }}
         />
 
-        {/* Left: Emoji + Text */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
-          <div style={{ fontSize: '4rem', lineHeight: 1 }}>📚</div>
-          <div>
+        <div className="sub-banner-grid">
+          {/* Illustration */}
+          <div className="sub-art" style={{ display: 'flex', justifyContent: 'center' }}>
+            <CapOnBookArt />
+          </div>
+
+          {/* Copy */}
+          <div style={{ minWidth: 0 }}>
             <h3
               style={{
                 fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(1.2rem, 2.5vw, 1.6rem)',
+                fontSize: 'clamp(1.05rem, 2vw, 1.28rem)',
                 fontWeight: 800,
                 color: 'var(--text-primary)',
-                margin: '0 0 6px',
+                letterSpacing: '-0.02em',
+                margin: '0 0 8px',
               }}
             >
               Unlimited Learning. Unlimited Possibilities.
             </h3>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', margin: '0 0 14px', maxWidth: '380px' }}>
-              Get unlimited access to all books, courses, projects, and premium resources with our subscription plans.
+            <p
+              style={{
+                color: 'var(--text-secondary)',
+                fontSize: '0.83rem',
+                lineHeight: 1.65,
+                margin: 0,
+                maxWidth: '330px',
+              }}
+            >
+              Get unlimited access to all books, courses, projects, and premium
+              resources with our subscription plans.
             </p>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '5px' }}>
-              {subscriptionFeatures.map((f) => (
-                <li key={f} style={{ display: 'flex', alignItems: 'center', gap: '7px', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                  <CheckCircle2 size={13} color="#4f46e5" />
-                  {f}
-                </li>
-              ))}
-            </ul>
+          </div>
+
+          {/* Feature list */}
+          <ul
+            style={{
+              listStyle: 'none', padding: 0, margin: 0,
+              display: 'flex', flexDirection: 'column', gap: '7px',
+              minWidth: 0,
+            }}
+          >
+            {subscriptionFeatures.map((f) => (
+              <li
+                key={f}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '8px',
+                  fontSize: '0.755rem', color: 'var(--text-secondary)', lineHeight: 1.3,
+                }}
+              >
+                <CheckCircle2 size={14} color={ACCENT} style={{ flexShrink: 0 }} />
+                {f}
+              </li>
+            ))}
+          </ul>
+
+          {/* CTA */}
+          <div
+            style={{
+              display: 'flex', flexDirection: 'column',
+              alignItems: 'center', gap: '10px', flexShrink: 0,
+            }}
+          >
+            <Link
+              to="/subscription"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: '8px',
+                padding: '13px 26px', borderRadius: '10px',
+                background: '#5b4fe0',
+                color: '#fff', fontSize: '0.855rem', fontWeight: 600,
+                textDecoration: 'none', whiteSpace: 'nowrap',
+                boxShadow: '0 8px 22px rgba(91,79,224,.3)',
+                transition: 'all .2s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#4f46e5';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = '#5b4fe0';
+                e.currentTarget.style.transform = 'none';
+              }}
+            >
+              View Plans <ArrowRight size={15} />
+            </Link>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.71rem', margin: 0, whiteSpace: 'nowrap' }}>
+              Starting from ₹299/month
+            </p>
           </div>
         </div>
 
-        {/* Right: CTA */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-          <Link
-            to="/subscription"
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: '8px',
-              padding: '13px 28px', borderRadius: '12px',
-              background: 'linear-gradient(135deg, #4f46e5, #7c3aed)',
-              color: '#fff', fontSize: '0.9rem', fontWeight: 700,
-              textDecoration: 'none',
-              boxShadow: '0 8px 24px rgba(79,70,229,.35)',
-              transition: 'all 0.2s',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 12px 32px rgba(79,70,229,.45)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'none';
-              e.currentTarget.style.boxShadow = '0 8px 24px rgba(79,70,229,.35)';
-            }}
-          >
-            View Plans <ArrowRight size={15} />
-          </Link>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.72rem', margin: 0 }}>
-            Starting from ₹299/month
-          </p>
-        </div>
+        <style>{`
+          .sub-banner-grid {
+            position: relative;
+            display: grid;
+            grid-template-columns: 170px minmax(0, 1fr) auto auto;
+            align-items: center;
+            gap: 28px;
+          }
+          @media (max-width: 1000px) {
+            .sub-banner-grid { grid-template-columns: 150px minmax(0, 1fr) auto; }
+            .sub-banner-grid > :last-child { grid-column: 1 / -1; align-items: flex-start; }
+          }
+          @media (max-width: 720px) {
+            .sub-banner { padding: 24px 22px; }
+            .sub-banner-grid { grid-template-columns: 1fr; gap: 20px; }
+            .sub-art { justify-content: flex-start !important; }
+          }
+        `}</style>
       </motion.div>
     </HomeSection>
   );
@@ -641,49 +689,74 @@ export function SubscriptionBanner() {
 
 // ── 5. Testimonials ──────────────────────────────────────────
 
-function TestimonialCard({ review, index }) {
+function TestimonialCard({ item, index }) {
   const { isDark } = useTheme();
-  const stars = Array.from({ length: 5 }, (_, i) => i < review.rating);
+  const border = isDark ? 'rgba(255,255,255,.08)' : 'rgba(15,23,42,.09)';
+
   return (
     <motion.div
-      {...fadeInUp(index * 0.08)}
+      {...fadeInUp(index * 0.07)}
       style={{
+        flex: '0 0 350px',
         background: 'var(--bg-card)',
-        border: isDark ? '1.5px solid rgba(255,255,255,0.08)' : '1.5px solid rgba(59,130,246,0.15)',
-        borderRadius: '18px',
-        padding: '22px',
-        flex: '1',
-        minWidth: '260px',
-        boxShadow: isDark ? '0 2px 10px rgba(0,0,0,.25)' : '0 2px 10px rgba(30,64,175,.07)',
-        transition: 'all 0.2s ease',
+        border: `1px solid ${border}`,
+        borderRadius: '14px',
+        padding: '18px',
+        boxSizing: 'border-box',
+        boxShadow: isDark ? '0 2px 10px rgba(0,0,0,.25)' : '0 1px 4px rgba(15,23,42,.05)',
+        transition: 'all .2s ease',
       }}
-      whileHover={{ y: -4, boxShadow: isDark ? '0 12px 32px rgba(0,0,0,.4)' : '0 12px 32px rgba(30,64,175,.15)' }}
+      whileHover={{
+        y: -4,
+        boxShadow: isDark ? '0 12px 30px rgba(0,0,0,.4)' : '0 10px 26px rgba(15,23,42,.12)',
+      }}
     >
-      {/* Quote */}
-      <p
-        style={{
-          color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.65,
-          margin: '0 0 18px', fontStyle: 'italic',
-        }}
-      >
-        "{review.review.slice(0, 140)}{review.review.length > 140 ? '...' : ''}"
-      </p>
-      {/* Reviewer */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      {/* Avatar + quote */}
+      <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
         <img
-          src={review.avatar}
-          alt={review.name}
-          style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(99,102,241,.35)' }}
+          src={item.avatar}
+          alt={item.name}
+          loading="lazy"
+          style={{
+            width: '44px', height: '44px', borderRadius: '50%',
+            objectFit: 'cover', flexShrink: 0,
+            background: isDark ? '#1e293b' : '#e2e8f0',
+          }}
         />
-        <div style={{ flex: 1 }}>
-          <p style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: '0.85rem', margin: 0 }}>{review.name}</p>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.72rem', margin: '2px 0' }}>{review.role}</p>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#fbbf24' }}>{review.rating}.0</span>
-            {stars.map((filled, i) => (
-              <Star key={i} size={11} fill={filled ? '#fbbf24' : 'none'} color={filled ? '#fbbf24' : '#374151'} />
+        <p
+          style={{
+            color: 'var(--text-secondary)',
+            fontSize: '0.79rem',
+            lineHeight: 1.6,
+            margin: 0,
+          }}
+        >
+          &ldquo;{item.review}&rdquo;
+        </p>
+      </div>
+
+      {/* Name / role / rating */}
+      <div style={{ marginTop: '14px' }}>
+        <p style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: '0.805rem', margin: 0 }}>
+          {item.name}
+        </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginTop: '3px' }}>
+          <span
+            style={{
+              color: 'var(--text-muted)', fontSize: '0.705rem',
+              minWidth: '88px', flexShrink: 0,
+            }}
+          >
+            {item.role}
+          </span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+            <span style={{ fontSize: '0.735rem', fontWeight: 700, color: '#f59e0b', marginRight: '2px' }}>
+              {item.rating}.0
+            </span>
+            {Array.from({ length: 5 }, (_, i) => (
+              <Star key={i} size={11} fill="#fbbf24" color="#fbbf24" />
             ))}
-          </div>
+          </span>
         </div>
       </div>
     </motion.div>
@@ -693,17 +766,17 @@ function TestimonialCard({ review, index }) {
 export function Testimonials() {
   const { isDark } = useTheme();
   return (
-    <HomeSection bg={isDark ? 'var(--bg-secondary)' : 'rgba(59,130,246,.025)'}>
-      <SectionHeader
+    <HomeSection bg={isDark ? 'var(--bg-secondary)' : '#fafaff'}>
+      <SectionHeading
         title="What Our Learners Say"
         link="/courses"
         linkLabel="View All Reviews"
       />
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
-        {reviews.slice(0, 3).map((r, i) => (
-          <TestimonialCard key={r.id} review={r} index={i} />
+      <ScrollRow step={366}>
+        {homeTestimonials.map((item, i) => (
+          <TestimonialCard key={item.id} item={item} index={i} />
         ))}
-      </div>
+      </ScrollRow>
     </HomeSection>
   );
 }
@@ -713,52 +786,54 @@ export function Testimonials() {
 function FAQItem({ faq, index }) {
   const [open, setOpen] = useState(false);
   const { isDark } = useTheme();
+  const border = isDark ? 'rgba(255,255,255,.08)' : 'rgba(15,23,42,.09)';
 
   return (
     <motion.div
       {...fadeInUp(index * 0.04)}
       style={{
         background: 'var(--bg-card)',
-        border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(59,130,246,0.15)',
-        borderRadius: '12px',
+        border: `1px solid ${open ? ACCENT : border}`,
+        borderRadius: '10px',
         overflow: 'hidden',
-        marginBottom: '10px',
-        boxShadow: isDark ? 'none' : '0 2px 8px rgba(59,130,246,.06)',
-        transition: 'border-color 0.2s',
-        ...(open ? { borderColor: isDark ? 'rgba(99,102,241,.35)' : '#4f46e5' } : {}),
+        alignSelf: 'start',
+        boxShadow: isDark ? 'none' : '0 1px 4px rgba(15,23,42,.04)',
+        transition: 'border-color .2s',
       }}
     >
       <button
         onClick={() => setOpen((p) => !p)}
+        aria-expanded={open}
         style={{
           width: '100%', display: 'flex', alignItems: 'center',
-          justifyContent: 'space-between', padding: '14px 18px',
+          justifyContent: 'space-between', gap: '10px',
+          padding: '13px 15px',
           background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left',
-          gap: '12px',
+          fontFamily: 'inherit',
         }}
       >
-        <span style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: '0.85rem', lineHeight: 1.4 }}>
+        <span style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.79rem', lineHeight: 1.4 }}>
           {faq.question}
         </span>
+        <ChevronDown
+          size={16}
+          style={{
+            flexShrink: 0,
+            color: open ? ACCENT : 'var(--text-muted)',
+            transform: open ? 'rotate(180deg)' : 'none',
+            transition: 'transform .2s, color .2s',
+          }}
+        />
+      </button>
+
+      {open && (
         <div
           style={{
-            width: '24px', height: '24px', borderRadius: '50%', flexShrink: 0,
-            background: open
-              ? 'linear-gradient(135deg, #4f46e5, #7c3aed)'
-              : (isDark ? 'rgba(255,255,255,.07)' : 'rgba(59,130,246,.1)'),
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            transition: 'background 0.2s',
+            padding: '12px 15px 14px',
+            borderTop: `1px solid ${isDark ? 'rgba(255,255,255,.06)' : 'rgba(15,23,42,.06)'}`,
           }}
         >
-          {open
-            ? <Minus size={12} color="#fff" />
-            : <Plus size={12} color={isDark ? '#94a3b8' : '#4f46e5'} />
-          }
-        </div>
-      </button>
-      {open && (
-        <div style={{ padding: '0 18px 14px', borderTop: `1px solid ${isDark ? 'rgba(255,255,255,.05)' : 'rgba(59,130,246,.1)'}`, paddingTop: '12px' }}>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.825rem', lineHeight: 1.65, margin: 0 }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.775rem', lineHeight: 1.65, margin: 0 }}>
             {faq.answer}
           </p>
         </div>
@@ -768,116 +843,91 @@ function FAQItem({ faq, index }) {
 }
 
 export function FAQ() {
-  const { isDark } = useTheme();
-  const visibleFaqs = faqs.slice(0, 4);
-
   return (
     <HomeSection>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '28px' }}>
-        <h2
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(1.3rem, 2.5vw, 1.8rem)',
-            fontWeight: 800, color: 'var(--text-primary)',
-            letterSpacing: '-0.02em', margin: 0,
-          }}
-        >
-          Frequently Asked Questions
-        </h2>
-        <Link
-          to="/courses"
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: '5px',
-            fontSize: '0.82rem', fontWeight: 700,
-            color: isDark ? '#60a5fa' : '#2563eb',
-            textDecoration: 'none',
-          }}
-        >
-          View All FAQs <ArrowRight size={14} />
-        </Link>
-      </div>
-
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))',
-          gap: '0 24px',
-        }}
-      >
-        {visibleFaqs.map((faq, i) => (
+      <SectionHeading
+        title="Frequently Asked Questions"
+        link="/contact"
+        linkLabel="View All FAQs"
+      />
+      <div className="faq-grid">
+        {homeFaqs.map((faq, i) => (
           <FAQItem key={faq.id} faq={faq} index={i} />
         ))}
       </div>
+      <style>{`
+        .faq-grid {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          align-items: start;
+          gap: 14px;
+        }
+        @media (max-width: 1000px) { .faq-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        @media (max-width: 620px)  { .faq-grid { grid-template-columns: 1fr; } }
+      `}</style>
     </HomeSection>
   );
 }
 
-// ── 7. Newsletter Banner ─────────────────────────────────────
+// ── 7. Newsletter banner ─────────────────────────────────────
 
 export function Newsletter() {
-  const { isDark } = useTheme();
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (email.trim()) {
-      setSent(true);
-      setTimeout(() => { setSent(false); setEmail(''); }, 3000);
-    }
+    if (!email.trim()) return;
+    setSent(true);
+    setTimeout(() => { setSent(false); setEmail(''); }, 2600);
   };
 
   return (
-    <section
-      style={{
-        width: '100%',
-        padding: '0 32px 56px',
-        boxSizing: 'border-box',
-      }}
-    >
-      <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+    <section style={{ width: '100%', padding: '4px 32px 30px', boxSizing: 'border-box' }}>
+      <div style={{ maxWidth: `${CONTAINER}px`, margin: '0 auto' }}>
         <motion.div
           {...fadeInUp()}
+          className="news-banner"
           style={{
-            background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #6d28d9 100%)',
-            borderRadius: '20px',
-            padding: '36px 40px',
+            background: 'linear-gradient(100deg, #5b4fe0 0%, #6d4fe6 48%, #7c3aed 100%)',
+            borderRadius: '14px',
+            padding: '19px 26px',
             display: 'flex',
             flexWrap: 'wrap',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: '24px',
+            gap: '20px',
             position: 'relative',
             overflow: 'hidden',
           }}
         >
           {/* Decorative blobs */}
-          <div style={{ position: 'absolute', left: '-40px', bottom: '-40px', width: '160px', height: '160px', borderRadius: '50%', background: 'rgba(255,255,255,.07)', pointerEvents: 'none' }} />
-          <div style={{ position: 'absolute', right: '-20px', top: '-30px', width: '120px', height: '120px', borderRadius: '50%', background: 'rgba(255,255,255,.06)', pointerEvents: 'none' }} />
+          <div aria-hidden="true" style={{ position: 'absolute', left: '-40px', bottom: '-56px', width: '150px', height: '150px', borderRadius: '50%', background: 'rgba(255,255,255,.07)', pointerEvents: 'none' }} />
+          <div aria-hidden="true" style={{ position: 'absolute', right: '-24px', top: '-46px', width: '120px', height: '120px', borderRadius: '50%', background: 'rgba(255,255,255,.06)', pointerEvents: 'none' }} />
 
-          {/* Left: Icon + Text */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '18px', zIndex: 1 }}>
-            <div
+          {/* Left */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px', zIndex: 1, minWidth: 0 }}>
+            <span
               style={{
-                width: '52px', height: '52px', borderRadius: '14px',
+                width: '42px', height: '42px', borderRadius: '11px',
                 background: 'rgba(255,255,255,.18)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 flexShrink: 0,
               }}
             >
-              <Mail size={24} color="#fff" />
-            </div>
-            <div>
-              <h3 style={{ color: '#fff', fontSize: '1.1rem', fontWeight: 800, margin: '0 0 4px' }}>
+              <Mail size={21} color="#fff" />
+            </span>
+            <div style={{ minWidth: 0 }}>
+              <h3 style={{ color: '#fff', fontSize: '0.98rem', fontWeight: 800, margin: '0 0 3px', letterSpacing: '-0.01em' }}>
                 Stay Updated
               </h3>
-              <p style={{ color: 'rgba(255,255,255,.75)', fontSize: '0.82rem', margin: 0 }}>
+              <p style={{ color: 'rgba(255,255,255,.8)', fontSize: '0.775rem', margin: 0, lineHeight: 1.4 }}>
                 Subscribe to get the latest updates on new courses and offers.
               </p>
             </div>
           </div>
 
-          {/* Right: Email Input */}
+          {/* Right */}
           <form
             onSubmit={handleSubmit}
             style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', zIndex: 1, flexShrink: 0 }}
@@ -888,54 +938,48 @@ export function Newsletter() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
               required
+              aria-label="Email address"
               style={{
-                padding: '11px 18px', borderRadius: '10px',
-                border: 'none', background: 'rgba(255,255,255,.95)',
-                color: '#111', fontSize: '0.875rem', outline: 'none',
-                minWidth: '240px', fontFamily: 'inherit',
+                padding: '10px 15px', borderRadius: '8px',
+                border: 'none', background: '#fff',
+                color: '#0f172a', fontSize: '0.815rem', outline: 'none',
+                width: '188px', fontFamily: 'inherit', boxSizing: 'border-box',
               }}
             />
             <button
               type="submit"
               style={{
-                padding: '11px 22px', borderRadius: '10px',
-                background: '#fff',
-                color: '#4f46e5', fontSize: '0.875rem', fontWeight: 700,
-                border: 'none', cursor: 'pointer',
-                display: 'flex', alignItems: 'center', gap: '6px',
-                transition: 'all 0.2s',
+                padding: '10px 20px', borderRadius: '8px',
+                background: sent ? '#22c55e' : '#8b7cf8',
+                color: '#fff', fontSize: '0.815rem', fontWeight: 600,
+                border: 'none', cursor: 'pointer', whiteSpace: 'nowrap',
+                transition: 'all .2s', fontFamily: 'inherit',
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-1px)';
-                e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,.2)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'none';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
+              onMouseEnter={(e) => { if (!sent) e.currentTarget.style.background = '#7c6ef2'; }}
+              onMouseLeave={(e) => { if (!sent) e.currentTarget.style.background = '#8b7cf8'; }}
             >
-              {sent ? <CheckCircle2 size={15} color="#10b981" /> : <Send size={15} />}
               {sent ? 'Subscribed!' : 'Subscribe'}
             </button>
           </form>
         </motion.div>
+
+        <style>{`
+          @media (max-width: 620px) {
+            .news-banner form { width: 100%; }
+            .news-banner input { flex: 1; width: auto !important; min-width: 140px; }
+          }
+        `}</style>
       </div>
     </section>
   );
 }
 
-// Re-export legacy exports so other pages that import them don't break
+// ── Legacy exports kept so other pages keep compiling ────────
+
 export function FeaturedCourses() {
-  const { isDark } = useTheme();
   return (
     <HomeSection>
-      <SectionHeader
-        eyebrow="Hand-picked for you"
-        title="Featured Courses"
-        description="Curated by our team — the most impactful courses to accelerate your career."
-        link="/courses"
-        linkLabel="Browse All Courses"
-      />
+      <SectionHeading title="Featured Courses" link="/courses" linkLabel="Browse All Courses" />
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '16px' }}>
         {getFeaturedCourses().slice(0, 4).map((course, i) => (
           <CourseCard key={course.id} course={course} index={i} />
