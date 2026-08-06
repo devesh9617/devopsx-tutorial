@@ -37,6 +37,14 @@ const Curriculum = lazy(() => import('../pages/Curriculum/index'));
 const Downloads = lazy(() => import('../pages/Downloads/index'));
 const Achievements = lazy(() => import('../pages/Achievements/index'));
 const Resources = lazy(() => import('../pages/Resources/index'));
+const Orders = lazy(() => import('../pages/Orders/index'));
+const OrderDetails = lazy(() => import('../pages/OrderDetails/index'));
+const OrderTracking = lazy(() => import('../pages/OrderTracking/index'));
+const Invoices = lazy(() => import('../pages/Invoices/index'));
+const InvoiceDetails = lazy(() => import('../pages/InvoiceDetails/index'));
+const ReturnsRefunds = lazy(() => import('../pages/ReturnsRefunds/index'));
+const RefundDetails = lazy(() => import('../pages/RefundDetails/index'));
+const RequestRefund = lazy(() => import('../pages/RequestRefund/index'));
 
 // Wrapper that renders MainLayout with Outlet for nested routes
 function LayoutWrapper() {
@@ -91,6 +99,14 @@ export default function AppRouter() {
           <Route path="/achievement" element={<Achievements />} />
           <Route path="/resources" element={<Resources />} />
           <Route path="/resource" element={<Resources />} />
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/orders/invoices" element={<Invoices />} />
+          <Route path="/orders/invoices/:id" element={<InvoiceDetails />} />
+          <Route path="/orders/returns" element={<ReturnsRefunds />} />
+          <Route path="/orders/returns/:id" element={<RefundDetails />} />
+          <Route path="/orders/:id/tracking" element={<OrderTracking />} />
+          <Route path="/orders/:id/refund" element={<RequestRefund />} />
+          <Route path="/orders/:id" element={<OrderDetails />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
