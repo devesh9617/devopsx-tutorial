@@ -1,5 +1,5 @@
 // ============================================================
-// Home Page — AI Learning Platform (Reference Design)
+// Home Page — DevOpsX Learning Platform (Reference Design)
 // ============================================================
 
 import Hero from '../../components/sections/Hero';

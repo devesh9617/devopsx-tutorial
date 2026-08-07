@@ -152,3 +152,30 @@ export const practiceQuestions = [
   { id: 9, title: 'AWS: VPC Peering vs Transit Gateway', category: 'Cloud', difficulty: 'Hard', points: 30, solved: false, tags: ['AWS', 'Networking'] },
   { id: 10, title: 'SQL: Write a Window Function', category: 'Database', difficulty: 'Medium', points: 20, solved: false, tags: ['SQL', 'Analytics'] },
 ];
+
+// ============================================================
+// Home page FAQs — short, subscription-focused questions
+// (`faqs` above stays as the full FAQ list for other pages)
+// ============================================================
+export const homeFaqs = [
+  {
+    id: 'hf-1',
+    question: 'How does the subscription work?',
+    answer: 'Pick a monthly or annual plan and get instant access to every book, course, project and premium resource on the platform. Your plan renews automatically and you can cancel from your profile at any time.',
+  },
+  {
+    id: 'hf-2',
+    question: 'Can I download the courses?',
+    answer: 'Yes. eBooks, notes and course resources can be downloaded as PDFs for offline use. Video lessons stream from your dashboard and are available offline in the mobile app.',
+  },
+  {
+    id: 'hf-3',
+    question: 'Will I get a certificate?',
+    answer: 'Every course includes a verifiable completion certificate with a unique credential ID that you can add to your LinkedIn profile or share with employers.',
+  },
+  {
+    id: 'hf-4',
+    question: 'Is there a refund policy?',
+    answer: 'We offer a 7-day money-back guarantee on every plan. If it is not the right fit, request a refund within 7 days of purchase and we will process it in full — no questions asked.',
+  },
+];

@@ -1,5 +1,5 @@
 // ============================================================
-// Books Data — AI Learning Platform
+// Books Data — DevOpsX Learning Platform
 // ============================================================
 
 export const books = [

@@ -79,7 +79,7 @@ export default function OrderSuccess() {
             Payment Successful!
           </h1>
           <h2 style={{ color: '#2563eb', fontSize: '1.2rem', fontWeight: 700, margin: '-6px 0 0' }}>
-            Welcome to AI Learning 🎉
+            Welcome to DevOpsX Learning 🎉
           </h2>
 
           <p style={{ color: '#475467', fontSize: '0.9rem', maxWidth: '520px', margin: 0, lineHeight: 1.5 }}>

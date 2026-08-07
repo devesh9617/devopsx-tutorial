@@ -109,3 +109,58 @@ export const stats = [
   { label: 'Instructors', value: '50+', suffix: '' },
   { label: 'Certificates', value: '8K+', suffix: '' },
 ];
+
+// ============================================================
+// Home page testimonials — "What Our Learners Say"
+// Kept separate from `reviews` (which are per-course reviews).
+// ============================================================
+export const homeTestimonials = [
+  {
+    id: 'ht-1',
+    name: 'Aman Verma',
+    role: 'Data Scientist',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&auto=format&fit=crop&crop=faces',
+    rating: 5,
+    review: 'The content is top-notch and easy to understand. DevOpsX Learning helped me crack my dream job!',
+  },
+  {
+    id: 'ht-2',
+    name: 'Neha Patel',
+    role: 'ML Engineer',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&h=120&auto=format&fit=crop&crop=faces',
+    rating: 5,
+    review: 'Excellent platform! The hands-on projects and practical approach make learning so effective.',
+  },
+  {
+    id: 'ht-3',
+    name: 'Rahul Singh',
+    role: 'AI Engineer',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=120&auto=format&fit=crop&crop=faces',
+    rating: 5,
+    review: 'I love the way complex topics are explained in a simple way. Highly recommended!',
+  },
+  {
+    id: 'ht-4',
+    name: 'Priya Sharma',
+    role: 'NLP Researcher',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&auto=format&fit=crop&crop=faces',
+    rating: 5,
+    review: 'The courses go deep without ever feeling heavy. Best money I have spent on upskilling.',
+  },
+  {
+    id: 'ht-5',
+    name: 'Karan Malhotra',
+    role: 'Product Manager',
+    avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=120&h=120&auto=format&fit=crop&crop=faces',
+    rating: 5,
+    review: 'I came in with zero coding background and still finished three projects. Brilliantly structured.',
+  },
+  {
+    id: 'ht-6',
+    name: 'Sneha Iyer',
+    role: 'Computer Vision Engineer',
+    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=120&h=120&auto=format&fit=crop&crop=faces',
+    rating: 5,
+    review: 'Great instructors and a community that actually replies. The certificate got me two interviews.',
+  },
+];
