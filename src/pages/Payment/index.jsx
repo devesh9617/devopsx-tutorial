@@ -16,7 +16,7 @@ export default function Payment() {
   const [selectedMethod, setSelectedMethod] = useState('card');
   const [cardDetails, setCardDetails] = useState({
     cardNumber: '1234 5678 9012 3456',
-    cardName: 'Shailendra Kumar',
+    cardName: 'xyz',
     expiry: '12/28',
     cvv: '123',
     saveCard: true,

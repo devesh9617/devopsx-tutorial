@@ -1,432 +1,496 @@
 // ============================================================
-// Profile Page — DevOpsX (Fully Theme-Aware & Ultra Professional)
+// Profile Information Page — 1:1 Pixel-Perfect DITTO UI
 // ============================================================
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import {
-  Camera, Edit3, Save, X, BookOpen, Award, Heart,
-  Calendar, Mail, User, LogOut, ChevronRight,
-  BarChart3, Clock, Star, Trophy, Flame, Lock, ClipboardList, LayoutDashboard
-} from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
-import { useTheme } from '../../context/ThemeContext';
-import { courses } from '../../data/courses';
+import { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import {
+  ChevronRight, Camera, Upload, Trash2,
+  BookOpen, Video, Award, Heart, Download, FileText,
+  Settings, HelpCircle, LogOut, Trophy, Bell, MessageCircle, Lock
+} from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
+import PageWrapper from '../../components/ui/PageWrapper';
+import { toast } from 'react-hot-toast';
 
-function ProgressBar({ value, isDark }) {
-  return (
-    <div
-      style={{
-        width: '100%',
-        height: '6px',
-        background: isDark ? 'rgba(255,255,255,.08)' : 'rgba(59,130,246,.12)',
-        borderRadius: '999px',
-        overflow: 'hidden',
-      }}
-    >
-      <motion.div
-        initial={{ width: 0 }}
-        animate={{ width: `${value}%` }}
-        transition={{ duration: 0.8, ease: 'easeOut', delay: 0.3 }}
-        style={{
-          height: '100%',
-          borderRadius: '999px',
-          background: value >= 70
-            ? 'linear-gradient(90deg,#10b981,#059669)'
-            : 'linear-gradient(90deg,#3b82f6,#06b6d4)',
-        }}
-      />
-    </div>
-  );
-}
+const SIDEBAR_MENU = [
+  { label: 'Overview', icon: BookOpen, path: '/dashboard' },
+  { label: 'My Courses', icon: BookOpen, path: '/my-learning' },
+  { label: 'Live Classes', icon: Video, path: '/live-classes' },
+  { label: 'Certificates', icon: Award, path: '/certificates' },
+  { label: 'Wishlist', icon: Heart, path: '/wishlist' },
+  { label: 'Downloads', icon: Download, path: '/downloads' },
+  { label: 'Orders', icon: FileText, path: '/orders' },
+  { label: 'Notifications', icon: Bell, path: '/settings/notifications', badge: 3 },
+  { label: 'Notes', icon: FileText, path: '/notes' },
+  { label: 'Achievements', icon: Trophy, path: '/achievements' },
+  { label: 'Settings', icon: Settings, path: '/settings', active: true },
+  { label: 'Help & Support', icon: HelpCircle, path: '/contact' },
+];
+
+const SETTINGS_NAV = [
+  { label: 'Profile', path: '/profile', active: true },
+  { label: 'Security', path: '/settings/security' },
+  { label: 'Notifications', path: '/settings/notifications' },
+  { label: 'Privacy & Data', path: '/settings/privacy' },
+  { label: 'Language', path: '/settings/language' },
+  { label: 'Refer & Earn', path: '/settings/refer' },
+];
 
 export default function Profile() {
-  const { user, updateProfile, logout } = useAuth();
   const { isDark } = useTheme();
+  const { user, logout, updateProfile } = useAuth();
   const navigate = useNavigate();
-  const [editing, setEditing] = useState(false);
-  const [form, setForm] = useState({ name: user?.name || '', email: user?.email || '' });
+  const fileInputRef = useRef(null);
+
+  const [form, setForm] = useState({
+    name: user?.name || 'Shailendra Ahirwar',
+    email: user?.email || 'shailendra@example.com',
+    phone: '+91 98765 43210',
+    dob: '1995-08-15',
+    gender: 'Male',
+    country: 'India',
+    bio: 'AI Enthusiast | Lifelong Learner | Passionate about building intelligent solutions and sharing knowledge.',
+    profession: 'Software Developer',
+    organization: 'Tech Solutions Pvt. Ltd.',
+  });
+
+  const [avatarSrc, setAvatarSrc] = useState(user?.avatar || null);
+  const bioMax = 200;
 
   if (!user) {
     return (
       <div style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '20px', padding: '24px', textAlign: 'center' }}>
-        <div style={{ width: '64px', height: '64px', borderRadius: '18px', background: 'rgba(59,130,246,.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Lock size={32} color="#3b82f6" />
-        </div>
-        <h2 style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 700 }}>Sign in to view your profile</h2>
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <button onClick={() => navigate('/login')} style={{ padding: '10px 24px', borderRadius: '12px', background: 'linear-gradient(135deg,#3b82f6,#06b6d4)', color: '#fff', fontWeight: 600, border: 'none', cursor: 'pointer', fontSize: '0.875rem' }}>Sign In</button>
-          <button onClick={() => navigate('/register')} style={{ padding: '10px 24px', borderRadius: '12px', background: 'var(--bg-glass)', color: 'var(--text-secondary)', border: '1px solid var(--border-muted)', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 600 }}>Register</button>
-        </div>
+        <Lock size={40} color="#4f46e5" />
+        <h2 style={{ color: 'var(--text-primary)', fontWeight: 700 }}>Sign in to view your profile</h2>
+        <button onClick={() => navigate('/login')} style={{ padding: '10px 24px', borderRadius: '8px', background: '#4f46e5', color: '#fff', fontWeight: 700, border: 'none', cursor: 'pointer' }}>Sign In</button>
       </div>
     );
   }
 
-  const enrolledCourses = courses.filter((c) => user.enrolledCourses?.includes(c.id));
-  const progressMap = { [courses[0]?.id]: 65, [courses[1]?.id]: 32, [courses[2]?.id]: 88 };
+  const handleChange = (field, value) => setForm((prev) => ({ ...prev, [field]: value }));
 
-  const handleSave = () => { updateProfile(form); setEditing(false); toast.success('Profile updated!'); };
-  const handleCancel = () => { setForm({ name: user.name, email: user.email }); setEditing(false); };
+  const handleAvatarUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => setAvatarSrc(ev.target.result);
+    reader.readAsDataURL(file);
+    toast.success('Profile photo updated!');
+  };
 
-  // Theme-aware styles
-  const cardBg     = isDark ? 'var(--bg-card)' : '#ffffff';
-  const cardBorder = isDark ? '1px solid var(--border-subtle)' : '1px solid rgba(59,130,246,.25)';
-  const cardShadow = isDark ? '0 8px 32px rgba(0,0,0,.4)' : '0 4px 20px rgba(15,23,42,.06), 0 1px 3px rgba(0,0,0,.04)';
-  const itemBg     = isDark ? 'rgba(255,255,255,.03)' : 'rgba(59,130,246,.04)';
-  const itemBorder = isDark ? '1px solid rgba(255,255,255,.06)' : '1px solid rgba(59,130,246,.12)';
-  const textHeading = isDark ? '#ffffff' : '#0f172a';
-  const textSubHead = isDark ? '#60a5fa' : '#1d4ed8';
+  const handleSave = () => {
+    updateProfile?.({ name: form.name, email: form.email });
+    toast.success('Profile updated successfully!');
+  };
+
+  const card = {
+    background: isDark ? '#0f172a' : '#ffffff',
+    border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#eaecf0'}`,
+    borderRadius: '16px',
+    boxShadow: '0 1px 3px rgba(16,24,40,0.04)',
+  };
+
+  const inputStyle = {
+    width: '100%', boxSizing: 'border-box',
+    padding: '10px 14px', borderRadius: '8px',
+    border: `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : '#d0d5dd'}`,
+    background: isDark ? 'rgba(255,255,255,0.04)' : '#ffffff',
+    color: 'var(--text-primary)', fontSize: '0.86rem',
+    outline: 'none', transition: 'border-color 0.15s',
+  };
+
+  const labelStyle = {
+    fontSize: '0.82rem', fontWeight: 600,
+    color: isDark ? '#94a3b8' : '#344054',
+    display: 'block', marginBottom: '6px',
+  };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', padding: '24px 20px 60px', boxSizing: 'border-box', width: '100%', overflowX: 'hidden', transition: 'background 0.25s ease' }}>
+    <PageWrapper>
+      <div style={{ maxWidth: '1360px', margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
-      {/* BANNER */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        style={{
-          position: 'relative',
-          borderRadius: '20px',
-          overflow: 'hidden',
-          marginBottom: '20px',
-          background: cardBg,
-          border: cardBorder,
-          boxShadow: cardShadow,
-          width: '100%',
-        }}
-      >
-        <div style={{
-          position: 'absolute', top: 0, left: 0, right: 0, height: '120px',
-          background: isDark
-            ? 'linear-gradient(135deg, #0f1e45, #1a1040, #0a2245, #081830)'
-            : 'linear-gradient(135deg, #1e3a8a, #2563eb, #0284c7)',
-        }} />
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '120px', backgroundImage: 'linear-gradient(rgba(255,255,255,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px)', backgroundSize: '40px 40px', opacity: 0.6 }} />
-        <div style={{ position: 'absolute', width: '180px', height: '180px', top: '-50px', right: '8%', background: 'radial-gradient(circle, rgba(255,255,255,.25), transparent 70%)', borderRadius: '50%', pointerEvents: 'none' }} />
-
-        <div style={{ position: 'relative', zIndex: 2, padding: '72px 24px 24px', display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: '16px' }}>
-          <div style={{ position: 'relative', flexShrink: 0 }}>
-            <div style={{ width: '88px', height: '88px', borderRadius: '18px', overflow: 'hidden', border: '3px solid #3b82f6', boxShadow: '0 8px 20px rgba(0,0,0,.3)' }}>
-              <img src={user.avatar} alt={user.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-            </div>
-            <button style={{ position: 'absolute', bottom: '-8px', right: '-8px', width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg,#3b82f6,#06b6d4)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', boxShadow: '0 4px 8px rgba(0,0,0,.3)' }}>
-              <Camera size={12} />
-            </button>
-          </div>
-
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <h1 style={{ color: textHeading, fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 800, letterSpacing: '-0.02em', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {user.name}
-            </h1>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', margin: '2px 0 0' }}>{user.email}</p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '8px' }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '5px', color: 'var(--text-muted)', fontSize: '0.72rem', fontWeight: 500 }}>
-                <Calendar size={11} /> Joined {user.joinedAt}
-              </span>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: isDark ? 'rgba(59,130,246,.2)' : 'rgba(59,130,246,.12)', color: isDark ? '#93c5fd' : '#1d4ed8', border: '1px solid rgba(59,130,246,.3)', borderRadius: '999px', padding: '2px 10px', fontSize: '0.72rem', fontWeight: 700, textTransform: 'capitalize' }}>
-                <User size={10} /> {user.role}
-              </span>
-            </div>
-          </div>
-
-          <button
-            onClick={() => setEditing(!editing)}
-            style={{
-              flexShrink: 0,
-              display: 'flex', alignItems: 'center', gap: '6px',
-              padding: '8px 18px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 700,
-              background: editing ? 'linear-gradient(135deg,#3b82f6,#06b6d4)' : (isDark ? 'rgba(255,255,255,.1)' : 'rgba(59,130,246,.1)'),
-              color: editing ? '#fff' : (isDark ? '#fff' : '#1d4ed8'),
-              border: editing ? 'none' : (isDark ? '1px solid rgba(255,255,255,.2)' : '1px solid rgba(59,130,246,.3)'),
-              cursor: 'pointer',
-              boxShadow: editing ? '0 4px 14px rgba(59,130,246,.3)' : 'none',
-            }}
-          >
-            <Edit3 size={13} /> {editing ? 'Editing…' : 'Edit Profile'}
-          </button>
+        {/* Breadcrumb */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+          <Link to="/" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>Home</Link>
+          <ChevronRight size={13} color="#98a2b3" />
+          <Link to="/settings" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>Settings</Link>
+          <ChevronRight size={13} color="#98a2b3" />
+          <span style={{ color: '#4f46e5', fontWeight: 600 }}>Profile Information</span>
         </div>
-      </motion.div>
 
-      {/* TWO-COLUMN GRID */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'minmax(0, 1fr) 280px',
-        gap: '20px',
-        alignItems: 'start',
-        width: '100%',
-      }}>
+        {/* 3-Column Layout */}
+        <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr 280px', gap: '24px', alignItems: 'start' }}>
 
-        {/* LEFT COLUMN */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', minWidth: 0 }}>
+          {/* LEFT SIDEBAR */}
+          <div style={{ ...card, padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+              {SIDEBAR_MENU.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link key={item.label} to={item.path} style={{
+                    display: 'flex', alignItems: 'center', gap: '10px',
+                    padding: '10px 12px', borderRadius: '10px', fontSize: '0.82rem',
+                    fontWeight: item.active ? 700 : 500,
+                    color: item.active ? '#4f46e5' : (isDark ? '#cbd5e1' : '#475467'),
+                    background: item.active ? (isDark ? 'rgba(79,70,229,0.15)' : '#f5f3ff') : 'transparent',
+                    textDecoration: 'none', transition: 'all 0.15s ease',
+                  }}>
+                    <Icon size={16} color={item.active ? '#4f46e5' : (isDark ? '#94a3b8' : '#667085')} />
+                    <span>{item.label}</span>
+                    {item.badge && (
+                      <span style={{ marginLeft: 'auto', background: '#ef4444', color: '#fff', fontSize: '0.62rem', fontWeight: 700, borderRadius: '999px', padding: '1px 5px' }}>{item.badge}</span>
+                    )}
+                  </Link>
+                );
+              })}
+              <button onClick={() => { logout(); navigate('/login'); }} style={{
+                display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '10px',
+                fontSize: '0.82rem', fontWeight: 500, color: '#ef4444', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left',
+              }}>
+                <LogOut size={16} /><span>Logout</span>
+              </button>
+            </div>
 
-          {/* Personal Info */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            style={{ background: cardBg, border: cardBorder, borderRadius: '18px', padding: '20px', boxShadow: cardShadow }}
-          >
-            <h2 style={{ color: textHeading, fontWeight: 800, fontSize: '0.9rem', marginBottom: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ display: 'flex', width: '28px', height: '28px', borderRadius: '9px', background: isDark ? 'rgba(59,130,246,.15)' : 'rgba(59,130,246,.12)', alignItems: 'center', justifyContent: 'center' }}>
-                <User size={14} color="#3b82f6" />
-              </span>
-              Personal Information
-            </h2>
+            {/* Go Premium */}
+            <div style={{
+              background: isDark ? 'linear-gradient(135deg,#1e1b4b,#311b92)' : 'linear-gradient(135deg,#f5f3ff,#ede9fe)',
+              border: `1px solid ${isDark ? 'rgba(99,102,241,0.3)' : '#ddd6fe'}`,
+              borderRadius: '14px', padding: '18px 14px',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '10px',
+            }}>
+              <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: '#fff', boxShadow: '0 4px 12px rgba(79,70,229,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Trophy size={22} color="#4f46e5" />
+              </div>
+              <div>
+                <h4 style={{ color: isDark ? '#fff' : '#1e1b4b', fontSize: '0.85rem', fontWeight: 800, margin: '0 0 4px' }}>Go Premium!</h4>
+                <p style={{ color: isDark ? '#cbd5e1' : '#5b21b6', fontSize: '0.72rem', lineHeight: 1.4, margin: 0 }}>Unlock unlimited access to all courses, live classes and premium resources.</p>
+              </div>
+              <button onClick={() => navigate('/subscription')} style={{
+                width: '100%', padding: '9px 14px', borderRadius: '8px',
+                background: 'linear-gradient(135deg,#4f46e5,#6366f1)', color: '#fff',
+                fontSize: '0.78rem', fontWeight: 700, border: 'none', cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(79,70,229,0.3)',
+              }}>Upgrade Now</button>
+            </div>
+          </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', gap: '14px' }}>
-              {[
-                { icon: User, label: 'Full Name',      field: 'name',  type: 'text',  ph: 'Your name' },
-                { icon: Mail, label: 'Email Address',  field: 'email', type: 'email', ph: 'you@email.com' },
-              ].map(({ icon: Icon, label, field, type, ph }) => (
-                <div key={field} style={{ minWidth: 0 }}>
-                  <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: '8px' }}>
-                    {label}
-                  </label>
-                  <div style={{ position: 'relative' }}>
-                    <Icon size={14} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: editing ? '#3b82f6' : 'var(--text-muted)', pointerEvents: 'none' }} />
-                    <input
-                      type={type}
-                      value={form[field]}
-                      onChange={(e) => setForm((p) => ({ ...p, [field]: e.target.value }))}
-                      disabled={!editing}
-                      placeholder={ph}
+          {/* CENTER — Main Form */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+            <div style={{ marginBottom: '16px' }}>
+              <h1 style={{ color: 'var(--text-primary)', fontSize: '1.6rem', fontWeight: 800, margin: '0 0 4px', letterSpacing: '-0.02em' }}>Profile Information</h1>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.86rem', margin: 0 }}>Update your personal details and profile picture.</p>
+            </div>
+
+            <div style={{ ...card, padding: '28px' }}>
+
+              {/* Profile Picture Section */}
+              <div style={{
+                marginBottom: '28px',
+                paddingBottom: '24px',
+                borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : '#f2f4f7'}`,
+              }}>
+                <h3 style={{ color: 'var(--text-primary)', fontSize: '0.95rem', fontWeight: 700, margin: '0 0 18px' }}>Profile Picture</h3>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+                  {/* Avatar */}
+                  <div style={{ position: 'relative', flexShrink: 0 }}>
+                    <div style={{
+                      width: '90px', height: '90px', borderRadius: '50%',
+                      border: `3px solid ${isDark ? 'rgba(255,255,255,0.12)' : '#eaecf0'}`,
+                      overflow: 'hidden', background: isDark ? '#1e293b' : '#f2f4f7',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      {avatarSrc ? (
+                        <img src={avatarSrc} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ) : (
+                        <span style={{ fontSize: '2.2rem', fontWeight: 800, color: '#4f46e5' }}>
+                          {form.name?.[0]?.toUpperCase() || 'U'}
+                        </span>
+                      )}
+                    </div>
+                    {/* Camera icon overlay */}
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
                       style={{
-                        width: '100%', boxSizing: 'border-box',
-                        paddingLeft: '36px', paddingRight: '12px', paddingTop: '10px', paddingBottom: '10px',
-                        borderRadius: '12px', fontSize: '0.82rem', outline: 'none', fontWeight: 600,
-                        background: editing
-                          ? (isDark ? 'rgba(59,130,246,.08)' : '#f0f4ff')
-                          : 'var(--bg-input)',
-                        border: `1px solid ${editing ? 'var(--brand-blue)' : 'var(--border-muted)'}`,
-                        color: 'var(--text-primary)',
-                        cursor: editing ? 'text' : 'default',
-                        transition: 'all 0.15s ease',
-                      }}
+                        position: 'absolute', bottom: '2px', right: '2px',
+                        width: '26px', height: '26px', borderRadius: '50%',
+                        background: '#4f46e5', color: '#fff', border: '2px solid #fff',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                      }}>
+                      <Camera size={12} />
+                    </button>
+                    <input type="file" ref={fileInputRef} accept="image/*" onChange={handleAvatarUpload} style={{ display: 'none' }} />
+                  </div>
+
+                  {/* Upload / Remove buttons */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.78rem', margin: 0 }}>JPG, PNG or GIF. Max size of 2MB.</p>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <button
+                        onClick={() => fileInputRef.current?.click()}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: '6px',
+                          padding: '8px 16px', borderRadius: '8px',
+                          background: 'transparent', border: `1px solid ${isDark ? 'rgba(255,255,255,0.15)' : '#d0d5dd'}`,
+                          color: 'var(--text-primary)', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer',
+                        }}>
+                        <Upload size={14} /> Upload New
+                      </button>
+                      <button
+                        onClick={() => { setAvatarSrc(null); toast.success('Profile photo removed!'); }}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: '6px',
+                          padding: '8px 16px', borderRadius: '8px',
+                          background: 'transparent', border: '1px solid #fca5a5',
+                          color: '#ef4444', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer',
+                        }}>
+                        <Trash2 size={14} /> Remove
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Form Fields */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+
+                {/* Row 1: Full Name + Email */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div>
+                    <label style={labelStyle}>Full Name</label>
+                    <input
+                      type="text"
+                      value={form.name}
+                      onChange={(e) => handleChange('name', e.target.value)}
+                      placeholder="Shailendra Ahirwar"
+                      style={inputStyle}
+                      onFocus={(e) => e.target.style.borderColor = '#4f46e5'}
+                      onBlur={(e) => e.target.style.borderColor = isDark ? 'rgba(255,255,255,0.12)' : '#d0d5dd'}
+                    />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Email Address</label>
+                    <input
+                      type="email"
+                      value={form.email}
+                      onChange={(e) => handleChange('email', e.target.value)}
+                      placeholder="shailendra@example.com"
+                      style={{ ...inputStyle, color: isDark ? '#94a3b8' : '#667085' }}
+                      onFocus={(e) => e.target.style.borderColor = '#4f46e5'}
+                      onBlur={(e) => e.target.style.borderColor = isDark ? 'rgba(255,255,255,0.12)' : '#d0d5dd'}
                     />
                   </div>
                 </div>
+
+                {/* Row 2: Phone + DOB */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div>
+                    <label style={labelStyle}>Phone Number</label>
+                    <input
+                      type="tel"
+                      value={form.phone}
+                      onChange={(e) => handleChange('phone', e.target.value)}
+                      placeholder="+91 98765 43210"
+                      style={inputStyle}
+                      onFocus={(e) => e.target.style.borderColor = '#4f46e5'}
+                      onBlur={(e) => e.target.style.borderColor = isDark ? 'rgba(255,255,255,0.12)' : '#d0d5dd'}
+                    />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Date of Birth</label>
+                    <input
+                      type="date"
+                      value={form.dob}
+                      onChange={(e) => handleChange('dob', e.target.value)}
+                      style={inputStyle}
+                      onFocus={(e) => e.target.style.borderColor = '#4f46e5'}
+                      onBlur={(e) => e.target.style.borderColor = isDark ? 'rgba(255,255,255,0.12)' : '#d0d5dd'}
+                    />
+                  </div>
+                </div>
+
+                {/* Row 3: Gender + Country */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div>
+                    <label style={labelStyle}>Gender</label>
+                    <div style={{ position: 'relative' }}>
+                      <select
+                        value={form.gender}
+                        onChange={(e) => handleChange('gender', e.target.value)}
+                        style={{ ...inputStyle, appearance: 'none', paddingRight: '36px', cursor: 'pointer' }}
+                        onFocus={(e) => e.target.style.borderColor = '#4f46e5'}
+                        onBlur={(e) => e.target.style.borderColor = isDark ? 'rgba(255,255,255,0.12)' : '#d0d5dd'}
+                      >
+                        <option>Male</option>
+                        <option>Female</option>
+                        <option>Non-Binary</option>
+                        <option>Prefer not to say</option>
+                      </select>
+                      <ChevronRight size={15} color="#667085" style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%) rotate(90deg)', pointerEvents: 'none' }} />
+                    </div>
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Country</label>
+                    <div style={{ position: 'relative' }}>
+                      <select
+                        value={form.country}
+                        onChange={(e) => handleChange('country', e.target.value)}
+                        style={{ ...inputStyle, appearance: 'none', paddingRight: '36px', cursor: 'pointer' }}
+                        onFocus={(e) => e.target.style.borderColor = '#4f46e5'}
+                        onBlur={(e) => e.target.style.borderColor = isDark ? 'rgba(255,255,255,0.12)' : '#d0d5dd'}
+                      >
+                        {['India', 'United States', 'United Kingdom', 'Canada', 'Australia', 'Germany', 'France', 'Singapore', 'UAE'].map(c => (
+                          <option key={c}>{c}</option>
+                        ))}
+                      </select>
+                      <ChevronRight size={15} color="#667085" style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%) rotate(90deg)', pointerEvents: 'none' }} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bio */}
+                <div>
+                  <label style={labelStyle}>Bio</label>
+                  <div style={{ position: 'relative' }}>
+                    <textarea
+                      value={form.bio}
+                      onChange={(e) => {
+                        if (e.target.value.length <= bioMax) handleChange('bio', e.target.value);
+                      }}
+                      rows={4}
+                      placeholder="Tell us about yourself..."
+                      style={{
+                        ...inputStyle,
+                        resize: 'vertical', lineHeight: 1.6,
+                        minHeight: '100px', fontFamily: 'inherit',
+                      }}
+                      onFocus={(e) => e.target.style.borderColor = '#4f46e5'}
+                      onBlur={(e) => e.target.style.borderColor = isDark ? 'rgba(255,255,255,0.12)' : '#d0d5dd'}
+                    />
+                    <span style={{
+                      position: 'absolute', bottom: '10px', right: '12px',
+                      fontSize: '0.72rem', color: 'var(--text-muted)',
+                    }}>{form.bio.length}/{bioMax}</span>
+                  </div>
+                </div>
+
+                {/* Row 4: Profession + Organization */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div>
+                    <label style={labelStyle}>Current Profession</label>
+                    <input
+                      type="text"
+                      value={form.profession}
+                      onChange={(e) => handleChange('profession', e.target.value)}
+                      placeholder="Software Developer"
+                      style={inputStyle}
+                      onFocus={(e) => e.target.style.borderColor = '#4f46e5'}
+                      onBlur={(e) => e.target.style.borderColor = isDark ? 'rgba(255,255,255,0.12)' : '#d0d5dd'}
+                    />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Organization (Optional)</label>
+                    <input
+                      type="text"
+                      value={form.organization}
+                      onChange={(e) => handleChange('organization', e.target.value)}
+                      placeholder="Company / Institution"
+                      style={inputStyle}
+                      onFocus={(e) => e.target.style.borderColor = '#4f46e5'}
+                      onBlur={(e) => e.target.style.borderColor = isDark ? 'rgba(255,255,255,0.12)' : '#d0d5dd'}
+                    />
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div style={{
+                  display: 'flex', justifyContent: 'flex-end', gap: '12px',
+                  paddingTop: '20px', borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : '#f2f4f7'}`,
+                  marginTop: '4px',
+                }}>
+                  <button
+                    onClick={() => {
+                      setForm({
+                        name: user?.name || 'Shailendra Ahirwar',
+                        email: user?.email || 'shailendra@example.com',
+                        phone: '+91 98765 43210', dob: '1995-08-15',
+                        gender: 'Male', country: 'India',
+                        bio: 'AI Enthusiast | Lifelong Learner | Passionate about building intelligent solutions and sharing knowledge.',
+                        profession: 'Software Developer', organization: 'Tech Solutions Pvt. Ltd.',
+                      });
+                      toast('Changes discarded', { icon: '↩️' });
+                    }}
+                    style={{
+                      padding: '10px 24px', borderRadius: '8px',
+                      background: 'transparent', border: `1px solid ${isDark ? 'rgba(255,255,255,0.15)' : '#d0d5dd'}`,
+                      color: 'var(--text-primary)', fontSize: '0.86rem', fontWeight: 600, cursor: 'pointer',
+                    }}>
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSave}
+                    style={{
+                      padding: '10px 24px', borderRadius: '8px',
+                      background: 'linear-gradient(135deg,#4f46e5,#6366f1)', color: '#fff',
+                      fontSize: '0.86rem', fontWeight: 700, border: 'none', cursor: 'pointer',
+                      boxShadow: '0 4px 12px rgba(79,70,229,0.3)',
+                    }}>
+                    Save Changes
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT PANEL */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {/* Settings sub-nav */}
+            <div style={{ ...card, padding: '16px 14px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <h4 style={{ color: 'var(--text-muted)', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', margin: '0 0 8px 2px' }}>SETTINGS</h4>
+              {SETTINGS_NAV.map((item) => (
+                <Link key={item.path} to={item.path} style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  padding: '9px 12px', borderRadius: '8px', fontSize: '0.83rem',
+                  fontWeight: item.active ? 700 : 500,
+                  color: item.active ? '#4f46e5' : (isDark ? '#cbd5e1' : '#475467'),
+                  background: item.active ? (isDark ? 'rgba(79,70,229,0.12)' : '#f5f3ff') : 'transparent',
+                  textDecoration: 'none', transition: 'all 0.15s',
+                }}>
+                  <span>{item.label}</span>
+                  <ChevronRight size={14} color={item.active ? '#4f46e5' : '#98a2b3'} />
+                </Link>
               ))}
             </div>
 
-            {editing && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ display: 'flex', gap: '10px', marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--border-subtle)' }}>
-                <button onClick={handleSave} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 20px', borderRadius: '10px', background: 'linear-gradient(135deg,#3b82f6,#06b6d4)', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '0.8rem', boxShadow: '0 4px 12px rgba(59,130,246,.3)' }}>
-                  <Save size={13} /> Save Changes
-                </button>
-                <button onClick={handleCancel} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 20px', borderRadius: '10px', background: isDark ? 'rgba(255,255,255,.06)' : 'rgba(59,130,246,.08)', color: 'var(--text-secondary)', border: '1px solid var(--border-subtle)', cursor: 'pointer', fontWeight: 600, fontSize: '0.8rem' }}>
-                  <X size={13} /> Cancel
-                </button>
-              </motion.div>
-            )}
-          </motion.div>
-
-          {/* Enrolled Courses */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.18 }}
-            style={{ background: cardBg, border: cardBorder, borderRadius: '18px', padding: '20px', minWidth: 0, boxShadow: cardShadow }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <h2 style={{ color: textHeading, fontWeight: 800, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
-                <span style={{ display: 'flex', width: '28px', height: '28px', borderRadius: '9px', background: isDark ? 'rgba(59,130,246,.15)' : 'rgba(59,130,246,.12)', alignItems: 'center', justifyContent: 'center' }}>
-                  <BookOpen size={14} color="#3b82f6" />
-                </span>
-                Enrolled Courses
-              </h2>
-              <span style={{ background: isDark ? 'rgba(59,130,246,.15)' : 'rgba(59,130,246,.12)', border: '1px solid rgba(59,130,246,.25)', color: textSubHead, borderRadius: '999px', padding: '3px 12px', fontSize: '0.72rem', fontWeight: 700 }}>
-                {enrolledCourses.length} Courses
-              </span>
+            {/* Profile completion */}
+            <div style={{ ...card, padding: '16px' }}>
+              <h4 style={{ color: 'var(--text-primary)', fontSize: '0.88rem', fontWeight: 700, margin: '0 0 12px' }}>Profile Completion</h4>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>80% Complete</span>
+                <span style={{ fontSize: '0.76rem', color: '#4f46e5', fontWeight: 700 }}>80%</span>
+              </div>
+              <div style={{ width: '100%', height: '6px', borderRadius: '999px', background: isDark ? 'rgba(255,255,255,0.08)' : '#e2e8f0', overflow: 'hidden' }}>
+                <div style={{ width: '80%', height: '100%', background: 'linear-gradient(90deg,#4f46e5,#6366f1)', borderRadius: '999px' }} />
+              </div>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.74rem', margin: '10px 0 0', lineHeight: 1.5 }}>Add a bio and organization to complete your profile.</p>
             </div>
-
-            {enrolledCourses.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '40px 0' }}>
-                <BookOpen size={36} color="var(--text-muted)" style={{ marginBottom: '12px' }} />
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '16px' }}>No courses enrolled yet</p>
-                <Link to="/courses" style={{ padding: '9px 22px', borderRadius: '10px', background: 'linear-gradient(135deg,#3b82f6,#06b6d4)', color: '#fff', fontWeight: 700, fontSize: '0.8rem', display: 'inline-block', textDecoration: 'none' }}>
-                  Browse Courses
-                </Link>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {enrolledCourses.map((course) => {
-                  const prog = progressMap[course.id] ?? 50;
-                  return (
-                    <Link
-                      to={`/courses/${course.slug}`}
-                      key={course.id}
-                      style={{
-                        display: 'flex', alignItems: 'center', gap: '12px',
-                        padding: '12px', borderRadius: '14px', textDecoration: 'none',
-                        background: itemBg, border: itemBorder,
-                        transition: 'all 0.18s ease',
-                        overflow: 'hidden',
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = isDark ? 'rgba(255,255,255,.06)' : 'rgba(59,130,246,.08)';
-                        e.currentTarget.style.transform = 'translateY(-2px)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = itemBg;
-                        e.currentTarget.style.transform = 'translateY(0)';
-                      }}
-                    >
-                      <div style={{ width: '52px', height: '38px', borderRadius: '10px', overflow: 'hidden', flexShrink: 0 }}>
-                        <img src={course.thumbnail} alt={course.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                      </div>
-
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ color: textHeading, fontWeight: 700, fontSize: '0.82rem', margin: '0 0 3px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {course.title}
-                        </p>
-                        <p style={{ color: 'var(--text-muted)', fontSize: '0.7rem', margin: '0 0 8px' }}>{course.category}</p>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <ProgressBar value={prog} isDark={isDark} />
-                          <span style={{ color: prog >= 70 ? (isDark ? '#34d399' : '#059669') : textSubHead, fontSize: '0.72rem', fontWeight: 700, flexShrink: 0, minWidth: '30px', textAlign: 'right' }}>
-                            {prog}%
-                          </span>
-                        </div>
-                      </div>
-
-                      <div style={{ flexShrink: 0, textAlign: 'right' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-muted)', fontSize: '0.7rem', justifyContent: 'flex-end' }}>
-                          <Clock size={10} /> {course.duration}
-                        </div>
-                        <span style={{ display: 'inline-block', marginTop: '6px', padding: '2px 9px', borderRadius: '999px', fontSize: '0.65rem', fontWeight: 700, background: prog >= 70 ? (isDark ? 'rgba(16,185,129,.15)' : 'rgba(16,185,129,.12)') : (isDark ? 'rgba(59,130,246,.12)' : 'rgba(59,130,246,.1)'), color: prog >= 70 ? (isDark ? '#34d399' : '#047857') : textSubHead }}>
-                          {prog >= 100 ? 'Done' : prog >= 70 ? 'Almost!' : 'In Progress'}
-                        </span>
-                      </div>
-                    </Link>
-                  );
-                })}
-
-                <Link
-                  to="/my-learning"
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '10px', borderRadius: '12px', border: cardBorder, color: textSubHead, fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none', marginTop: '4px' }}
-                >
-                  View All Courses <ChevronRight size={13} />
-                </Link>
-              </div>
-            )}
-          </motion.div>
-
-          {/* Achievements */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25 }}
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: '12px' }}
-          >
-            {[
-              { icon: Trophy, label: 'Top Learner',  sub: 'This Month',   color: '#f59e0b' },
-              { icon: Flame,  label: '7 Day Streak', sub: 'Keep Going!',  color: '#ef4444' },
-              { icon: Star,   label: '4.9 Rating',   sub: 'From Reviews', color: '#8b5cf6' },
-            ].map(({ icon: BIcon, label, sub, color }) => (
-              <div key={label} style={{ background: cardBg, border: cardBorder, borderRadius: '18px', padding: '16px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', boxShadow: cardShadow }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: `${color}18`, border: `1.5px solid ${color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <BIcon size={20} style={{ color }} />
-                </div>
-                <p style={{ color: textHeading, fontWeight: 800, fontSize: '0.8rem', margin: 0 }}>{label}</p>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.7rem', margin: 0 }}>{sub}</p>
-              </div>
-            ))}
-          </motion.div>
+          </div>
         </div>
 
-        {/* RIGHT COLUMN */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '280px', flexShrink: 0 }}>
-
-          {/* Stats */}
-          <motion.div
-            initial={{ opacity: 0, x: 16 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.15 }}
-            style={{ background: cardBg, border: cardBorder, borderRadius: '18px', padding: '18px', boxShadow: cardShadow }}
-          >
-            <h3 style={{ color: textHeading, fontWeight: 800, fontSize: '0.85rem', margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: '7px' }}>
-              <BarChart3 size={15} color="#3b82f6" /> My Stats
-            </h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {[
-                { icon: BookOpen, label: 'Enrolled',     value: user.enrolledCourses?.length || 0, color: '#3b82f6' },
-                { icon: Award,    label: 'Certificates', value: user.certificates?.length || 0,    color: '#f59e0b' },
-                { icon: Heart,    label: 'Wishlist',     value: user.wishlist?.length || 0,         color: '#ef4444' },
-                { icon: Star,     label: 'Avg Rating',   value: '4.9',                              color: '#8b5cf6' },
-              ].map(({ icon: Icon, label, value, color }) => (
-                <div key={label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderRadius: '12px', background: itemBg, border: itemBorder }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <div style={{ width: '32px', height: '32px', borderRadius: '9px', background: `${color}18`, border: `1px solid ${color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <Icon size={14} style={{ color }} />
-                    </div>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 600 }}>{label}</span>
-                  </div>
-                  <span style={{ color: textHeading, fontWeight: 800, fontSize: '1rem' }}>{value}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Quick Links */}
-          <motion.div
-            initial={{ opacity: 0, x: 16 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.22 }}
-            style={{ background: cardBg, border: cardBorder, borderRadius: '18px', padding: '18px', boxShadow: cardShadow }}
-          >
-            <h3 style={{ color: textHeading, fontWeight: 800, fontSize: '0.85rem', margin: '0 0 12px' }}>Quick Links</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              {[
-                { icon: BookOpen,         label: 'My Learning',  to: '/my-learning',  color: '#3b82f6' },
-                { icon: Heart,            label: 'Wishlist',     to: '/wishlist',     color: '#ef4444' },
-                { icon: Award,            label: 'Certificates', to: '/certificates', color: '#f59e0b' },
-                { icon: LayoutDashboard,  label: 'Dashboard',    to: '/dashboard',    color: '#06b6d4' },
-                { icon: ClipboardList,    label: 'Assignments',  to: '/assignments',  color: '#8b5cf6' },
-              ].map(({ icon: QIcon, label, to, color }) => (
-                <Link
-                  key={label}
-                  to={to}
-                  style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 10px', borderRadius: '10px', textDecoration: 'none', color: 'var(--text-secondary)', fontSize: '0.8rem', fontWeight: 600, transition: 'background 0.12s' }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = isDark ? 'rgba(255,255,255,.06)' : 'rgba(59,130,246,.08)';
-                    e.currentTarget.style.color = textSubHead;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'transparent';
-                    e.currentTarget.style.color = 'var(--text-secondary)';
-                  }}
-                >
-                  <span style={{ width: '28px', height: '28px', borderRadius: '8px', background: `${color}15`, border: `1px solid ${color}25`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <QIcon size={14} style={{ color }} />
-                  </span>
-                  {label}
-                </Link>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Sign Out */}
-          <motion.div
-            initial={{ opacity: 0, x: 16 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.29 }}
-            style={{
-              background: isDark ? 'rgba(239,68,68,.05)' : 'rgba(239,68,68,.04)',
-              border: isDark ? '1px solid rgba(239,68,68,.18)' : '1px solid rgba(239,68,68,.25)',
-              borderRadius: '18px', padding: '18px', boxShadow: cardShadow,
-            }}
-          >
-            <h3 style={{ color: '#ef4444', fontWeight: 800, fontSize: '0.85rem', margin: '0 0 12px' }}>Account</h3>
-            <button
-              onClick={() => { logout(); navigate('/'); toast.success('Signed out successfully'); }}
-              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '10px', borderRadius: '12px', background: 'linear-gradient(135deg,#dc2626,#b91c1c)', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '0.825rem', boxShadow: '0 4px 12px rgba(220,38,38,.25)' }}
-            >
-              <LogOut size={14} /> Sign Out
-            </button>
-          </motion.div>
+        {/* Floating chat */}
+        <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 50 }}>
+          <button onClick={() => toast.success('Chat assistant coming soon!')} style={{
+            width: '48px', height: '48px', borderRadius: '50%',
+            background: 'linear-gradient(135deg,#4f46e5,#6366f1)', color: '#fff',
+            border: 'none', boxShadow: '0 6px 20px rgba(79,70,229,0.4)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+          }}>
+            <MessageCircle size={22} />
+          </button>
         </div>
       </div>
-    </div>
+    </PageWrapper>
   );
 }

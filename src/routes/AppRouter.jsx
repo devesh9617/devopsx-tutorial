@@ -46,6 +46,20 @@ const InvoiceDetails = lazy(() => import('../pages/InvoiceDetails/index'));
 const ReturnsRefunds = lazy(() => import('../pages/ReturnsRefunds/index'));
 const RefundDetails = lazy(() => import('../pages/RefundDetails/index'));
 const RequestRefund = lazy(() => import('../pages/RequestRefund/index'));
+const SecuritySettings = lazy(() => import('../pages/Settings/Security/index'));
+const NotificationSettings = lazy(() => import('../pages/Settings/Notifications/index'));
+const ReferEarn = lazy(() => import('../pages/Settings/ReferEarn/index'));
+const PrivacyData = lazy(() => import('../pages/Settings/Privacy/index'));
+const LanguageSettings = lazy(() => import('../pages/Settings/Language/index'));
+const SettingsHome = lazy(() => import('../pages/Settings/index'));
+const PaymentMethods = lazy(() => import('../pages/Settings/Payment/index'));
+const DownloadSettings = lazy(() => import('../pages/Settings/Downloads/index'));
+const AppearanceSettings = lazy(() => import('../pages/Settings/Appearance/index'));
+const ChangePassword = lazy(() => import('../pages/Settings/ChangePassword/index'));
+const ResetPassword = lazy(() => import('../pages/ResetPassword/index'));
+const ResetPasswordSuccess = lazy(() => import('../pages/ResetPasswordSuccess/index'));
+const ForgotPasswordSuccess = lazy(() => import('../pages/ForgotPasswordSuccess/index'));
+const ForgotPassword = lazy(() => import('../pages/ForgotPassword/index'));
 
 // Wrapper that renders MainLayout with Outlet for nested routes
 function LayoutWrapper() {
@@ -110,6 +124,23 @@ export default function AppRouter() {
           <Route path="/orders/:id/tracking" element={<OrderTracking />} />
           <Route path="/orders/:id/refund" element={<RequestRefund />} />
           <Route path="/orders/:id" element={<OrderDetails />} />
+          <Route path="/settings" element={<SettingsHome />} />
+          <Route path="/settings/security" element={<SecuritySettings />} />
+          <Route path="/settings/notifications" element={<NotificationSettings />} />
+          <Route path="/settings/refer" element={<ReferEarn />} />
+          <Route path="/settings/privacy" element={<PrivacyData />} />
+          <Route path="/settings/language" element={<LanguageSettings />} />
+          <Route path="/settings/payment" element={<PaymentMethods />} />
+          <Route path="/settings/downloads" element={<DownloadSettings />} />
+          <Route path="/settings/appearance" element={<AppearanceSettings />} />
+          <Route path="/settings/change-password" element={<ChangePassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/reset-password-success" element={<ResetPasswordSuccess />} />
+          <Route path="/reset-password/success" element={<ResetPasswordSuccess />} />
+          <Route path="/forgot-password-success" element={<ForgotPasswordSuccess />} />
+          <Route path="/check-email" element={<ForgotPasswordSuccess />} />
+          <Route path="/forgot-password/sent" element={<ForgotPasswordSuccess />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

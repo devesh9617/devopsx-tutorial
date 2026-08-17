@@ -1,307 +1,416 @@
 // ============================================================
-// Login Page — DevOpsX (Split Layout — Theme Aware)
+// Login Page — Ultra-Professional DITTO UI (No Emojis, Sleek Mockup)
 // ============================================================
 
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Mail, Lock, Eye, EyeOff, LogIn, Loader2, CheckCircle2,
-  ArrowRight, AlertTriangle, Server, Terminal, Shield, Brain
+  ChevronRight, User, Eye, EyeOff, GraduationCap, Video,
+  Award, BookOpen, Heart, Download, FileText, Settings,
+  HelpCircle, LogOut, Trophy, Bell, MessageCircle, ShoppingBag,
+  Sparkles, Play, CheckCircle2, TrendingUp, Lock
 } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
-import toast from 'react-hot-toast';
-import BrandLogo from '../../components/ui/BrandLogo';
+import { useAuth } from '../../context/AuthContext';
+import PageWrapper from '../../components/ui/PageWrapper';
+import { toast } from 'react-hot-toast';
 
-const features = [
-  { icon: Server,   label: 'Cloud & AI Courses', desc: 'AWS, Azure, Python, Generative AI & MLOps' },
-  { icon: Terminal, label: 'Hands-on Labs',      desc: 'Real-world projects built by experts' },
-  { icon: Brain,    label: 'AI Career Mentor',   desc: 'Personalized skill roadmaps & feedback' },
-  { icon: Shield,   label: 'Verified Certs',     desc: 'Industry-recognized on resume & LinkedIn' },
+const SIDEBAR_MENU = [
+  { label: 'Overview', icon: BookOpen, path: '/dashboard' },
+  { label: 'My Courses', icon: BookOpen, path: '/my-learning' },
+  { label: 'Live Classes', icon: Video, path: '/live-classes' },
+  { label: 'Certificates', icon: Award, path: '/certificates' },
+  { label: 'Wishlist', icon: Heart, path: '/wishlist' },
+  { label: 'Downloads', icon: Download, path: '/downloads' },
+  { label: 'Orders', icon: FileText, path: '/orders' },
+  { label: 'Notifications', icon: Bell, path: '/settings/notifications' },
+  { label: 'Notes', icon: FileText, path: '/notes' },
+  { label: 'Achievements', icon: Trophy, path: '/achievements' },
+  { label: 'Settings', icon: Settings, path: '/settings' },
+  { label: 'Help & Support', icon: HelpCircle, path: '/contact' },
 ];
 
+function GoogleSvg() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24">
+      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+    </svg>
+  );
+}
+
+function FacebookSvg() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2">
+      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+    </svg>
+  );
+}
+
+function AppleSvg() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.32c.67-.82 1.13-1.96.99-3.12-1 .04-2.19.67-2.88 1.48-.61.71-1.15 1.87-.99 3 1.12.09 2.23-.55 2.88-1.36z"/>
+    </svg>
+  );
+}
+
 export default function Login() {
-  const { login } = useAuth();
   const { isDark } = useTheme();
-  const navigate  = useNavigate();
+  const { login, logout } = useAuth();
+  const navigate = useNavigate();
 
-  const [form, setForm]       = useState({ email: 'example1@devopsx.io', password: 'password123' });
-  const [showPw, setShowPw]   = useState(false);
+  const [form, setForm] = useState({ email: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors]   = useState({});
-  const [focused, setFocused] = useState('');
 
-  const validate = () => {
-    const e = {};
-    if (!form.email)    e.email    = 'Email is required';
-    if (!form.password) e.password = 'Password is required';
-    if (form.email && !/\S+@\S+\.\S+/.test(form.email)) e.email = 'Enter a valid email';
-    return e;
-  };
-
-  const handleSubmit = async (ev) => {
-    ev.preventDefault();
-    const errs = validate();
-    if (Object.keys(errs).length) { setErrors(errs); return; }
+  const handleSubmit = async (e) => {
+    e?.preventDefault();
+    if (!form.email || !form.password) {
+      toast.error('Please enter email and password');
+      return;
+    }
     setLoading(true);
     try {
       await login(form.email, form.password);
-      toast.success('Welcome back to DevOpsX!');
+      toast.success('Welcome back!');
       navigate('/dashboard');
     } catch {
       toast.error('Invalid credentials');
-      setErrors({ general: 'Invalid email or password. Use the demo credentials below.' });
     }
     setLoading(false);
   };
 
-  const field = (name) => ({
+  const card = {
+    background: isDark ? '#0f172a' : '#ffffff',
+    border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#eaecf0'}`,
+    borderRadius: '16px',
+    boxShadow: '0 1px 3px rgba(16,24,40,0.04)',
+  };
+
+  const inputStyle = {
     width: '100%', boxSizing: 'border-box',
-    paddingLeft: '44px',
-    paddingRight: name === 'password' ? '44px' : '16px',
-    paddingTop: '13px', paddingBottom: '13px',
-    borderRadius: '14px', fontSize: '0.875rem', outline: 'none',
-    background: focused === name
-      ? (isDark ? 'rgba(59,130,246,.12)' : '#ffffff')
-      : (isDark ? 'rgba(255,255,255,.04)' : '#ffffff'),
-    border: `1.5px solid ${
-      errors[name]
-        ? (isDark ? 'rgba(248,113,113,.6)' : '#dc2626')
-        : focused === name
-          ? (isDark ? 'rgba(59,130,246,.7)' : '#2563eb')
-          : (isDark ? 'rgba(255,255,255,.12)' : '#cbd5e1')
-    }`,
-    color: isDark ? '#f1f5f9' : '#0f172a',
-    boxShadow: focused === name
-      ? (isDark ? '0 0 0 3px rgba(59,130,246,.25)' : '0 0 0 3px rgba(37,99,235,.18)')
-      : (isDark ? 'none' : '0 1px 3px rgba(15,23,42,.04)'),
-    transition: 'all 0.2s ease',
-  });
+    padding: '11px 40px 11px 40px', borderRadius: '8px',
+    border: `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : '#d0d5dd'}`,
+    background: isDark ? 'rgba(255,255,255,0.04)' : '#fff',
+    color: 'var(--text-primary)', fontSize: '0.88rem', outline: 'none',
+    transition: 'border-color 0.15s',
+  };
 
   return (
-    <div style={{
-      minHeight: '100vh', width: '100%', display: 'flex', overflow: 'hidden',
-      background: isDark ? '#060d1f' : '#f1f5f9',
-      color: isDark ? '#f8fafc' : '#0f172a',
-      fontFamily: 'var(--font-sans)',
-      transition: 'background 0.2s ease',
-    }}>
+    <PageWrapper>
+      <div style={{ maxWidth: '1280px', margin: '0 auto', width: '100%', display: 'flex', gap: '24px', alignItems: 'start' }}>
 
-      {/* ── LEFT PANEL — DevOpsX Branding ── */}
-      <div
-        className="auth-left-panel"
-        style={{
-          flex: '0 0 45%',
-          position: 'relative', overflow: 'hidden',
-          background: isDark
-            ? 'linear-gradient(145deg, #07112e 0%, #0b1d4a 45%, #060d1f 100%)'
-            : 'linear-gradient(145deg, #eff6ff 0%, #dbeafe 50%, #f0f9ff 100%)',
-          display: 'none', flexDirection: 'column',
-          borderRight: isDark ? '1px solid rgba(255,255,255,.08)' : '1.5px solid #cbd5e1',
-        }}
-      >
-        <motion.div animate={{ scale: [1, 1.18, 1], opacity: isDark ? [0.25, 0.45, 0.25] : [0.4, 0.6, 0.4] }} transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
-          style={{ position: 'absolute', width: '500px', height: '500px', borderRadius: '50%', top: '-120px', left: '-120px', background: isDark ? 'radial-gradient(circle, rgba(59,130,246,.4) 0%, transparent 65%)' : 'radial-gradient(circle, rgba(59,130,246,.25) 0%, transparent 65%)', pointerEvents: 'none' }} />
-        <motion.div animate={{ scale: [1, 1.1, 1], opacity: isDark ? [0.15, 0.3, 0.15] : [0.2, 0.4, 0.2] }} transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
-          style={{ position: 'absolute', width: '400px', height: '400px', borderRadius: '50%', bottom: '-80px', right: '-80px', background: isDark ? 'radial-gradient(circle, rgba(6,182,212,.35) 0%, transparent 65%)' : 'radial-gradient(circle, rgba(6,182,212,.2) 0%, transparent 65%)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: isDark ? 'linear-gradient(rgba(59,130,246,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,.04) 1px, transparent 1px)' : 'linear-gradient(rgba(59,130,246,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,.1) 1px, transparent 1px)', backgroundSize: '52px 52px' }} />
-
-        <div style={{ position: 'relative', zIndex: 2, height: '100%', display: 'flex', flexDirection: 'column', padding: '40px 44px' }}>
-          <div style={{ marginBottom: '56px' }}>
-            <BrandLogo size="lg" />
-          </div>
-
-          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
-            <h1 style={{ color: isDark ? '#fff' : '#0f172a', fontFamily: 'var(--font-display)', fontSize: '2.35rem', fontWeight: 900, lineHeight: 1.12, letterSpacing: '-0.03em', margin: '0 0 14px' }}>
-              Learn Skills.<br />
-              Build Projects.<br />
-              <span style={{ background: isDark ? 'linear-gradient(135deg,#60a5fa,#22d3ee)' : 'linear-gradient(135deg,#1d4ed8,#0284c7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                Get Hired.
-              </span>
-            </h1>
-            <p style={{ color: isDark ? 'rgba(255,255,255,.45)' : '#334155', fontSize: '0.9rem', lineHeight: 1.7, margin: '0 0 40px', maxWidth: '320px', fontWeight: 500 }}>
-              The platform built for developers & students to master Cloud & AI — faster.
-            </p>
-          </motion.div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: 'auto' }}>
-            {features.map(({ icon: Icon, label, desc }, i) => (
-              <motion.div key={label} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.25 + i * 0.09 }}
-                style={{
-                  display: 'flex', alignItems: 'flex-start', gap: '14px',
-                  padding: '10px 14px', borderRadius: '14px',
-                  background: isDark ? 'transparent' : '#ffffff',
-                  border: isDark ? 'none' : '1.5px solid #bfdbfe',
-                  boxShadow: isDark ? 'none' : '0 2px 6px rgba(37,99,235,.06)',
-                }}>
-                <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: isDark ? 'rgba(59,130,246,.15)' : 'rgba(37,99,235,.1)', border: isDark ? '1px solid rgba(59,130,246,.2)' : '1px solid rgba(37,99,235,.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <Icon size={16} color={isDark ? '#60a5fa' : '#1d4ed8'} />
-                </div>
-                <div>
-                  <p style={{ color: isDark ? '#e2e8f0' : '#0f172a', fontSize: '0.85rem', fontWeight: 800, margin: '0 0 2px' }}>{label}</p>
-                  <p style={{ color: isDark ? 'rgba(255,255,255,.35)' : '#475569', fontSize: '0.78rem', margin: 0, fontWeight: 500 }}>{desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.65 }}
-            style={{ display: 'flex', gap: '1px', background: isDark ? 'rgba(255,255,255,.07)' : '#cbd5e1', borderRadius: '16px', overflow: 'hidden', marginTop: '40px', border: isDark ? 'none' : '1.5px solid #cbd5e1' }}>
-            {[['500+', 'Courses', isDark ? '#60a5fa' : '#1d4ed8'], ['10K+', 'Students', isDark ? '#34d399' : '#059669'], ['8K+', 'Certs', isDark ? '#fbbf24' : '#d97706']].map(([val, lbl, clr]) => (
-              <div key={lbl} style={{ flex: 1, background: isDark ? 'rgba(7,17,46,.65)' : '#ffffff', padding: '16px', textAlign: 'center', backdropFilter: 'blur(10px)' }}>
-                <p style={{ color: clr, fontFamily: 'var(--font-display)', fontSize: '1.45rem', fontWeight: 900, margin: 0, lineHeight: 1 }}>{val}</p>
-                <p style={{ color: isDark ? 'rgba(255,255,255,.35)' : '#475569', fontSize: '0.68rem', fontWeight: 600, margin: '4px 0 0' }}>{lbl}</p>
-              </div>
-            ))}
-          </motion.div>
-
-          <p style={{ color: isDark ? 'rgba(255,255,255,.2)' : '#64748b', fontSize: '0.7rem', marginTop: '20px', textAlign: 'center', fontWeight: 500 }}>© 2025 DevOpsX Learning Inc.</p>
-        </div>
-      </div>
-
-      {/* ── RIGHT PANEL — Login Form ── */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 24px', background: isDark ? 'var(--bg-primary)' : '#f1f5f9', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', top: '-100px', left: '50%', transform: 'translateX(-50%)', width: '400px', height: '300px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(59,130,246,.06) 0%, transparent 70%)', pointerEvents: 'none' }} />
-
-        <motion.div
-          initial={{ opacity: 0, y: 20, scale: 0.97 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.38, ease: 'easeOut' }}
-          style={{ width: '100%', maxWidth: '420px', position: 'relative', zIndex: 2 }}
-        >
-          {/* Mobile Logo */}
-          <div className="auth-mobile-logo" style={{ display: 'flex', justifyContent: 'center', marginBottom: '28px' }}>
-            <BrandLogo size="md" />
-          </div>
-
-          {/* Form Card */}
-          <div style={{
-            background: isDark ? 'rgba(13,22,48,0.9)' : '#ffffff',
-            backdropFilter: isDark ? 'blur(28px)' : 'none',
-            border: isDark ? '1px solid rgba(255,255,255,.09)' : '1.5px solid #cbd5e1',
-            borderRadius: '24px', padding: '36px',
-            boxShadow: isDark ? '0 32px 80px rgba(0,0,0,.7)' : '0 20px 50px rgba(15,23,42,0.1)',
+        {/* LEFT SIDEBAR */}
+        <div style={{ width: '200px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          {SIDEBAR_MENU.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link key={item.label} to={item.path} style={{
+                display: 'flex', alignItems: 'center', gap: '10px',
+                padding: '9px 12px', borderRadius: '10px', fontSize: '0.82rem', fontWeight: 500,
+                color: isDark ? '#cbd5e1' : '#475467',
+                background: 'transparent',
+                textDecoration: 'none', transition: 'all 0.15s ease',
+              }}>
+                <Icon size={16} color={isDark ? '#94a3b8' : '#667085'} />
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+          <button onClick={() => { logout(); navigate('/login'); }} style={{
+            display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 12px', borderRadius: '10px',
+            fontSize: '0.82rem', fontWeight: 500, color: '#ef4444', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left',
           }}>
-            <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-              <h2 style={{ color: isDark ? '#fff' : '#0f172a', fontFamily: 'var(--font-display)', fontSize: '1.65rem', fontWeight: 800, letterSpacing: '-0.02em', margin: '0 0 6px' }}>
-                Welcome back
-              </h2>
-              <p style={{ color: isDark ? 'rgba(148,163,184,.6)' : '#475569', fontSize: '0.875rem', margin: 0, fontWeight: 500 }}>
-                Sign in to continue your career journey
+            <LogOut size={16} /><span>Logout</span>
+          </button>
+
+          {/* Access Your Learning widget */}
+          <div style={{
+            marginTop: '16px',
+            background: isDark ? 'linear-gradient(135deg,#1e1b4b,#311b92)' : 'linear-gradient(135deg,#f5f3ff,#ede9fe)',
+            border: `1px solid ${isDark ? 'rgba(99,102,241,0.3)' : '#ddd6fe'}`,
+            borderRadius: '14px', padding: '18px 14px',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '10px',
+          }}>
+            <div style={{
+              width: '40px', height: '40px', borderRadius: '50%', background: '#fff',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 4px 12px rgba(79,70,229,0.15)',
+            }}>
+              <ShoppingBag size={20} color="#4f46e5" />
+            </div>
+            <div>
+              <h4 style={{ color: isDark ? '#fff' : '#1e1b4b', fontSize: '0.84rem', fontWeight: 800, margin: '0 0 4px' }}>Access Your Learning</h4>
+              <p style={{ color: isDark ? '#cbd5e1' : '#5b21b6', fontSize: '0.7rem', lineHeight: 1.4, margin: 0 }}>
+                Login to continue your learning journey and unlock amazing features.
+              </p>
+            </div>
+            <button onClick={() => navigate('/login')} style={{
+              width: '100%', padding: '9px 14px', borderRadius: '8px',
+              background: 'linear-gradient(135deg,#4f46e5,#6366f1)', color: '#fff',
+              fontSize: '0.76rem', fontWeight: 700, border: 'none', cursor: 'pointer',
+            }}>Login Now</button>
+          </div>
+        </div>
+
+        {/* MAIN CONTENT */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+          {/* Breadcrumb */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+            <Link to="/" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>Home</Link>
+            <ChevronRight size={13} color="#98a2b3" />
+            <span style={{ color: '#4f46e5', fontWeight: 600 }}>Login</span>
+          </div>
+
+          <h1 style={{ color: 'var(--text-primary)', fontSize: '1.6rem', fontWeight: 800, margin: '0 0 2px', letterSpacing: '-0.02em' }}>Welcome Back!</h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.86rem', margin: '0 0 8px' }}>Login to your account and continue your learning journey.</p>
+
+          {/* Main Card (Split 2 Columns) */}
+          <div style={{ ...card, padding: '0', display: 'grid', gridTemplateColumns: '1fr 400px', overflow: 'hidden' }}>
+
+            {/* Left Column — Learn Smarter + Professional Mockup */}
+            <div style={{
+              padding: '36px 32px',
+              background: isDark ? 'rgba(79,70,229,0.04)' : '#f8f9ff',
+              borderRight: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : '#eaecf0'}`,
+              display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+              gap: '24px',
+            }}>
+              <div>
+                <h2 style={{ color: 'var(--text-primary)', fontSize: '1.45rem', fontWeight: 800, margin: '0 0 8px', letterSpacing: '-0.02em' }}>
+                  Learn Smarter with<br />
+                  <span style={{ color: '#4f46e5' }}>AI Learning</span>
+                </h2>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.84rem', lineHeight: 1.5, margin: '0 0 24px', maxWidth: '380px' }}>
+                  Access unlimited courses, live classes, certificates and resources to accelerate your career with AI.
+                </p>
+
+                {/* Features List */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '20px' }}>
+                  {[
+                    { icon: GraduationCap, title: 'Expert-Led Courses', desc: 'Learn from industry experts', bg: '#e0e7ff', color: '#4f46e5' },
+                    { icon: Video, title: 'Live Interactive Classes', desc: 'Engage in real-time learning', bg: '#f0fdf4', color: '#16a34a' },
+                    { icon: Award, title: 'Certificates & More', desc: 'Earn certificates and boost your profile', bg: '#fef3c7', color: '#b45309' },
+                  ].map((f, i) => {
+                    const FIcon = f.icon;
+                    return (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                        <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: f.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <FIcon size={18} color={f.color} />
+                        </div>
+                        <div>
+                          <h4 style={{ color: 'var(--text-primary)', fontSize: '0.86rem', fontWeight: 700, margin: '0 0 2px' }}>{f.title}</h4>
+                          <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', margin: 0 }}>{f.desc}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Ultra-Sleek Professional Dashboard Preview Box */}
+              <div style={{
+                borderRadius: '16px', overflow: 'hidden',
+                background: isDark ? '#1e293b' : '#ffffff',
+                border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0'}`,
+                boxShadow: '0 12px 36px rgba(79,70,229,0.12)',
+              }}>
+                {/* Window top bar */}
+                <div style={{
+                  padding: '10px 14px',
+                  background: isDark ? '#0f172a' : '#f1f5f9',
+                  borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : '#e2e8f0'}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                }}>
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ef4444' }} />
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#f59e0b' }} />
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981' }} />
+                  </div>
+                  <span style={{ fontSize: '0.68rem', fontWeight: 600, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <Sparkles size={11} color="#4f46e5" /> AI Portal Preview
+                  </span>
+                </div>
+
+                {/* Inner Preview Content */}
+                <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {/* Learner Welcome Header */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div>
+                      <div style={{ fontSize: '0.84rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                        Hello, Learner!
+                      </div>
+                      <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                        What do you want to learn today?
+                      </div>
+                    </div>
+                    <div style={{
+                      padding: '4px 10px', borderRadius: '999px',
+                      background: 'rgba(79,70,229,0.1)', color: '#4f46e5',
+                      fontSize: '0.68rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px',
+                    }}>
+                      <TrendingUp size={11} /> 75% Done
+                    </div>
+                  </div>
+
+                  {/* Course Cards Grid */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+                    {[
+                      { name: 'Python for AI', prog: 85, color: '#4f46e5', active: true },
+                      { name: 'Machine Learning', prog: 60, color: '#0284c7', active: false },
+                      { name: 'Deep Learning', prog: 40, color: '#16a34a', active: false },
+                    ].map((c, i) => (
+                      <div key={i} style={{
+                        padding: '10px', borderRadius: '10px',
+                        background: c.active ? 'linear-gradient(135deg, #4f46e5, #6366f1)' : (isDark ? 'rgba(255,255,255,0.04)' : '#f8fafc'),
+                        border: `1px solid ${c.active ? 'transparent' : (isDark ? 'rgba(255,255,255,0.08)' : '#e2e8f0')}`,
+                        color: c.active ? '#ffffff' : 'var(--text-primary)',
+                        display: 'flex', flexDirection: 'column', gap: '6px',
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <span style={{ fontSize: '0.68rem', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
+                          {c.active ? <Play size={10} fill="#fff" color="#fff" /> : <CheckCircle2 size={10} color="#94a3b8" />}
+                        </div>
+                        {/* Progress Bar */}
+                        <div style={{ width: '100%', height: '4px', borderRadius: '999px', background: c.active ? 'rgba(255,255,255,0.3)' : '#e2e8f0', overflow: 'hidden' }}>
+                          <div style={{ width: `${c.prog}%`, height: '100%', borderRadius: '999px', background: c.active ? '#ffffff' : c.color }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Right Column — Login Form */}
+            <div style={{ padding: '36px 32px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <h2 style={{ color: 'var(--text-primary)', fontSize: '1.25rem', fontWeight: 800, margin: '0 0 4px', letterSpacing: '-0.02em' }}>Login to Your Account</h2>
+
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {/* Email Address */}
+                <div>
+                  <label style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-primary)', display: 'block', marginBottom: '6px' }}>Email Address</label>
+                  <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                    <User size={16} color="#667085" style={{ position: 'absolute', left: '12px', pointerEvents: 'none' }} />
+                    <input
+                      type="email"
+                      value={form.email}
+                      onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
+                      placeholder="Enter your email address"
+                      style={inputStyle}
+                      onFocus={(e) => e.target.style.borderColor = '#4f46e5'}
+                      onBlur={(e) => e.target.style.borderColor = isDark ? 'rgba(255,255,255,0.12)' : '#d0d5dd'}
+                    />
+                  </div>
+                </div>
+
+                {/* Password */}
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                    <label style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-primary)' }}>Password</label>
+                    <Link to="/forgot-password" style={{ color: '#4f46e5', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none' }}>Forgot Password?</Link>
+                  </div>
+                  <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                    <Lock size={16} color="#667085" style={{ position: 'absolute', left: '12px', pointerEvents: 'none' }} />
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      value={form.password}
+                      onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}
+                      placeholder="Enter your password"
+                      style={inputStyle}
+                      onFocus={(e) => e.target.style.borderColor = '#4f46e5'}
+                      onBlur={(e) => e.target.style.borderColor = isDark ? 'rgba(255,255,255,0.12)' : '#d0d5dd'}
+                    />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '12px', background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', display: 'flex', padding: '4px' }}>
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Remember Me */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input
+                    type="checkbox"
+                    id="rememberMe"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    style={{ width: '16px', height: '16px', accentColor: '#4f46e5', cursor: 'pointer' }}
+                  />
+                  <label htmlFor="rememberMe" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', cursor: 'pointer' }}>Remember me</label>
+                </div>
+
+                {/* Login Button */}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  style={{
+                    width: '100%', padding: '12px', borderRadius: '8px',
+                    background: 'linear-gradient(135deg,#4f46e5,#6366f1)', color: '#fff',
+                    fontSize: '0.9rem', fontWeight: 700, border: 'none', cursor: 'pointer',
+                    boxShadow: '0 4px 14px rgba(79,70,229,0.35)', marginTop: '4px',
+                  }}>
+                  {loading ? 'Logging in...' : 'Login'}
+                </button>
+              </form>
+
+              {/* Divider */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '4px' }}>
+                <div style={{ flex: 1, height: '1px', background: isDark ? 'rgba(255,255,255,0.08)' : '#eaecf0' }} />
+                <span style={{ color: 'var(--text-muted)', fontSize: '0.76rem' }}>or continue with</span>
+                <div style={{ flex: 1, height: '1px', background: isDark ? 'rgba(255,255,255,0.08)' : '#eaecf0' }} />
+              </div>
+
+              {/* Social Login Buttons (SVG icons) */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+                {[
+                  { name: 'Google', icon: <GoogleSvg /> },
+                  { name: 'Facebook', icon: <FacebookSvg /> },
+                  { name: 'Apple', icon: <AppleSvg /> },
+                ].map((s) => (
+                  <button
+                    key={s.name}
+                    onClick={() => toast.success(`Logging in with ${s.name}...`)}
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                      padding: '9px 8px', borderRadius: '8px',
+                      background: 'transparent',
+                      border: `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : '#d0d5dd'}`,
+                      color: 'var(--text-primary)', fontSize: '0.78rem', fontWeight: 600,
+                      cursor: 'pointer', transition: 'background 0.15s',
+                    }}>
+                    {s.icon} <span>{s.name}</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Footer text */}
+              <p style={{ textAlign: 'center', fontSize: '0.82rem', color: 'var(--text-muted)', margin: '4px 0 0' }}>
+                Don't have an account?{' '}
+                <Link to="/register" style={{ color: '#4f46e5', fontWeight: 700, textDecoration: 'none' }}>Sign up</Link>
               </p>
             </div>
 
-            <AnimatePresence>
-              {errors.general && (
-                <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                  style={{ background: 'rgba(239,68,68,.1)', border: '1.5px solid rgba(239,68,68,.3)', borderRadius: '12px', padding: '12px 14px', marginBottom: '20px', color: '#dc2626', fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <AlertTriangle size={14} /> {errors.general}
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            <form onSubmit={handleSubmit} noValidate>
-              {/* Email */}
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: isDark ? 'rgba(148,163,184,.65)' : '#334155', marginBottom: '8px' }}>Email Address</label>
-                <div style={{ position: 'relative' }}>
-                  <Mail size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: focused === 'email' ? (isDark ? '#60a5fa' : '#2563eb') : (isDark ? 'rgba(148,163,184,.35)' : '#64748b'), pointerEvents: 'none' }} />
-                  <input
-                    type="email" value={form.email} placeholder="you@example.com"
-                    onChange={(e) => { setForm((p) => ({ ...p, email: e.target.value })); setErrors((p) => ({ ...p, email: '', general: '' })); }}
-                    onFocus={() => setFocused('email')} onBlur={() => setFocused('')}
-                    style={field('email')}
-                  />
-                </div>
-                {errors.email && <p style={{ color: '#dc2626', fontSize: '0.72rem', marginTop: '6px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}><AlertTriangle size={12} /> {errors.email}</p>}
-              </div>
-
-              {/* Password */}
-              <div style={{ marginBottom: '20px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <label style={{ fontSize: '0.72rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: isDark ? 'rgba(148,163,184,.65)' : '#334155' }}>Password</label>
-                  <Link to="/" style={{ fontSize: '0.75rem', color: isDark ? '#60a5fa' : '#1d4ed8', textDecoration: 'none', fontWeight: 700 }}>Forgot Password?</Link>
-                </div>
-                <div style={{ position: 'relative' }}>
-                  <Lock size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: focused === 'password' ? (isDark ? '#60a5fa' : '#2563eb') : (isDark ? 'rgba(148,163,184,.35)' : '#64748b'), pointerEvents: 'none' }} />
-                  <input
-                    type={showPw ? 'text' : 'password'} value={form.password} placeholder="Enter your password"
-                    onChange={(e) => { setForm((p) => ({ ...p, password: e.target.value })); setErrors((p) => ({ ...p, password: '', general: '' })); }}
-                    onFocus={() => setFocused('password')} onBlur={() => setFocused('')}
-                    style={field('password')}
-                  />
-                  <button type="button" onClick={() => setShowPw((p) => !p)}
-                    style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: isDark ? 'rgba(148,163,184,.5)' : '#64748b', padding: '4px' }}>
-                    {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
-                  </button>
-                </div>
-                {errors.password && <p style={{ color: '#dc2626', fontSize: '0.72rem', marginTop: '6px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}><AlertTriangle size={12} /> {errors.password}</p>}
-              </div>
-
-              {/* Demo hint */}
-              <div style={{
-                background: isDark ? 'rgba(59,130,246,.07)' : '#eff6ff',
-                border: isDark ? '1px solid rgba(59,130,246,.18)' : '1.5px solid #bfdbfe',
-                borderRadius: '12px', padding: '11px 14px', marginBottom: '20px',
-                display: 'flex', alignItems: 'center', gap: '10px'
-              }}>
-                <CheckCircle2 size={14} color={isDark ? '#34d399' : '#059669'} style={{ flexShrink: 0 }} />
-                <p style={{ color: isDark ? 'rgba(148,163,184,.65)' : '#334155', fontSize: '0.72rem', margin: 0, fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
-                  <strong style={{ color: isDark ? '#93c5fd' : '#1d4ed8' }}>Demo:</strong> example1@devopsx.io / password123
-                </p>
-              </div>
-
-              {/* Submit */}
-              <motion.button
-                type="submit" disabled={loading}
-                whileHover={!loading ? { scale: 1.01 } : {}}
-                whileTap={!loading ? { scale: 0.98 } : {}}
-                style={{
-                  width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
-                  padding: '14px', borderRadius: '14px', border: 'none',
-                  background: loading ? (isDark ? 'rgba(59,130,246,.5)' : '#93c5fd') : 'linear-gradient(135deg, #2563eb, #0284c7)',
-                  color: '#fff', fontWeight: 800, fontSize: '0.95rem', cursor: loading ? 'not-allowed' : 'pointer',
-                  boxShadow: loading ? 'none' : '0 8px 24px rgba(37,99,235,.35)',
-                }}
-              >
-                {loading ? <><Loader2 size={18} className="animate-spin" /> Signing in…</> : <><LogIn size={18} /> Sign In to DevOpsX</>}
-              </motion.button>
-            </form>
-
-            {/* Divider */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '22px 0' }}>
-              <div style={{ flex: 1, height: '1.5px', background: isDark ? 'rgba(255,255,255,.07)' : '#cbd5e1' }} />
-              <span style={{ color: isDark ? 'rgba(148,163,184,.35)' : '#64748b', fontSize: '0.7rem', fontWeight: 700 }}>OR CONTINUE WITH</span>
-              <div style={{ flex: 1, height: '1.5px', background: isDark ? 'rgba(255,255,255,.07)' : '#cbd5e1' }} />
-            </div>
-
-            {/* Social Buttons */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '22px' }}>
-              {['Google', 'GitHub'].map((provider) => (
-                <button key={provider} type="button" onClick={() => toast('Coming soon!')}
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '11px', borderRadius: '12px', background: isDark ? 'rgba(255,255,255,.04)' : '#ffffff', border: isDark ? '1px solid rgba(255,255,255,.1)' : '1.5px solid #cbd5e1', color: isDark ? 'rgba(255,255,255,.7)' : '#0f172a', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', boxShadow: isDark ? 'none' : '0 1px 3px rgba(15,23,42,.04)' }}>
-                  {provider}
-                </button>
-              ))}
-            </div>
-
-            <p style={{ textAlign: 'center', fontSize: '0.8rem', color: isDark ? 'rgba(148,163,184,.5)' : '#475569', margin: 0, fontWeight: 500 }}>
-              Don't have an account?{' '}
-              <Link to="/register" style={{ color: isDark ? '#60a5fa' : '#1d4ed8', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                Create free account <ArrowRight size={12} />
-              </Link>
-            </p>
           </div>
-        </motion.div>
+        </div>
       </div>
 
-      <style>{`
-        @media (min-width: 1024px) {
-          .auth-left-panel { display: flex !important; }
-          .auth-mobile-logo { display: none !important; }
-        }
-      `}</style>
-    </div>
+      {/* Floating chat */}
+      <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 50 }}>
+        <button onClick={() => toast.success('Chat assistant coming soon!')} style={{
+          width: '48px', height: '48px', borderRadius: '50%',
+          background: 'linear-gradient(135deg,#4f46e5,#6366f1)', color: '#fff',
+          border: 'none', boxShadow: '0 6px 20px rgba(79,70,229,0.4)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+        }}>
+          <MessageCircle size={22} />
+        </button>
+      </div>
+    </PageWrapper>
   );
 }
