@@ -5,7 +5,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  ChevronRight, Eye, EyeOff, Shield, Smartphone, Monitor, Chrome,
+  ChevronRight, Eye, EyeOff, Shield, Smartphone, Monitor,
   LayoutDashboard, BookOpen, Video, Heart, Download, FileText,
   Settings, HelpCircle, LogOut, Award, Trophy, Bell,
   MoreVertical, MessageCircle, AlertCircle
@@ -46,7 +46,6 @@ const ACTIVE_SESSIONS = [
 ];
 
 function DeviceIcon({ type, size = 20 }) {
-  if (type === 'chrome') return <Chrome size={size} />;
   if (type === 'mobile') return <Smartphone size={size} />;
   return <Monitor size={size} />;
 }
@@ -132,7 +131,7 @@ export default function SecuritySettings() {
               borderRadius: '14px', padding: '18px 14px',
               display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '10px',
             }}>
-              <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: '#fff', boxShadow: '0 4px 12px rgba(79,70,229,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: '#fff', boxShadow: '0 4px 12px rgba(79,70,229,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <Trophy size={22} color="#4f46e5" />
               </div>
               <div>
@@ -177,7 +176,7 @@ export default function SecuritySettings() {
                         color: 'var(--text-primary)', fontSize: '0.86rem', outline: 'none', boxSizing: 'border-box',
                       }}
                     />
-                    <button onClick={() => setShowCurrent(!showCurrent)} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#667085', display: 'flex' }}>
+                    <button onClick={() => setShowCurrent(!showCurrent)} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>
                       {showCurrent ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   </div>
@@ -198,7 +197,7 @@ export default function SecuritySettings() {
                         color: 'var(--text-primary)', fontSize: '0.86rem', outline: 'none', boxSizing: 'border-box',
                       }}
                     />
-                    <button onClick={() => setShowNew(!showNew)} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#667085', display: 'flex' }}>
+                    <button onClick={() => setShowNew(!showNew)} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>
                       {showNew ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   </div>
@@ -220,7 +219,7 @@ export default function SecuritySettings() {
                         color: 'var(--text-primary)', fontSize: '0.86rem', outline: 'none', boxSizing: 'border-box',
                       }}
                     />
-                    <button onClick={() => setShowConfirm(!showConfirm)} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#667085', display: 'flex' }}>
+                    <button onClick={() => setShowConfirm(!showConfirm)} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>
                       {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   </div>
